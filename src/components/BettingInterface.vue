@@ -238,7 +238,7 @@ export default {
         },
         {
           team: homeLine < 0 ? awayTeam.value : homeTeam.value,
-          line: homeLine < 0 ? Math.abs(homeLine) : Math.abs(awayLine),
+          line: homeLine < 0 ? awayLine : homeLine,
           odds: homeLine < 0 ? props.betting.pointSpread.away.close.odds : props.betting.pointSpread.home.close.odds,
           selection: homeLine < 0 ? awayTeam.value : homeTeam.value
         }
