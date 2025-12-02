@@ -19,6 +19,13 @@
           Friends' Bets
         </button>
         <button 
+          @click="activeTab = 'leaderboard'" 
+          :class="{ active: activeTab === 'leaderboard' }"
+          class="tab-btn"
+        >
+          Leaderboard
+        </button>
+        <button 
           @click="activeTab = 'management'" 
           :class="{ active: activeTab === 'management' }"
           class="tab-btn"
@@ -30,27 +37,56 @@
       <div class="tab-content">
         <LeagueManagement v-if="activeTab === 'management'" />
         <FriendsBets v-if="activeTab === 'friends'" />
+        <Leaderboard v-if="activeTab === 'leaderboard'" :user-leagues="userLeagues" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import LeagueManagement from './LeagueManagement.vue'
 import FriendsBets from './FriendsBets.vue'
+import Leaderboard from './Leaderboard.vue'
+import { useUserStore } from '../stores/userStore.js'
+import axios from 'axios'
+import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'LeaguesPage',
   components: {
     LeagueManagement,
-    FriendsBets
+    FriendsBets,
+    Leaderboard
   },
   setup() {
-    const activeTab = ref('friends')
+    const userStore = useUserStore()
+    // Check for tab preference from sessionStorage (set when navigating from BettingPage)
+    const initialTab = sessionStorage.getItem('leaguesTab') || 'friends'
+    const activeTab = ref(initialTab)
+    const userLeagues = ref([])
+
+    const fetchUserLeagues = async () => {
+      if (!userStore.currentUser.value?.username) return
+      
+      try {
+        const response = await axios.get(`${API_BASE_URL}/user/${userStore.currentUser.value.username}/leagues`)
+        userLeagues.value = response.data || []
+      } catch (error) {
+        console.error('Error fetching user leagues:', error)
+        userLeagues.value = []
+      }
+    }
+
+    onMounted(async () => {
+      // Clear the tab preference after using it (so it doesn't persist on manual navigation)
+      sessionStorage.removeItem('leaguesTab')
+      await fetchUserLeagues()
+    })
 
     return {
-      activeTab
+      activeTab,
+      userLeagues
     }
   }
 }
@@ -136,7 +172,8 @@ export default {
 }
 
 .tab-content :deep(.league-management),
-.tab-content :deep(.friends-bets) {
+.tab-content :deep(.friends-bets),
+.tab-content :deep(.leaderboard) {
   background: transparent;
   box-shadow: none;
   border-radius: 0;

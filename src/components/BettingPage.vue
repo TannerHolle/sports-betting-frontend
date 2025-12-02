@@ -54,8 +54,22 @@
     <!-- Bet History -->
     <BetHistory />
 
-    <!-- Leaderboard -->
-    <Leaderboard :user-leagues="userLeaguesForLeaderboard" />
+    <!-- Leaderboard Moved Notice -->
+    <div class="leaderboard-notice" v-if="showLeaderboardNotice">
+      <button @click="dismissLeaderboardNotice" class="notice-close" aria-label="Close notice">
+        ×
+      </button>
+      <div class="notice-icon">🏆</div>
+      <div class="notice-content">
+        <h3 class="notice-title">Leaderboard Moved</h3>
+        <p class="notice-message">
+          The leaderboard has been moved to the Leagues page! Check out how you rank against your friends and league members.
+        </p>
+        <button @click="goToLeagues" class="notice-button">
+          Go to Leaderboard
+        </button>
+      </div>
+    </div>
 
     <!-- Games Header -->
     <div class="games-header">
@@ -144,6 +158,8 @@ export default {
     const games = ref([])
     const loading = ref(false)
     const error = ref(null)
+    // Check if notice was previously dismissed
+    const showLeaderboardNotice = ref(localStorage.getItem('leaderboardNoticeDismissed') !== 'true')
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
     const refreshInterval = ref(null)
     const allSportsRefreshInterval = ref(null)
@@ -591,6 +607,29 @@ export default {
       stopAllSportsRefresh()
     })
 
+    const goToLeagues = () => {
+      // Store the tab preference in sessionStorage
+      sessionStorage.setItem('leaguesTab', 'leaderboard')
+      window.dispatchEvent(new CustomEvent('change-page', { detail: 'leagues' }))
+    }
+
+    const dismissLeaderboardNotice = () => {
+      showLeaderboardNotice.value = false
+      // Store dismissal in localStorage so it doesn't show again
+      localStorage.setItem('leaderboardNoticeDismissed', 'true')
+    }
+
+    // Function to reset the notice (can be called from console: window.showLeaderboardNotice())
+    const resetLeaderboardNotice = () => {
+      localStorage.removeItem('leaderboardNoticeDismissed')
+      showLeaderboardNotice.value = true
+    }
+
+    // Expose reset function to window for easy access
+    if (typeof window !== 'undefined') {
+      window.showLeaderboardNotice = resetLeaderboardNotice
+    }
+
       return {
       games,
       loading,
@@ -609,7 +648,10 @@ export default {
       fetchData,
       setActiveLeague,
       userLeaguesForLeaderboard,
-      showingDate
+      showingDate,
+      goToLeagues,
+      showLeaderboardNotice,
+      dismissLeaderboardNotice
     }
   }
 }
@@ -680,6 +722,94 @@ export default {
   font-weight: 800;
   color: #1a1a1a;
   margin-bottom: 0.5rem;
+}
+
+.leaderboard-notice {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 0 auto 2rem auto;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  border-left: 4px solid #3b82f6;
+  position: relative;
+}
+
+.notice-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.notice-close:hover {
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.notice-close:active {
+  background: #e5e7eb;
+}
+
+.notice-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.notice-content {
+  flex: 1;
+}
+
+.notice-title {
+  margin: 0 0 0.5rem 0;
+  color: #1a1a1a;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.notice-message {
+  margin: 0 0 1.25rem 0;
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.notice-button {
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notice-button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.notice-button:active {
+  transform: translateY(0);
 }
 
 .stat-value.positive {
@@ -962,6 +1092,38 @@ export default {
   
   .chip-icon {
     font-size: 1.2rem;
+  }
+
+  .leaderboard-notice {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+    margin: 0 1rem 2rem 1rem;
+  }
+
+  .notice-close {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1.25rem;
+  }
+
+  .notice-icon {
+    font-size: 2.5rem;
+  }
+
+  .notice-title {
+    font-size: 1.25rem;
+  }
+
+  .notice-message {
+    font-size: 0.9rem;
+  }
+
+  .notice-button {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
   }
 }
 </style>

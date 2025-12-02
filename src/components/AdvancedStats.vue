@@ -1,20 +1,21 @@
 <template>
   <div class="advanced-stats">
     <div v-if="stats && stats.availableSports && stats.availableSports.length > 0" class="stats-content">
-      <!-- Sport Filter (applies to both sections) -->
-      <div class="global-filter" v-if="stats.availableSports && stats.availableSports.length > 0">
-        <label for="sport-select">Filter by Sport:</label>
-        <select id="sport-select" v-model="selectedSport" @change="onSportChange" class="sport-select">
-          <option value="all">All Sports</option>
-          <option v-for="sport in stats.availableSports" :key="sport" :value="sport">
-            {{ formatSportName(sport) }}
-          </option>
-        </select>
-      </div>
-
       <!-- Win Percentage by Bet Type -->
       <div class="stats-section">
-        <h4>Win Percentage by Bet Type</h4>
+        <div class="section-header">
+          <h4>Win Percentage by Bet Type</h4>
+          <!-- Sport Filter inside the section -->
+          <div class="section-filter" v-if="stats.availableSports && stats.availableSports.length > 0">
+            <label for="sport-select">Filter by Sport:</label>
+            <select id="sport-select" v-model="selectedSport" @change="onSportChange" class="sport-select">
+              <option value="all">All Sports</option>
+              <option v-for="sport in stats.availableSports" :key="sport" :value="sport">
+                {{ formatSportName(sport) }}
+              </option>
+            </select>
+          </div>
+        </div>
         <div class="stats-grid">
           <div 
             v-for="(stat, betType) in currentWinPercentageByType" 
@@ -48,6 +49,119 @@
                 <span class="value">{{ stat.total }}</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Statistics -->
+      <div class="stats-section" v-if="stats.teamStats && Object.keys(stats.teamStats).length > 0">
+        <h4>🏈 Team Statistics</h4>
+        <div class="fun-stats-grid">
+          <div class="fun-stat-card" v-if="stats.mostBetTeam">
+            <div class="fun-stat-label">Most Bet On</div>
+            <div class="fun-stat-value">{{ stats.mostBetTeam.name }}</div>
+            <div class="fun-stat-detail">{{ stats.mostBetTeam.count }} bets</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.mostProfitableTeam">
+            <div class="fun-stat-label">Most Profitable</div>
+            <div class="fun-stat-value positive">{{ stats.mostProfitableTeam.name }}</div>
+            <div class="fun-stat-detail">+${{ stats.mostProfitableTeam.profit.toLocaleString() }}</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.mostWinsTeam">
+            <div class="fun-stat-label">Most Wins</div>
+            <div class="fun-stat-value positive">{{ stats.mostWinsTeam.name }}</div>
+            <div class="fun-stat-detail">{{ stats.mostWinsTeam.wins }} wins</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.mostLossesTeam">
+            <div class="fun-stat-label">Most Losses</div>
+            <div class="fun-stat-value negative">{{ stats.mostLossesTeam.name }}</div>
+            <div class="fun-stat-detail">{{ stats.mostLossesTeam.losses }} losses</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Betting Patterns -->
+      <div class="stats-section" v-if="stats.bettingPatterns">
+        <h4>📊 Betting Patterns</h4>
+        <div class="fun-stats-grid">
+          <div class="fun-stat-card" v-if="stats.bettingPatterns.favoriteSport">
+            <div class="fun-stat-label">Favorite Sport</div>
+            <div class="fun-stat-value">{{ formatSportName(stats.bettingPatterns.favoriteSport.name) }}</div>
+            <div class="fun-stat-detail">{{ stats.bettingPatterns.favoriteSport.count }} bets</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.bettingPatterns.mostProfitableSport">
+            <div class="fun-stat-label">Most Profitable Sport</div>
+            <div class="fun-stat-value positive">{{ formatSportName(stats.bettingPatterns.mostProfitableSport.name) }}</div>
+            <div class="fun-stat-detail">+${{ stats.bettingPatterns.mostProfitableSport.profit.toLocaleString() }}</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.bettingPatterns.favoriteBetType">
+            <div class="fun-stat-label">Favorite Bet Type</div>
+            <div class="fun-stat-value">{{ formatBetType(stats.bettingPatterns.favoriteBetType.name) }}</div>
+            <div class="fun-stat-detail">{{ stats.bettingPatterns.favoriteBetType.count }} bets</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.bettingPatterns.overUnderPercent">
+            <div class="fun-stat-label">Over/Under Preference</div>
+            <div class="fun-stat-value">{{ stats.bettingPatterns.overUnderPercent.over }}%</div>
+            <div class="fun-stat-detail">{{ stats.bettingPatterns.overUnderPercent.overCount }} Over / {{ stats.bettingPatterns.overUnderPercent.underCount }} Under</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.bettingPatterns.spreadPreference">
+            <div class="fun-stat-label">Spread Preference</div>
+            <div class="fun-stat-value">{{ stats.bettingPatterns.spreadPreference.favorite }}%</div>
+            <div class="fun-stat-detail">{{ stats.bettingPatterns.spreadPreference.favoriteCount }} Favorite / {{ stats.bettingPatterns.spreadPreference.underdogCount }} Underdog</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Record Bets -->
+      <div class="stats-section" v-if="stats.recordBets">
+        <h4>🏆 Record Bets</h4>
+        <div class="fun-stats-grid">
+          <div class="fun-stat-card" v-if="stats.recordBets.largestBet">
+            <div class="fun-stat-label">Largest Bet</div>
+            <div class="fun-stat-value">${{ stats.recordBets.largestBet.amount.toLocaleString() }}</div>
+            <div class="fun-stat-detail">{{ stats.recordBets.largestBet.team || 'N/A' }}</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.recordBets.biggestWin">
+            <div class="fun-stat-label">Biggest Win</div>
+            <div class="fun-stat-value positive">+${{ stats.recordBets.biggestWin.profit.toLocaleString() }}</div>
+            <div class="fun-stat-detail">{{ stats.recordBets.biggestWin.team || 'N/A' }}</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.recordBets.biggestLoss">
+            <div class="fun-stat-label">Biggest Loss</div>
+            <div class="fun-stat-value negative">-${{ Math.abs(stats.recordBets.biggestLoss.profit).toLocaleString() }}</div>
+            <div class="fun-stat-detail">{{ stats.recordBets.biggestLoss.team || 'N/A' }}</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.bettingPatterns.averageBet">
+            <div class="fun-stat-label">Average Bet</div>
+            <div class="fun-stat-value">${{ stats.bettingPatterns.averageBet.toLocaleString() }}</div>
+            <div class="fun-stat-detail">Per bet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streaks -->
+      <div class="stats-section" v-if="stats.streaks">
+        <h4>🔥 Streaks</h4>
+        <div class="fun-stats-grid">
+          <div class="fun-stat-card" v-if="stats.streaks.bestStreak">
+            <div class="fun-stat-label">Best Win Streak</div>
+            <div class="fun-stat-value positive">{{ stats.streaks.bestStreak.length }}</div>
+            <div class="fun-stat-detail">consecutive wins</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.streaks.worstStreak">
+            <div class="fun-stat-label">Worst Losing Streak</div>
+            <div class="fun-stat-value negative">{{ stats.streaks.worstStreak.length }}</div>
+            <div class="fun-stat-detail">consecutive losses</div>
+          </div>
+          <div class="fun-stat-card" v-if="stats.streaks.currentStreak">
+            <div class="fun-stat-label">Current Streak</div>
+            <div class="fun-stat-value" :class="{ 
+              'positive': stats.streaks.currentStreak.type === 'win', 
+              'negative': stats.streaks.currentStreak.type === 'loss' 
+            }">
+              {{ stats.streaks.currentStreak.length }}
+            </div>
+            <div class="fun-stat-detail">{{ stats.streaks.currentStreak.type === 'win' ? 'wins' : 'losses' }}</div>
           </div>
         </div>
       </div>
@@ -183,10 +297,281 @@ export default {
 
       winPercentageByTypeBySport.all = winPercentageByType
 
+      // Calculate team statistics
+      const teamStats = {}
+      const allBets = currentUser.bets || []
+      
+      allBets.forEach(bet => {
+        // Extract team name from selection or gameData
+        let teamName = bet.selection
+        if (bet.gameData) {
+          // For moneyline bets, selection is the team name
+          if (bet.betType === 'moneyline') {
+            teamName = bet.selection
+          } else if (bet.betType === 'spread' || bet.betType === 'total') {
+            // For spread/total, try to extract team from selection
+            // Selection might be like "Lakers -5.5" or "Over 220.5"
+            if (bet.selection && !bet.selection.toLowerCase().includes('over') && !bet.selection.toLowerCase().includes('under')) {
+              teamName = bet.selection.split(/[+-]/)[0].trim()
+            }
+          }
+        }
+        
+        if (!teamName || teamName.toLowerCase().includes('over') || teamName.toLowerCase().includes('under')) {
+          return // Skip totals bets for team stats
+        }
+        
+        if (!teamStats[teamName]) {
+          teamStats[teamName] = {
+            name: teamName,
+            count: 0,
+            wins: 0,
+            losses: 0,
+            profit: 0
+          }
+        }
+        
+        teamStats[teamName].count++
+        
+        if (bet.status === 'won') {
+          teamStats[teamName].wins++
+          teamStats[teamName].profit += (bet.potentialWin || 0) - (bet.amount || 0)
+        } else if (bet.status === 'lost') {
+          teamStats[teamName].losses++
+          teamStats[teamName].profit -= (bet.amount || 0)
+        }
+      })
+
+      // Find most bet on team
+      const mostBetTeam = Object.values(teamStats).length > 0
+        ? Object.values(teamStats).reduce((max, team) => team.count > max.count ? team : max)
+        : null
+
+      // Find most profitable team
+      const mostProfitableTeam = Object.values(teamStats).length > 0
+        ? Object.values(teamStats).filter(t => t.profit > 0).reduce((max, team) => 
+            team.profit > (max?.profit || 0) ? team : max, null)
+        : null
+
+      // Find team with most wins
+      const mostWinsTeam = Object.values(teamStats).length > 0
+        ? Object.values(teamStats).reduce((max, team) => team.wins > max.wins ? team : max)
+        : null
+
+      // Find team with most losses
+      const mostLossesTeam = Object.values(teamStats).length > 0
+        ? Object.values(teamStats).reduce((max, team) => team.losses > max.losses ? team : max)
+        : null
+
+      // Calculate sport statistics
+      const sportStats = {}
+      allBets.forEach(bet => {
+        if (!bet.sport) return
+        if (!sportStats[bet.sport]) {
+          sportStats[bet.sport] = {
+            name: bet.sport,
+            count: 0,
+            profit: 0
+          }
+        }
+        sportStats[bet.sport].count++
+        if (bet.status === 'won') {
+          sportStats[bet.sport].profit += (bet.potentialWin || 0) - (bet.amount || 0)
+        } else if (bet.status === 'lost') {
+          sportStats[bet.sport].profit -= (bet.amount || 0)
+        }
+      })
+
+      const favoriteSport = Object.values(sportStats).length > 0
+        ? Object.values(sportStats).reduce((max, sport) => sport.count > max.count ? sport : max)
+        : null
+
+      const mostProfitableSport = Object.values(sportStats).length > 0
+        ? Object.values(sportStats).filter(s => s.profit > 0).reduce((max, sport) => 
+            sport.profit > (max?.profit || 0) ? sport : max, null)
+        : null
+
+      // Calculate bet type statistics
+      const betTypeStats = {}
+      allBets.forEach(bet => {
+        if (!betTypeStats[bet.betType]) {
+          betTypeStats[bet.betType] = { name: bet.betType, count: 0 }
+        }
+        betTypeStats[bet.betType].count++
+      })
+
+      const favoriteBetType = Object.values(betTypeStats).length > 0
+        ? Object.values(betTypeStats).reduce((max, type) => type.count > max.count ? type : max)
+        : null
+
+      // Calculate total wagered and average bet
+      const totalWagered = allBets.reduce((sum, bet) => sum + (bet.amount || 0), 0)
+      const totalBets = allBets.length
+      const averageBet = totalBets > 0 ? totalWagered / totalBets : 0
+
+      // Calculate Over/Under preference
+      const totalTypeBets = allBets.filter(b => b.betType === 'total')
+      const overBets = totalTypeBets.filter(b => b.selection && b.selection.toLowerCase().includes('over'))
+      const underBets = totalTypeBets.filter(b => b.selection && b.selection.toLowerCase().includes('under'))
+      const totalOverUnderCount = overBets.length + underBets.length
+      const overUnderPercent = totalOverUnderCount > 0 ? {
+        over: ((overBets.length / totalOverUnderCount) * 100).toFixed(1),
+        overCount: overBets.length,
+        underCount: underBets.length
+      } : null
+
+      // Calculate Spread preference (favorite vs underdog)
+      const allSpreadBets = allBets.filter(b => b.betType === 'spread')
+      let favoriteBets = 0
+      let underdogBets = 0
+      
+      allSpreadBets.forEach(bet => {
+        if (bet.line) {
+          // Parse the line value (e.g., "-5.5" or "+3.5")
+          const lineValue = parseFloat(bet.line)
+          if (!isNaN(lineValue)) {
+            if (lineValue < 0) {
+              // Negative spread = favorite
+              favoriteBets++
+            } else if (lineValue > 0) {
+              // Positive spread = underdog
+              underdogBets++
+            }
+            // If lineValue is 0, we skip it (shouldn't happen but just in case)
+          }
+        }
+      })
+      
+      const totalSpreadPreferenceCount = favoriteBets + underdogBets
+      const spreadPreference = totalSpreadPreferenceCount > 0 ? {
+        favorite: ((favoriteBets / totalSpreadPreferenceCount) * 100).toFixed(1),
+        favoriteCount: favoriteBets,
+        underdogCount: underdogBets
+      } : null
+
+      // Calculate Spread coverage percentage
+      const spreadBets = completedBets.filter(b => b.betType === 'spread')
+      const coveredBets = spreadBets.filter(b => b.status === 'won')
+      const notCoveredBets = spreadBets.filter(b => b.status === 'lost')
+      const totalSpreadCount = coveredBets.length + notCoveredBets.length
+      const spreadCoverPercent = totalSpreadCount > 0 ? {
+        coverPercent: ((coveredBets.length / totalSpreadCount) * 100).toFixed(1),
+        covered: coveredBets.length,
+        notCovered: notCoveredBets.length
+      } : null
+
+      // Find record bets
+      const largestBet = allBets.length > 0
+        ? allBets.reduce((max, bet) => (bet.amount || 0) > (max.amount || 0) ? bet : max)
+        : null
+
+      const biggestWin = completedBets.filter(b => b.status === 'won').length > 0
+        ? completedBets.filter(b => b.status === 'won').reduce((max, bet) => {
+            const profit = (bet.potentialWin || 0) - (bet.amount || 0)
+            const maxProfit = (max.potentialWin || 0) - (max.amount || 0)
+            return profit > maxProfit ? bet : max
+          })
+        : null
+
+      const biggestLoss = completedBets.filter(b => b.status === 'lost').length > 0
+        ? completedBets.filter(b => b.status === 'lost').reduce((max, bet) => 
+            (bet.amount || 0) > (max.amount || 0) ? bet : max)
+        : null
+
+      // Calculate streaks
+      const sortedBets = [...completedBets].sort((a, b) => 
+        new Date(a.resolvedAt || a.createdAt) - new Date(b.resolvedAt || b.createdAt)
+      )
+
+      let bestStreak = { length: 0, type: 'win' }
+      let worstStreak = { length: 0, type: 'loss' }
+      let currentStreak = { length: 0, type: null }
+
+      if (sortedBets.length > 0) {
+        let currentWinStreak = 0
+        let currentLossStreak = 0
+        let maxWinStreak = 0
+        let maxLossStreak = 0
+
+        sortedBets.forEach(bet => {
+          if (bet.status === 'won') {
+            currentWinStreak++
+            currentLossStreak = 0
+            if (currentWinStreak > maxWinStreak) {
+              maxWinStreak = currentWinStreak
+            }
+          } else if (bet.status === 'lost') {
+            currentLossStreak++
+            currentWinStreak = 0
+            if (currentLossStreak > maxLossStreak) {
+              maxLossStreak = currentLossStreak
+            }
+          } else if (bet.status === 'push') {
+            // Push doesn't break streak but doesn't extend it either
+          }
+        })
+
+        bestStreak = { length: maxWinStreak, type: 'win' }
+        worstStreak = { length: maxLossStreak, type: 'loss' }
+
+        // Current streak (from most recent bets)
+        const recentBets = [...sortedBets].reverse()
+        if (recentBets.length > 0) {
+          const firstStatus = recentBets[0].status
+          let streakLength = 0
+          for (const bet of recentBets) {
+            if (bet.status === firstStatus) {
+              streakLength++
+            } else if (bet.status !== 'push') {
+              break
+            }
+          }
+          currentStreak = {
+            length: streakLength,
+            type: firstStatus === 'won' ? 'win' : firstStatus === 'lost' ? 'loss' : null
+          }
+        }
+      }
+
       return {
         winPercentageByType,
         winPercentageByTypeBySport,
-        availableSports: Array.from(userSports).sort()
+        availableSports: Array.from(userSports).sort(),
+        teamStats,
+        mostBetTeam,
+        mostProfitableTeam,
+        mostWinsTeam,
+        mostLossesTeam,
+        bettingPatterns: {
+          favoriteSport,
+          mostProfitableSport,
+          favoriteBetType,
+          totalWagered,
+          totalBets,
+          averageBet,
+          overUnderPercent,
+          spreadPreference,
+          spreadCoverPercent
+        },
+        recordBets: {
+          largestBet: largestBet ? {
+            amount: largestBet.amount,
+            team: largestBet.selection || 'N/A'
+          } : null,
+          biggestWin: biggestWin ? {
+            profit: (biggestWin.potentialWin || 0) - (biggestWin.amount || 0),
+            team: biggestWin.selection || 'N/A'
+          } : null,
+          biggestLoss: biggestLoss ? {
+            profit: -(biggestLoss.amount || 0),
+            team: biggestLoss.selection || 'N/A'
+          } : null
+        },
+        streaks: {
+          bestStreak: bestStreak.length > 0 ? bestStreak : null,
+          worstStreak: worstStreak.length > 0 ? worstStreak : null,
+          currentStreak: currentStreak.length > 0 && currentStreak.type ? currentStreak : null
+        }
       }
     })
 
@@ -233,7 +618,7 @@ export default {
 
 <style scoped>
 .advanced-stats {
-  padding: 1rem 0;
+  padding: 2rem;
 }
 
 .no-stats {
@@ -293,18 +678,7 @@ export default {
   gap: 2rem;
 }
 
-.global-filter {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
-
-.global-filter label {
+.section-filter label {
   font-size: 0.875rem;
   color: #6b7280;
   font-weight: 600;
@@ -338,11 +712,26 @@ export default {
   padding: 1.5rem;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .stats-section h4 {
-  margin: 0 0 1rem 0;
+  margin: 0;
   color: #1a1a1a;
   font-size: 1.25rem;
   font-weight: 700;
+}
+
+.section-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .section-description {
@@ -569,8 +958,64 @@ export default {
   font-weight: 600;
 }
 
+.fun-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.fun-stat-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.fun-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+.fun-stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.fun-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.fun-stat-value.positive {
+  color: #059669;
+}
+
+.fun-stat-value.negative {
+  color: #dc2626;
+}
+
+.fun-stat-detail {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fun-stats-grid {
     grid-template-columns: 1fr;
   }
 
@@ -580,6 +1025,19 @@ export default {
 
   .stats-section {
     padding: 1rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section-filter {
+    width: 100%;
+  }
+
+  .section-filter select {
+    flex: 1;
   }
 }
 </style>

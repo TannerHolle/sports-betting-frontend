@@ -25,6 +25,13 @@
         >
           History ({{ completedBets.length }})
         </button>
+        <button 
+          @click="switchTab('stats')" 
+          :class="{ active: activeTab === 'stats' }"
+          class="tab-btn"
+        >
+          Advanced Stats
+        </button>
       </div>
     </div>
 
@@ -112,6 +119,11 @@
       </div>
     </div>
 
+    <!-- Advanced Stats -->
+    <div v-if="activeTab === 'stats'" class="bets-section">
+      <AdvancedStats />
+    </div>
+
     <!-- Cancel Bet Confirmation Modal -->
     <div v-if="showCancelModal" class="modal-overlay" @click.self="closeCancelModal">
       <div class="modal-content">
@@ -139,11 +151,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import liveScoreService from '../services/liveScoreService.js'
 import BetCard from './BetCard.vue'
+import AdvancedStats from './AdvancedStats.vue'
 
 export default {
   name: 'BetHistory',
   components: {
-    BetCard
+    BetCard,
+    AdvancedStats
   },
   setup() {
     const userStore = useUserStore()
