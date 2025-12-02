@@ -131,38 +131,6 @@
             <div class="fun-stat-value negative">-${{ Math.abs(stats.recordBets.biggestLoss.profit).toLocaleString() }}</div>
             <div class="fun-stat-detail">{{ stats.recordBets.biggestLoss.team || 'N/A' }}</div>
           </div>
-          <div class="fun-stat-card" v-if="stats.bettingPatterns.averageBet">
-            <div class="fun-stat-label">Average Bet</div>
-            <div class="fun-stat-value">${{ stats.bettingPatterns.averageBet.toLocaleString() }}</div>
-            <div class="fun-stat-detail">Per bet</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Streaks -->
-      <div class="stats-section" v-if="stats.streaks">
-        <h4>🔥 Streaks</h4>
-        <div class="fun-stats-grid">
-          <div class="fun-stat-card" v-if="stats.streaks.bestStreak">
-            <div class="fun-stat-label">Best Win Streak</div>
-            <div class="fun-stat-value positive">{{ stats.streaks.bestStreak.length }}</div>
-            <div class="fun-stat-detail">consecutive wins</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.streaks.worstStreak">
-            <div class="fun-stat-label">Worst Losing Streak</div>
-            <div class="fun-stat-value negative">{{ stats.streaks.worstStreak.length }}</div>
-            <div class="fun-stat-detail">consecutive losses</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.streaks.currentStreak">
-            <div class="fun-stat-label">Current Streak</div>
-            <div class="fun-stat-value" :class="{ 
-              'positive': stats.streaks.currentStreak.type === 'win', 
-              'negative': stats.streaks.currentStreak.type === 'loss' 
-            }">
-              {{ stats.streaks.currentStreak.length }}
-            </div>
-            <div class="fun-stat-detail">{{ stats.streaks.currentStreak.type === 'win' ? 'wins' : 'losses' }}</div>
-          </div>
         </div>
       </div>
 
@@ -467,8 +435,9 @@ export default {
 
       const biggestWin = completedBets.filter(b => b.status === 'won').length > 0
         ? completedBets.filter(b => b.status === 'won').reduce((max, bet) => {
-            const profit = (bet.potentialWin || 0) - (bet.amount || 0)
-            const maxProfit = (max.potentialWin || 0) - (max.amount || 0)
+            // potentialWin is already the profit amount (winnings on top of bet amount)
+            const profit = bet.potentialWin || 0
+            const maxProfit = max.potentialWin || 0
             return profit > maxProfit ? bet : max
           })
         : null
@@ -477,61 +446,6 @@ export default {
         ? completedBets.filter(b => b.status === 'lost').reduce((max, bet) => 
             (bet.amount || 0) > (max.amount || 0) ? bet : max)
         : null
-
-      // Calculate streaks
-      const sortedBets = [...completedBets].sort((a, b) => 
-        new Date(a.resolvedAt || a.createdAt) - new Date(b.resolvedAt || b.createdAt)
-      )
-
-      let bestStreak = { length: 0, type: 'win' }
-      let worstStreak = { length: 0, type: 'loss' }
-      let currentStreak = { length: 0, type: null }
-
-      if (sortedBets.length > 0) {
-        let currentWinStreak = 0
-        let currentLossStreak = 0
-        let maxWinStreak = 0
-        let maxLossStreak = 0
-
-        sortedBets.forEach(bet => {
-          if (bet.status === 'won') {
-            currentWinStreak++
-            currentLossStreak = 0
-            if (currentWinStreak > maxWinStreak) {
-              maxWinStreak = currentWinStreak
-            }
-          } else if (bet.status === 'lost') {
-            currentLossStreak++
-            currentWinStreak = 0
-            if (currentLossStreak > maxLossStreak) {
-              maxLossStreak = currentLossStreak
-            }
-          } else if (bet.status === 'push') {
-            // Push doesn't break streak but doesn't extend it either
-          }
-        })
-
-        bestStreak = { length: maxWinStreak, type: 'win' }
-        worstStreak = { length: maxLossStreak, type: 'loss' }
-
-        // Current streak (from most recent bets)
-        const recentBets = [...sortedBets].reverse()
-        if (recentBets.length > 0) {
-          const firstStatus = recentBets[0].status
-          let streakLength = 0
-          for (const bet of recentBets) {
-            if (bet.status === firstStatus) {
-              streakLength++
-            } else if (bet.status !== 'push') {
-              break
-            }
-          }
-          currentStreak = {
-            length: streakLength,
-            type: firstStatus === 'won' ? 'win' : firstStatus === 'lost' ? 'loss' : null
-          }
-        }
-      }
 
       return {
         winPercentageByType,
@@ -559,18 +473,13 @@ export default {
             team: largestBet.selection || 'N/A'
           } : null,
           biggestWin: biggestWin ? {
-            profit: (biggestWin.potentialWin || 0) - (biggestWin.amount || 0),
+            profit: biggestWin.potentialWin || 0,
             team: biggestWin.selection || 'N/A'
           } : null,
           biggestLoss: biggestLoss ? {
             profit: -(biggestLoss.amount || 0),
             team: biggestLoss.selection || 'N/A'
           } : null
-        },
-        streaks: {
-          bestStreak: bestStreak.length > 0 ? bestStreak : null,
-          worstStreak: worstStreak.length > 0 ? worstStreak : null,
-          currentStreak: currentStreak.length > 0 && currentStreak.type ? currentStreak : null
         }
       }
     })
