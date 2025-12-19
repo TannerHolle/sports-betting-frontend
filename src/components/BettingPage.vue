@@ -107,6 +107,11 @@
         <button @click="fetchData" class="retry-btn">Try Again</button>
       </div>
 
+      <div v-else-if="switchingSports" class="loading-container">
+        <div class="spinner-large"></div>
+        <p>Loading {{ currentSport.name }} games...</p>
+      </div>
+
       <div v-else-if="loading && !games.length" class="loading-container">
         <div class="spinner-large"></div>
         <p>Loading games...</p>
@@ -157,6 +162,7 @@ export default {
     const userStore = useUserStore()
     const games = ref([])
     const loading = ref(false)
+    const switchingSports = ref(false)
     const error = ref(null)
     // Check if notice was previously dismissed
     const showLeaderboardNotice = ref(localStorage.getItem('leaderboardNoticeDismissed') !== 'true')
@@ -526,11 +532,27 @@ export default {
       }
     }
 
-    const setActiveLeague = (league) => {
+    const setActiveLeague = async (league) => {
+      if (activeLeague.value === league) return // Already on this sport
+      
       activeLeague.value = league
+      switchingSports.value = true
+      // Clear games immediately so old games don't show
+      games.value = []
+      
       // Restart refresh with new league
       stopLiveRefresh()
-      startLiveRefresh()
+      
+      try {
+        // Fetch data for the new sport
+        await fetchData(true)
+      } catch (err) {
+        console.error('Error switching sports:', err)
+        error.value = err.message || 'Failed to load games'
+      } finally {
+        switchingSports.value = false
+        startLiveRefresh()
+      }
     }
 
     // Start periodic refresh for live games
@@ -633,6 +655,7 @@ export default {
       return {
       games,
       loading,
+      switchingSports,
       error,
       activeLeague,
       sports,
