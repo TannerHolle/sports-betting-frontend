@@ -3,7 +3,7 @@
     <div class="page-header">
       <h1 class="page-title">Admin Panel</h1>
       <p class="page-description">
-        Administrative controls for the betting system haha
+        Administrative controls for the betting system
       </p>
     </div>
     
