@@ -1,11 +1,10 @@
 <template>
   <div v-if="legCount > 0" class="bet-slip" :class="{ open: isOpen }">
-    <button class="slip-handle" :class="{ correlated: hasCorrelatedLegs }" @click="isOpen = !isOpen">
+    <button class="slip-handle" @click="isOpen = !isOpen">
       <span class="slip-badge">{{ legCount }}</span>
       <span class="slip-handle-text">
         {{ legCount }}-leg parlay
         <span v-if="legCount >= minLegs" class="slip-handle-odds">{{ combinedOdds }}</span>
-        <span v-if="hasCorrelatedLegs" class="slip-sgp-chip">Same game</span>
       </span>
       <span class="slip-chevron">{{ isOpen ? '▾' : '▴' }}</span>
     </button>
@@ -27,11 +26,6 @@
 
       <p v-if="legCount < minLegs" class="slip-hint">
         Add {{ minLegs - legCount }} more pick{{ minLegs - legCount === 1 ? '' : 's' }} to place a parlay.
-      </p>
-
-      <p v-if="hasCorrelatedLegs" class="slip-correlated-note">
-        Legs from the same game tend to win or lose together, but the price here
-        multiplies them as if they were independent.
       </p>
 
       <div class="slip-stake">
@@ -178,37 +172,6 @@ export default {
   justify-content: center;
   font-size: var(--text-sm);
   font-weight: 700;
-}
-
-/* Same-game parlays get an amber header so the correlation is visible at a
-   glance rather than buried in the leg list */
-.slip-handle.correlated {
-  background: #fffbeb;
-  border-top-color: var(--color-warning);
-}
-
-.slip-sgp-chip {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 2px 7px;
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fde68a;
-  border-radius: 999px;
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.slip-correlated-note {
-  margin: 12px 0 0;
-  padding: 9px 11px;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  line-height: 1.5;
-  color: #92400e;
 }
 
 .slip-handle-text { flex: 1; text-align: left; }

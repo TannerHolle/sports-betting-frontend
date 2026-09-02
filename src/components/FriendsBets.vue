@@ -69,14 +69,21 @@
 
       <div v-else>
         <div class="bets-list">
-          <BetCard
-            v-for="(betWithUser, index) in paginatedFriendsBets" 
-            :key="`${betWithUser.user.username}-${betWithUser.bet._id}-${index}`"
-            :bet="betWithUser.bet"
-            :user="betWithUser.user"
-            :live-scores="liveScores"
-            :show-cancel-button="false"
-          />
+          <template v-for="(betWithUser, index) in paginatedFriendsBets"
+                    :key="`${betWithUser.user.username}-${betWithUser.bet._id}-${index}`">
+            <ParlayCard
+              v-if="betWithUser.isParlay"
+              :parlay="betWithUser.bet"
+              :user="betWithUser.user"
+            />
+            <BetCard
+              v-else
+              :bet="betWithUser.bet"
+              :user="betWithUser.user"
+              :live-scores="liveScores"
+              :show-cancel-button="false"
+            />
+          </template>
         </div>
         <!-- Pagination Controls -->
         <div v-if="totalPages > 1 || filteredFriendsBets.length > 0" class="pagination">
@@ -122,11 +129,13 @@ import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import liveScoreService from '../services/liveScoreService.js'
 import BetCard from './BetCard.vue'
+import ParlayCard from './ParlayCard.vue'
 
 export default {
   name: 'FriendsBets',
   components: {
-    BetCard
+    BetCard,
+    ParlayCard
   },
   setup() {
     const userStore = useUserStore()
@@ -365,6 +374,23 @@ export default {
                 bet: bet,
                 user: user
               })
+            })
+          }
+
+          // Parlays go in the same feed - same status/amount/odds/resolvedAt
+          // shape, so the sorting and filters below work on them unchanged.
+          if (user.username !== currentUser.value.username && user.parlays) {
+            user.parlays.forEach(parlay => {
+              const recent = parlay.resolvedAt
+                ? new Date(parlay.resolvedAt) >= sevenDaysAgo
+                : parlay.createdAt && new Date(parlay.createdAt) >= sevenDaysAgo
+              if (parlay.status === 'pending' || recent) {
+                betsWithUsers.push({
+                  bet: parlay,
+                  user: user,
+                  isParlay: true
+                })
+              }
             })
           }
         })

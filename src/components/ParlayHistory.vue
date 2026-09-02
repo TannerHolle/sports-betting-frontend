@@ -22,7 +22,6 @@
           <span class="ph-status" :class="parlay.status">{{ statusLabel(parlay.status) }}</span>
           <span class="ph-legs">{{ parlay.legs.length }}-leg parlay</span>
           <span class="ph-odds">{{ parlay.odds }}</span>
-          <span v-if="isSameGame(parlay)" class="ph-sgp">Same game</span>
         </div>
         <div class="ph-head-right">
           <span class="ph-amount">${{ parlay.amount.toLocaleString() }}</span>
@@ -105,10 +104,6 @@ export default {
     const statusLabel = (s) => ({ pending: 'Open', won: 'Won', lost: 'Lost', push: 'Push' }[s] || s)
     const wonLegs = (p) => p.legs.filter(l => l.status === 'won').length
 
-    // Two legs off one game are correlated - worth marking, since the odds
-    // shown were priced as if the legs were independent
-    const isSameGame = (parlay) =>
-      new Set(parlay.legs.map(l => l.gameId)).size < parlay.legs.length
     const gameLabel = (leg) =>
       leg.gameData?.gameName ||
       (leg.gameData?.awayTeam && leg.gameData?.homeTeam
@@ -148,7 +143,7 @@ export default {
 
     return {
       tab, isAuthenticated, parlays, activeParlays, settledParlays, visible,
-      isOpen, toggle, statusLabel, wonLegs, gameLabel, displayLine, isSameGame,
+      isOpen, toggle, statusLabel, wonLegs, gameLabel, displayLine,
       canCancel, cancel, cancelling, errors
     }
   }
@@ -242,15 +237,6 @@ export default {
 .ph-odds { font-weight: 700; color: var(--color-primary); font-variant-numeric: tabular-nums; }
 .ph-amount { font-weight: 600; color: var(--color-text); font-variant-numeric: tabular-nums; }
 
-.ph-sgp {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  background: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fde68a;
-}
 .ph-arrow { color: var(--color-text-subtle); }
 
 .ph-progress {
