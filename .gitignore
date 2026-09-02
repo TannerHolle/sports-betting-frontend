@@ -11,6 +11,8 @@ build/
 *.local
 
 # Environment variables
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
@@ -90,3 +92,7 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+
+# Local backups / scratch copies
+*.bak
+*.orig
