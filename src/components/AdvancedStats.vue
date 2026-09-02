@@ -774,7 +774,7 @@ export default {
 
 .outcome-card.over {
   border-color: var(--color-success);
-  background: #ecfdf5;
+  background: var(--color-success-soft);
 }
 
 .outcome-card.under {
@@ -784,7 +784,7 @@ export default {
 
 .outcome-card.covered {
   border-color: var(--color-success);
-  background: #ecfdf5;
+  background: var(--color-success-soft);
 }
 
 .outcome-card.covered-low {

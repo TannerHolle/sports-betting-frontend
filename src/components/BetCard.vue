@@ -372,7 +372,7 @@ export default {
 
 .bet-card.won {
   border-left: 4px solid var(--color-success);
-  background: #ecfdf5;
+  background: var(--color-success-soft);
 }
 
 .bet-card.lost {

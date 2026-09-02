@@ -1,10 +1,11 @@
 <template>
   <div v-if="legCount > 0" class="bet-slip" :class="{ open: isOpen }">
-    <button class="slip-handle" @click="isOpen = !isOpen">
+    <button class="slip-handle" :class="{ correlated: hasCorrelatedLegs }" @click="isOpen = !isOpen">
       <span class="slip-badge">{{ legCount }}</span>
       <span class="slip-handle-text">
         {{ legCount }}-leg parlay
         <span v-if="legCount >= minLegs" class="slip-handle-odds">{{ combinedOdds }}</span>
+        <span v-if="hasCorrelatedLegs" class="slip-sgp-chip">Same game</span>
       </span>
       <span class="slip-chevron">{{ isOpen ? '▾' : '▴' }}</span>
     </button>
@@ -26,6 +27,11 @@
 
       <p v-if="legCount < minLegs" class="slip-hint">
         Add {{ minLegs - legCount }} more pick{{ minLegs - legCount === 1 ? '' : 's' }} to place a parlay.
+      </p>
+
+      <p v-if="hasCorrelatedLegs" class="slip-correlated-note">
+        Legs from the same game tend to win or lose together, but the price here
+        multiplies them as if they were independent.
       </p>
 
       <div class="slip-stake">
@@ -123,16 +129,21 @@ export default {
 
 <style scoped>
 .bet-slip {
+  /* ChatWidget owns the bottom-right corner (z-index 1000), so the slip lives
+     on the left. On mobile the chat widget is hidden and this goes full width. */
   position: fixed;
-  right: 24px;
+  left: 24px;
   bottom: 0;
   width: 340px;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100vw - 48px);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  /* Every main page uses --gradient-brand as its background, so a brand-colored
+     ticket disappears into it. A white card with a brand stripe on top reads
+     clearly against the blue without shouting. */
+  border: 1px solid rgba(255, 255, 255, 0.7);
   border-bottom: none;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.18);
   z-index: 900;
   overflow: hidden;
 }
@@ -142,17 +153,23 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 16px;
-  background: var(--gradient-brand);
-  color: white;
+  padding: 15px 16px;
+  /* Light green ties the ticket to the money theme and to the green Place
+     button, and reads clearly against the blue page background. */
+  background: var(--color-success-soft);
+  color: var(--color-text);
   border: none;
+  border-top: 3px solid var(--color-success);
+  border-bottom: 1px solid #a7f3d0;
   cursor: pointer;
-  font-size: var(--text-base);
-  font-weight: 600;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .slip-badge {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--color-success);
+  color: white;
   border-radius: 999px;
   min-width: 24px;
   height: 24px;
@@ -163,9 +180,45 @@ export default {
   font-weight: 700;
 }
 
+/* Same-game parlays get an amber header so the correlation is visible at a
+   glance rather than buried in the leg list */
+.slip-handle.correlated {
+  background: #fffbeb;
+  border-top-color: var(--color-warning);
+}
+
+.slip-sgp-chip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 7px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.slip-correlated-note {
+  margin: 12px 0 0;
+  padding: 9px 11px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: #92400e;
+}
+
 .slip-handle-text { flex: 1; text-align: left; }
-.slip-handle-odds { opacity: 0.85; font-weight: 500; margin-left: 6px; }
-.slip-chevron { opacity: 0.9; }
+.slip-handle-odds {
+  color: var(--color-success);
+  font-weight: 700;
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.slip-chevron { color: var(--color-text-subtle); }
 
 .slip-body {
   padding: 16px;
@@ -201,7 +254,7 @@ export default {
 }
 .slip-leg-odds {
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-success);
   font-size: var(--text-sm);
 }
 .slip-leg-remove {
@@ -295,11 +348,12 @@ export default {
   border-radius: var(--radius-sm);
 }
 .slip-error { background: #fef2f2; color: var(--color-danger); }
-.slip-success { background: #ecfdf5; color: var(--color-success); }
+.slip-success { background: var(--color-success-soft); color: var(--color-success); }
 
 .slip-actions { display: flex; gap: 8px; margin-top: 14px; }
 .slip-clear {
-  padding: 11px 14px;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
   background: var(--color-surface-muted);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
@@ -309,20 +363,25 @@ export default {
   cursor: pointer;
 }
 .slip-place {
+  /* Matches .place-bet-btn - in this app, green means "place the bet" */
   flex: 1;
-  padding: 11px 14px;
-  background: var(--color-primary);
+  padding: 0.75rem 1rem;
+  background: var(--color-success);
   color: white;
   border: none;
   border-radius: var(--radius-md);
   font-weight: 700;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
+  font-family: inherit;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
+.slip-place:hover:not(:disabled) { background: #047857; }
 .slip-place:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @media (max-width: 768px) {
-  .bet-slip { right: 0; left: 0; width: 100%; max-width: 100%; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .bet-slip { left: 0; right: 0; width: 100%; max-width: 100%; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   .slip-body { max-height: 55vh; }
 }
 </style>

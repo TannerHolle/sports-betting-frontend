@@ -241,7 +241,10 @@ const userBalance = computed(() => currentUser.value?.balance || 0)
 const userStats = computed(() => {
   if (!currentUser.value) return null
   
-  const { totalWagered, totalWon, totalLost, bets } = currentUser.value
+  const { totalWagered, totalWon, totalLost } = currentUser.value
+  // Parlays carry the same status / amount / potentialWin / resolvedAt shape as
+  // straight bets, so every stat below treats them as one pool of wagers.
+  const bets = [...(currentUser.value.bets || []), ...(currentUser.value.parlays || [])]
   const completedBets = bets.filter(bet => bet.status === 'won' || bet.status === 'lost')
   const wonBets = bets.filter(bet => bet.status === 'won').length
   const winRate = completedBets.length > 0 ? ((wonBets / completedBets.length) * 100).toFixed(1) : 0

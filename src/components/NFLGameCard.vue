@@ -15,6 +15,9 @@
         <div v-if="hasBets" class="bet-indicator" @click="openBetsModal">
           <span class="bet-badge">{{ betCount }} bet{{ betCount > 1 ? 's' : '' }}</span>
         </div>
+        <div v-if="inParlaySlip" class="bet-indicator parlay-indicator">
+          <span class="bet-badge">In parlay</span>
+        </div>
         <button @click="toggleCollapsed" class="collapse-btn">
           {{ isCollapsed ? '▼' : '▲' }}
         </button>
@@ -161,6 +164,7 @@ import oddsService from '../services/oddsService.js'
 import { useChatWidget } from '../composables/useChatWidget.js'
 import { FEATURES } from '../config/features.js'
 import { useUserStore } from '../stores/userStore.js'
+import { useBetSlip } from '../stores/betSlipStore.js'
 
 export default {
   name: 'NFLGameCard',
@@ -180,6 +184,9 @@ export default {
   },
   setup(props) {
     const userStore = useUserStore()
+    const betSlip = useBetSlip()
+    // Mirrors the existing "n bets" badge so a slipped game reads the same way
+    const inParlaySlip = computed(() => betSlip.hasGame(props.game.id))
     const isCollapsed = ref(true)
     const gameOdds = ref(null)
     const showBetsModal = ref(false)
@@ -410,6 +417,7 @@ export default {
       FEATURES,
       hasBets,
       betCount,
+      inParlaySlip,
       gameBets,
       showBetsModal,
       openBetsModal,
@@ -565,6 +573,11 @@ export default {
   border-radius: var(--radius-lg);
   min-width: 18px;
   text-align: center;
+}
+
+.parlay-indicator {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .bet-icon {

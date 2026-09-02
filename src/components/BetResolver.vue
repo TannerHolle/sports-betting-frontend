@@ -328,7 +328,7 @@ export default {
 }
 
 .resolution-message.success {
-  background: #ecfdf5;
+  background: var(--color-success-soft);
   color: #065f46;
   border: 1px solid #a7f3d0;
 }

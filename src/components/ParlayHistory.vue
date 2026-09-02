@@ -22,6 +22,7 @@
           <span class="ph-status" :class="parlay.status">{{ statusLabel(parlay.status) }}</span>
           <span class="ph-legs">{{ parlay.legs.length }}-leg parlay</span>
           <span class="ph-odds">{{ parlay.odds }}</span>
+          <span v-if="isSameGame(parlay)" class="ph-sgp">Same game</span>
         </div>
         <div class="ph-head-right">
           <span class="ph-amount">${{ parlay.amount.toLocaleString() }}</span>
@@ -103,6 +104,11 @@ export default {
 
     const statusLabel = (s) => ({ pending: 'Open', won: 'Won', lost: 'Lost', push: 'Push' }[s] || s)
     const wonLegs = (p) => p.legs.filter(l => l.status === 'won').length
+
+    // Two legs off one game are correlated - worth marking, since the odds
+    // shown were priced as if the legs were independent
+    const isSameGame = (parlay) =>
+      new Set(parlay.legs.map(l => l.gameId)).size < parlay.legs.length
     const gameLabel = (leg) =>
       leg.gameData?.gameName ||
       (leg.gameData?.awayTeam && leg.gameData?.homeTeam
@@ -142,7 +148,7 @@ export default {
 
     return {
       tab, isAuthenticated, parlays, activeParlays, settledParlays, visible,
-      isOpen, toggle, statusLabel, wonLegs, gameLabel, displayLine,
+      isOpen, toggle, statusLabel, wonLegs, gameLabel, displayLine, isSameGame,
       canCancel, cancel, cancelling, errors
     }
   }
@@ -151,11 +157,12 @@ export default {
 
 <style scoped>
 .parlay-history {
-  background: var(--color-surface);
+  /* Mirrors .bet-history so the two sections read as one family */
+  background: white;
   border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  margin-bottom: 24px;
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
 }
 
 .ph-header {
@@ -163,31 +170,38 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
-.ph-header h3 { font-size: var(--text-xl); font-weight: 700; color: var(--color-text); }
+.ph-header h3 { margin: 0; font-size: var(--text-2xl); font-weight: 700; color: var(--color-text); }
 
-.ph-tabs { display: flex; gap: 6px; }
+.ph-tabs { display: flex; gap: 0.5rem; }
+
+/* Same shape as .tab-btn in BetHistory */
 .ph-tab {
-  padding: 7px 14px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-muted);
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--color-border);
+  background: white;
   border-radius: var(--radius-md);
-  font-size: var(--text-sm);
   font-weight: 600;
   font-family: inherit;
   color: var(--color-text-muted);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
-.ph-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
 
-.ph-empty { color: var(--color-text-muted); font-size: var(--text-sm); padding: 12px 0; }
+.ph-tab.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.ph-empty { color: var(--color-text-muted); padding: 1rem 0; }
 
 .ph-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  margin-bottom: 10px;
+  margin-bottom: 0.75rem;
   overflow: hidden;
 }
 .ph-card.won { border-left: 3px solid var(--color-success); }
@@ -220,13 +234,23 @@ export default {
   border-radius: var(--radius-sm);
 }
 .ph-status.pending { background: var(--color-primary-soft); color: var(--color-primary); }
-.ph-status.won { background: #ecfdf5; color: var(--color-success); }
+.ph-status.won { background: var(--color-success-soft); color: var(--color-success); }
 .ph-status.lost { background: #fef2f2; color: var(--color-danger); }
 .ph-status.push { background: #fffbeb; color: #92400e; }
 
 .ph-legs { font-weight: 600; color: var(--color-text); font-size: var(--text-sm); }
 .ph-odds { font-weight: 700; color: var(--color-primary); font-variant-numeric: tabular-nums; }
 .ph-amount { font-weight: 600; color: var(--color-text); font-variant-numeric: tabular-nums; }
+
+.ph-sgp {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
 .ph-arrow { color: var(--color-text-subtle); }
 
 .ph-progress {
@@ -279,7 +303,7 @@ export default {
 .ph-error { margin-top: 8px; font-size: var(--text-xs); color: var(--color-danger); }
 
 @media (max-width: 768px) {
-  .parlay-history { padding: 16px; }
+  .parlay-history { padding: 1rem; }
   .ph-header { flex-direction: column; align-items: flex-start; }
 }
 </style>

@@ -34,8 +34,13 @@ restore()
 
 const legKey = (leg) => `${leg.gameId}:${leg.betType}:${leg.selection}:${leg.line ?? ''}`
 
+// Used for the "In parlay" badge on game cards
 const hasGame = (gameId) => legs.value.some(l => l.gameId === gameId)
 const hasLeg = (leg) => legs.value.some(l => legKey(l) === legKey(leg))
+// One pick per market per game - a second pick on the same market is the other
+// side of that line, so both can never win
+const hasMarket = (gameId, betType) =>
+  legs.value.some(l => l.gameId === gameId && l.betType === betType)
 
 const addLeg = (leg) => {
   if (legs.value.length >= MAX_LEGS) {
@@ -45,9 +50,13 @@ const addLeg = (leg) => {
     removeLeg(leg)
     return { success: true, removed: true }
   }
-  // Books don't allow two picks from one game - they're correlated
-  if (hasGame(leg.gameId)) {
-    return { success: false, error: 'You already have a pick from this game in your slip' }
+  // Same-game parlays are allowed (mix spread, moneyline and total), but not
+  // two picks from the same market - those are opposite sides of one line
+  if (hasMarket(leg.gameId, leg.betType)) {
+    return {
+      success: false,
+      error: `You already have a ${leg.betType} pick on this game - swap it or try another market`
+    }
   }
   legs.value.push({ ...leg })
   isOpen.value = true
@@ -72,6 +81,20 @@ const setStake = (value) => {
   stake.value = Number(value) || 0
   persist()
 }
+
+// True when two legs come from the same game. Those outcomes are correlated,
+// but the price is just the legs multiplied, which assumes independence - so
+// the slip flags it rather than pretending the number is fair.
+const correlatedGames = computed(() => {
+  const seen = new Set()
+  const dupes = new Set()
+  for (const leg of legs.value) {
+    if (seen.has(leg.gameId)) dupes.add(leg.gameId)
+    seen.add(leg.gameId)
+  }
+  return dupes
+})
+const hasCorrelatedLegs = computed(() => correlatedGames.value.size > 0)
 
 const combinedDecimal = computed(() => combineLegs(legs.value))
 const combinedOdds = computed(() => {
@@ -112,6 +135,8 @@ export const useBetSlip = () => ({
   legCount: computed(() => legs.value.length),
   combinedOdds,
   potentialWin,
+  hasCorrelatedLegs,
+  correlatedGames,
   canPlace,
   minLegs: MIN_LEGS,
   maxLegs: MAX_LEGS,
@@ -121,5 +146,6 @@ export const useBetSlip = () => ({
   setStake,
   hasLeg,
   hasGame,
+  hasMarket,
   placeParlay
 })
