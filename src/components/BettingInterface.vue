@@ -63,6 +63,15 @@
       </div>
     </div>
 
+    <!-- Add the current pick to the parlay slip -->
+    <div class="parlay-add-row" v-if="selectedBet">
+      <button @click="addToParlay" class="add-parlay-btn" :class="{ 'in-slip': inSlip }">
+        <span class="add-parlay-icon">{{ inSlip ? '✓' : '+' }}</span>
+        {{ inSlip ? 'In your parlay slip' : 'Add to parlay' }}
+      </button>
+      <span v-if="parlayNote" class="parlay-note">{{ parlayNote }}</span>
+    </div>
+
     <!-- Bet Amount Selection -->
     <div class="bet-amount" v-if="selectedBet">
       <h5>Bet Amount</h5>
@@ -134,6 +143,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
+import { useBetSlip } from '../stores/betSlipStore.js'
 import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
 
 export default {
@@ -154,7 +164,9 @@ export default {
   },
   setup(props) {
     const userStore = useUserStore()
+    const betSlip = useBetSlip()
     const selectedBet = ref(null)
+    const parlayNote = ref('')
     const betAmount = ref(0)
     const error = ref('')
     const success = ref('')
@@ -392,9 +404,52 @@ export default {
       }
     }
 
+    // Shape the current selection the way the slip and the API expect
+    const currentLeg = () => {
+      if (!selectedBet.value) return null
+      const competition = props.game.competitions?.[0]
+      return {
+        gameId: props.game.id,
+        betType: selectedBet.value.type,
+        selection: selectedBet.value.selection,
+        odds: selectedBet.value.odds,
+        line: selectedBet.value.line ?? null,
+        sport: props.sport,
+        gameLabel: `${awayTeam.value} @ ${homeTeam.value}`,
+        gameData: {
+          homeTeam: homeTeam.value,
+          awayTeam: awayTeam.value,
+          gameName: props.game.name,
+          gameStartTime: props.game.date || competition?.date,
+          gameStartTimeFormatted: competition?.status?.type?.shortDetail || null
+        }
+      }
+    }
+
+    const inSlip = computed(() => {
+      const leg = currentLeg()
+      return leg ? betSlip.hasLeg(leg) : false
+    })
+
+    const addToParlay = () => {
+      const leg = currentLeg()
+      if (!leg) return
+      parlayNote.value = ''
+      const result = betSlip.addLeg(leg)
+      if (!result.success) {
+        parlayNote.value = result.error
+      } else if (result.removed) {
+        parlayNote.value = 'Removed from slip'
+        setTimeout(() => { parlayNote.value = '' }, 2500)
+      }
+    }
+
     return {
       selectedBet,
       betAmount,
+      addToParlay,
+      inSlip,
+      parlayNote,
       error,
       success,
       quickAmounts,
@@ -658,5 +713,42 @@ export default {
   .quick-amounts {
     justify-content: center;
   }
+}
+
+.parlay-add-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.add-parlay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.add-parlay-btn:hover { background: var(--color-primary-soft); }
+
+.add-parlay-btn.in-slip {
+  border-style: solid;
+  background: var(--color-primary-soft);
+}
+
+.add-parlay-icon { font-weight: 700; }
+
+.parlay-note {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 </style>

@@ -51,6 +51,9 @@
       </div>
     </div>
 
+    <!-- Parlays -->
+    <ParlayHistory />
+
     <!-- Bet History -->
     <BetHistory />
 
@@ -142,6 +145,7 @@ import { useUserStore } from '../stores/userStore.js'
 import { API_BASE_URL } from '../config/api.js'
 import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
+import ParlayHistory from './ParlayHistory.vue'
 import Leaderboard from './Leaderboard.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
@@ -151,6 +155,7 @@ import NBAGameCard from './NBAGameCard.vue'
 export default {
   name: 'BettingPage',
   components: {
+    ParlayHistory,
     BetHistory,
     Leaderboard,
     NCAAFootballCard,

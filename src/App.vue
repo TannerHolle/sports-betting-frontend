@@ -32,6 +32,9 @@
     
     <!-- Chat Widget (Available on all pages - Desktop only) -->
     <ChatWidget v-if="showAiChat && currentPage !== 'chat'" />
+
+    <!-- Parlay slip - follows you between games and pages -->
+    <BetSlip v-if="isAuthenticated" />
   </div>
 </template>
 
@@ -47,6 +50,7 @@ import AdminPage from './components/AdminPage.vue'
 import AuthPage from './components/AuthPage.vue'
 import ChatWidget from './components/ChatWidget.vue'
 import ChatPage from './components/ChatPage.vue'
+import BetSlip from './components/BetSlip.vue'
 
 export default {
   name: 'App',
@@ -58,7 +62,8 @@ export default {
     AdminPage,
     AuthPage,
     ChatWidget,
-    ChatPage
+    ChatPage,
+    BetSlip
   },
   setup() {
     const userStore = useUserStore()
