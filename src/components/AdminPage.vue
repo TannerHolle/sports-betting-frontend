@@ -48,7 +48,7 @@ export default {
 <style scoped>
 .admin-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   padding: 2rem 0;
 }
 
@@ -67,7 +67,7 @@ export default {
 }
 
 .page-description {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   margin: 0;
   opacity: 0.9;
   max-width: 600px;
@@ -81,11 +81,11 @@ export default {
   }
   
   .page-title {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
   }
   
   .page-description {
-    font-size: 1rem;
+    font-size: var(--text-base);
     padding: 0 1rem;
   }
 }

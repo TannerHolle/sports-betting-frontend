@@ -533,19 +533,19 @@ export default {
 .no-stats {
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .no-stats p {
-  font-size: 1rem;
+  font-size: var(--text-base);
   margin: 0;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #2563eb;
+  border: 4px solid var(--color-border);
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem auto;
@@ -561,17 +561,17 @@ export default {
   padding: 2rem;
   background: #fef2f2;
   border: 1px solid #fee2e2;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: #991b1b;
 }
 
 .retry-btn {
   margin-top: 1rem;
   padding: 0.5rem 1.5rem;
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -588,36 +588,36 @@ export default {
 }
 
 .section-filter label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 
 .sport-select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
   background: white;
-  font-size: 0.875rem;
-  color: #1a1a1a;
+  font-size: var(--text-sm);
+  color: var(--color-text);
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
 
 .sport-select:hover {
-  border-color: #9ca3af;
+  border-color: var(--color-text-subtle);
 }
 
 .sport-select:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .stats-section {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
 }
 
@@ -632,8 +632,8 @@ export default {
 
 .stats-section h4 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.25rem;
+  color: var(--color-text);
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 
@@ -645,13 +645,13 @@ export default {
 
 .section-description {
   margin: 0 0 1.5rem 0;
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 .subsection-description {
   margin: 0 0 1rem 0;
-  color: #9ca3af;
+  color: var(--color-text-subtle);
   font-size: 0.8125rem;
   font-style: italic;
 }
@@ -664,8 +664,8 @@ export default {
 
 .stat-card {
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   text-align: center;
 }
@@ -675,33 +675,33 @@ export default {
 }
 
 .bet-type-label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 800;
   margin-bottom: 1rem;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .stat-value.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .stat-value.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .stat-details {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .stat-detail {
@@ -711,20 +711,20 @@ export default {
 }
 
 .stat-detail .label {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .stat-detail .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .stat-detail .value.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .stat-detail .value.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .outcomes-row {
@@ -743,7 +743,7 @@ export default {
 .outcome-section h5 {
   margin: 0 0 1rem 0;
   color: #374151;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
@@ -760,8 +760,8 @@ export default {
 
 .outcome-card {
   background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   text-align: center;
   transition: transform 0.2s ease;
@@ -769,32 +769,32 @@ export default {
 
 .outcome-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .outcome-card.over {
-  border-color: #059669;
+  border-color: var(--color-success);
   background: #ecfdf5;
 }
 
 .outcome-card.under {
-  border-color: #dc2626;
+  border-color: var(--color-danger);
   background: #fef2f2;
 }
 
 .outcome-card.covered {
-  border-color: #059669;
+  border-color: var(--color-success);
   background: #ecfdf5;
 }
 
 .outcome-card.covered-low {
-  border-color: #f59e0b;
+  border-color: var(--color-warning);
   background: #fffbeb;
 }
 
 .outcome-card.covered-zero {
-  border-color: #e5e7eb;
-  background: #f9fafb;
+  border-color: var(--color-border);
+  background: var(--color-surface-muted);
 }
 
 .outcome-card.push {
@@ -803,8 +803,8 @@ export default {
 }
 
 .outcome-label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -812,58 +812,58 @@ export default {
 }
 
 .outcome-percentage {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .outcome-card.over .outcome-percentage {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .outcome-card.under .outcome-percentage {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .outcome-card.covered .outcome-percentage {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .outcome-card.covered-low .outcome-percentage {
-  color: #f59e0b;
+  color: var(--color-warning);
 }
 
 .outcome-card.covered-zero .outcome-percentage {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .outcome-count {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .no-data {
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .total-games {
   text-align: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-  font-size: 0.875rem;
-  color: #6b7280;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-  font-size: 0.875rem;
-  color: #6b7280;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 
@@ -875,8 +875,8 @@ export default {
 
 .fun-stat-card {
   background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   text-align: center;
   transition: all 0.3s ease;
@@ -884,13 +884,13 @@ export default {
 
 .fun-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
 }
 
 .fun-stat-label {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -898,24 +898,24 @@ export default {
 }
 
 .fun-stat-value {
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
   word-break: break-word;
 }
 
 .fun-stat-value.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .fun-stat-value.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .fun-stat-detail {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 

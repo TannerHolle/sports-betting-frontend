@@ -470,7 +470,7 @@ export default {
 <style scoped>
 .auth-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -495,7 +495,7 @@ export default {
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0 0 1rem 0;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .title-icon {
@@ -504,8 +504,8 @@ export default {
 }
 
 .auth-subtitle {
-  color: #6b7280;
-  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
   margin: 0;
   line-height: 1.6;
 }
@@ -521,28 +521,28 @@ export default {
   padding: 1rem;
   border: none;
   background: none;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #666;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   border-bottom: 3px solid transparent;
 }
 
 .tab-btn.active {
-  color: #2563eb;
-  border-bottom-color: #2563eb;
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 .tab-btn:hover {
-  color: #2563eb;
+  color: var(--color-primary);
 }
 
 .auth-form h3 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
 }
 
 /* Password Strength Styles */
@@ -553,8 +553,8 @@ export default {
 .strength-bar {
   width: 100%;
   height: 4px;
-  background-color: #e5e7eb;
-  border-radius: 2px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   margin-bottom: 0.25rem;
 }
@@ -569,15 +569,15 @@ export default {
 }
 
 .strength-fill.fair {
-  background-color: #f59e0b;
+  background-color: var(--color-warning);
 }
 
 .strength-fill.strong {
-  background-color: #10b981;
+  background-color: var(--color-success-light);
 }
 
 .strength-text {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   text-align: right;
 }
@@ -587,26 +587,26 @@ export default {
 }
 
 .strength-text.fair {
-  color: #f59e0b;
+  color: var(--color-warning);
 }
 
 .strength-text.strong {
-  color: #10b981;
+  color: var(--color-success-light);
 }
 
 .password-requirements {
   margin-top: 0.75rem;
   padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .requirement {
   display: flex;
   align-items: center;
   margin-bottom: 0.25rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .requirement:last-child {
@@ -621,11 +621,11 @@ export default {
 }
 
 .requirement.met .requirement-icon {
-  color: #10b981;
+  color: var(--color-success-light);
 }
 
 .requirement:not(.met) .requirement-icon {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .requirement-text {
@@ -633,7 +633,7 @@ export default {
 }
 
 .requirement.met .requirement-text {
-  color: #10b981;
+  color: var(--color-success-light);
   text-decoration: line-through;
 }
 
@@ -660,14 +660,14 @@ export default {
   border: none;
   cursor: pointer;
   padding: 0.25rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .eye-icon {
@@ -682,7 +682,7 @@ export default {
 }
 
 .password-toggle-btn:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--color-primary-light);
   outline-offset: 2px;
 }
 
@@ -696,26 +696,26 @@ export default {
 .form-input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   transition: border-color 0.3s ease;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .submit-btn {
   width: 100%;
   padding: 0.875rem;
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -726,12 +726,12 @@ export default {
 }
 
 .submit-btn:disabled {
-  background: #9ca3af;
+  background: var(--color-text-subtle);
   cursor: not-allowed;
 }
 
 .error-message {
-  color: #dc2626;
+  color: var(--color-danger);
   text-align: center;
   margin-top: 1rem;
   font-weight: 500;
@@ -741,27 +741,27 @@ export default {
   text-align: center;
   padding: 2rem;
   background: #f0fdf4;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   border: 2px solid #bbf7d0;
 }
 
 .success-message h4 {
-  color: #059669;
+  color: var(--color-success);
   margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
 }
 
 .success-message p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0 0 1.5rem 0;
 }
 
 .success-btn {
-  background: #059669;
+  background: var(--color-success);
   color: white;
   border: none;
   padding: 0.75rem 2rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -779,7 +779,7 @@ export default {
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   color: #374151;
   user-select: none;
 }
@@ -789,7 +789,7 @@ export default {
   width: 1.1rem;
   height: 1.1rem;
   cursor: pointer;
-  accent-color: #2563eb;
+  accent-color: var(--color-primary);
 }
 
 .remember-me-label:hover {
@@ -806,7 +806,7 @@ export default {
   }
   
   .auth-title {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
   }
   
   .title-icon {

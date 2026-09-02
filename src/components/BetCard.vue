@@ -353,30 +353,30 @@ export default {
 
 <style scoped>
 .bet-card {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .bet-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .bet-card.active {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--color-warning);
   background: #fffbeb;
 }
 
 .bet-card.won {
-  border-left: 4px solid #059669;
+  border-left: 4px solid var(--color-success);
   background: #ecfdf5;
 }
 
 .bet-card.lost {
-  border-left: 4px solid #dc2626;
+  border-left: 4px solid var(--color-danger);
   background: #fef2f2;
 }
 
@@ -405,28 +405,28 @@ export default {
 
 .bet-game h4 {
   margin: 0 0 0.25rem 0;
-  color: #1a1a1a;
-  font-size: 1.1rem;
+  color: var(--color-text);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .bet-date {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
   margin-bottom: 0.25rem;
 }
 
 .game-start-time {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
 }
 
 .bet-username {
   font-weight: 600;
-  color: #3b82f6;
-  font-size: 0.875rem;
+  color: var(--color-primary-light);
+  font-size: var(--text-sm);
   margin-bottom: 0.75rem;
   text-transform: capitalize;
 }
@@ -434,7 +434,7 @@ export default {
 .bet-status {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -473,14 +473,14 @@ export default {
 }
 
 .bet-type {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .bet-selection {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amounts {
@@ -497,25 +497,25 @@ export default {
 }
 
 .bet-amount .label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .bet-amount .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amount .value.potential {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .bet-amount .value.won {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .bet-amount .value.lost {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .bet-amount .value.push {
@@ -530,17 +530,17 @@ export default {
 }
 
 .bet-odds .label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .bet-odds .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .final-score-inline {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: #64748b;
   font-weight: 400;
 }
@@ -566,7 +566,7 @@ export default {
   padding: 1rem;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border-radius: 0.5rem;
-  border: 1px solid #f59e0b;
+  border: 1px solid var(--color-warning);
 }
 
 .live-score {
@@ -575,7 +575,7 @@ export default {
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: #92400e;
 }
@@ -597,14 +597,14 @@ export default {
 }
 
 .live-indicator {
-  color: #dc2626;
+  color: var(--color-danger);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   animation: pulse 2s infinite;
 }
 
 .game-time {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: #92400e;
   font-weight: 600;
 }
@@ -616,12 +616,12 @@ export default {
 
 .cancel-bet-btn-header {
   padding: 0.25rem 0.75rem;
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
   border: none;
   border-radius: 20px;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -634,7 +634,7 @@ export default {
 }
 
 .cancel-bet-btn-header:disabled {
-  background: #9ca3af;
+  background: var(--color-text-subtle);
   cursor: not-allowed;
   opacity: 0.7;
 }

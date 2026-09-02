@@ -187,23 +187,23 @@ export default {
 <style scoped>
 .bet-resolver {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
 
 .resolver-header h3 {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
 .resolver-description {
   margin: 0 0 2rem 0;
-  color: #6b7280;
-  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
   line-height: 1.5;
 }
 
@@ -218,15 +218,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   transition: all 0.3s ease;
 }
 
 .bet-to-resolve:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .bet-header {
@@ -238,17 +238,17 @@ export default {
 
 .bet-info h4 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.1rem;
+  color: var(--color-text);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .bet-owner {
   background: #f3f4f6;
-  color: #6b7280;
+  color: var(--color-text-muted);
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 
@@ -259,19 +259,19 @@ export default {
 }
 
 .bet-type {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .bet-selection {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amount {
   font-weight: 700;
-  color: #059669;
+  color: var(--color-success);
 }
 
 .resolution-controls {
@@ -282,15 +282,15 @@ export default {
 .resolve-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
 }
 
 .resolve-btn.won {
-  background: #059669;
+  background: var(--color-success);
   color: white;
 }
 
@@ -300,7 +300,7 @@ export default {
 }
 
 .resolve-btn.lost {
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
 }
 
@@ -315,14 +315,14 @@ export default {
 }
 
 .resolve-btn.push:hover {
-  background: #4f46e5;
+  background: var(--color-primary);
   transform: translateY(-1px);
 }
 
 .resolution-message {
   margin-top: 1.5rem;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   text-align: center;
 }

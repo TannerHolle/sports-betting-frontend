@@ -465,8 +465,8 @@ export default {
 <style scoped>
 .bet-history {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
@@ -482,8 +482,8 @@ export default {
 
 .bet-history-header h3 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
@@ -494,23 +494,23 @@ export default {
 
 .tab-btn {
   padding: 0.75rem 1.5rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .tab-btn.active {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
 }
 
 .tab-btn:hover:not(.active) {
-  border-color: #9ca3af;
+  border-color: var(--color-text-subtle);
   color: #374151;
 }
 
@@ -521,11 +521,11 @@ export default {
 .no-bets {
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .no-bets p {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   margin: 0;
 }
 
@@ -542,30 +542,30 @@ export default {
 }
 
 .bet-card {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .bet-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .bet-card.active {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--color-warning);
   background: #fffbeb;
 }
 
 .bet-card.won {
-  border-left: 4px solid #059669;
+  border-left: 4px solid var(--color-success);
   background: #ecfdf5;
 }
 
 .bet-card.lost {
-  border-left: 4px solid #dc2626;
+  border-left: 4px solid var(--color-danger);
   background: #fef2f2;
 }
 
@@ -594,28 +594,28 @@ export default {
 
 .bet-game h4 {
   margin: 0 0 0.25rem 0;
-  color: #1a1a1a;
-  font-size: 1.1rem;
+  color: var(--color-text);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .bet-date {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
   margin-bottom: 0.25rem;
 }
 
 .game-start-time {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
 }
 
 .bet-status {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -654,14 +654,14 @@ export default {
 }
 
 .bet-type {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .bet-selection {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amounts {
@@ -678,25 +678,25 @@ export default {
 }
 
 .bet-amount .label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .bet-amount .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amount .value.potential {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .bet-amount .value.won {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .bet-amount .value.lost {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .bet-odds {
@@ -707,13 +707,13 @@ export default {
 }
 
 .bet-odds .label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .bet-odds .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 @media (max-width: 768px) {
@@ -728,7 +728,7 @@ export default {
   }
   
   .bet-history-header h3 {
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
   }
   
   .bet-tabs {
@@ -738,7 +738,7 @@ export default {
   
   .tab-btn {
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -757,7 +757,7 @@ export default {
 
 /* Final Score Inline Styles */
 .final-score-inline {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: #64748b;
   font-weight: 400;
 }
@@ -784,7 +784,7 @@ export default {
   padding: 1rem;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border-radius: 0.5rem;
-  border: 1px solid #f59e0b;
+  border: 1px solid var(--color-warning);
 }
 
 .live-score {
@@ -793,7 +793,7 @@ export default {
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: #92400e;
 }
@@ -815,14 +815,14 @@ export default {
 }
 
 .live-indicator {
-  color: #dc2626;
+  color: var(--color-danger);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   animation: pulse 2s infinite;
 }
 
 .game-time {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: #92400e;
   font-weight: 600;
 }
@@ -835,12 +835,12 @@ export default {
 /* Cancel Button in Header */
 .cancel-bet-btn-header {
   padding: 0.25rem 0.75rem;
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
   border: none;
   border-radius: 20px;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -853,7 +853,7 @@ export default {
 }
 
 .cancel-bet-btn-header:disabled {
-  background: #9ca3af;
+  background: var(--color-text-subtle);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -884,7 +884,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 450px;
@@ -907,21 +907,21 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.25rem;
+  color: var(--color-text);
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 
 .modal-close-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
-  color: #6b7280;
+  font-size: var(--text-2xl);
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -929,13 +929,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
 }
 
 .modal-close-btn:hover {
   background: #f3f4f6;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .modal-body {
@@ -945,7 +945,7 @@ export default {
 .modal-body p {
   margin: 0 0 0.75rem 0;
   color: #374151;
-  font-size: 1rem;
+  font-size: var(--text-base);
   line-height: 1.5;
 }
 
@@ -954,15 +954,15 @@ export default {
 }
 
 .modal-info {
-  background: #f9fafb;
+  background: var(--color-surface-muted);
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 3px solid #f59e0b;
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-warning);
   margin-top: 1rem;
 }
 
 .modal-info strong {
-  color: #1a1a1a;
+  color: var(--color-text);
   font-weight: 700;
 }
 
@@ -970,16 +970,16 @@ export default {
   display: flex;
   gap: 0.75rem;
   padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   justify-content: flex-end;
 }
 
 .modal-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 100px;
@@ -991,11 +991,11 @@ export default {
 }
 
 .modal-btn-cancel:hover {
-  background: #e5e7eb;
+  background: var(--color-border);
 }
 
 .modal-btn-confirm {
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
 }
 
@@ -1006,7 +1006,7 @@ export default {
 }
 
 .modal-btn-confirm:disabled {
-  background: #9ca3af;
+  background: var(--color-text-subtle);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -1034,7 +1034,7 @@ export default {
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
 }
 
@@ -1045,17 +1045,17 @@ export default {
 }
 
 .page-size-label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .page-size-select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
@@ -1064,7 +1064,7 @@ export default {
 
 .page-size-select:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -1077,9 +1077,9 @@ export default {
 
 .pagination-btn {
   padding: 0.75rem 1.5rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   color: #374151;
   cursor: pointer;
@@ -1088,21 +1088,21 @@ export default {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
   transform: translateY(-1px);
 }
 
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f9fafb;
+  background: var(--color-surface-muted);
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
   min-width: 100px;
   text-align: center;

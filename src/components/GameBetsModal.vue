@@ -129,7 +129,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
@@ -155,14 +155,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .close-btn {
@@ -170,17 +170,17 @@ export default {
   border: none;
   cursor: pointer;
   padding: 0.5rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
 }
 
 .close-btn:hover {
   background: #f3f4f6;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .modal-body {
@@ -192,7 +192,7 @@ export default {
 .no-bets {
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .bets-list {
@@ -205,27 +205,27 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding: 1.5rem 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   color: white;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -241,7 +241,7 @@ export default {
   }
   
   .modal-header h2 {
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
   }
 }
 </style>

@@ -95,7 +95,7 @@ export default {
 <style scoped>
 .leagues-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   padding: 2rem 0;
 }
 
@@ -113,7 +113,7 @@ export default {
 }
 
 .page-description {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   margin: 0;
   opacity: 0.9;
   max-width: 600px;
@@ -133,7 +133,7 @@ export default {
   margin-bottom: 0;
   background: white;
   border-radius: 12px 12px 0 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   padding: 0;
   overflow: hidden;
 }
@@ -142,11 +142,11 @@ export default {
   flex: 1;
   padding: 1rem 2rem;
   border: none;
-  background: #f9fafb;
+  background: var(--color-surface-muted);
   border-bottom: 3px solid transparent;
   font-weight: 600;
-  font-size: 1rem;
-  color: #6b7280;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -159,15 +159,15 @@ export default {
 
 .tab-btn.active {
   background: white;
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: var(--color-primary-light);
+  border-bottom-color: var(--color-primary-light);
 }
 
 .tab-content {
   min-height: 400px;
   background: white;
   border-radius: 0 0 12px 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
@@ -186,11 +186,11 @@ export default {
   }
   
   .page-title {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
   }
   
   .page-description {
-    font-size: 1rem;
+    font-size: var(--text-base);
     padding: 0 1rem;
   }
 
@@ -211,7 +211,7 @@ export default {
 
   .tab-btn {
     padding: 0.75rem 1rem;
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
   }
 }
 </style>

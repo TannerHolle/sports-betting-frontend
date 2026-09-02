@@ -557,8 +557,8 @@ export default {
 <style scoped>
 .friends-bets {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
@@ -595,7 +595,7 @@ export default {
 
 .league-selector-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: #374151;
   margin-bottom: 0.5rem;
@@ -605,9 +605,9 @@ export default {
   width: 100%;
   max-width: 300px;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
@@ -621,7 +621,7 @@ export default {
 
 .status-filter-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: #374151;
   margin-bottom: 0.5rem;
@@ -631,9 +631,9 @@ export default {
   width: 100%;
   max-width: 200px;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
@@ -642,7 +642,7 @@ export default {
 
 .search-filter-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: #374151;
   margin-bottom: 0.5rem;
@@ -652,33 +652,33 @@ export default {
   width: 100%;
   max-width: 300px;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   background: white;
   transition: border-color 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .search-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-subtle);
 }
 
 .status-filter-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .league-selector:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .league-selector:disabled {
@@ -690,11 +690,11 @@ export default {
 .no-leagues {
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .no-leagues p {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   margin: 0;
 }
 
@@ -703,21 +703,21 @@ export default {
 .no-bets {
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .loading-state p,
 .error-state p,
 .no-bets p {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   margin: 0.5rem 0 0 0;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #3b82f6;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary-light);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -731,17 +731,17 @@ export default {
 .retry-btn {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background: #3b82f6;
+  background: var(--color-primary-light);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .retry-btn:hover {
-  background: #2563eb;
+  background: var(--color-primary);
 }
 
 .bets-list {
@@ -763,27 +763,27 @@ export default {
 }
 
 .bet-card {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   transition: all 0.3s ease;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--color-primary-light);
 }
 
 .bet-card.won {
-  border-left: 4px solid #059669;
+  border-left: 4px solid var(--color-success);
   background: #ecfdf5;
 }
 
 .bet-card.lost {
-  border-left: 4px solid #dc2626;
+  border-left: 4px solid var(--color-danger);
   background: #fef2f2;
 }
 
 .bet-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .bet-header {
@@ -814,13 +814,13 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   flex-shrink: 0;
 }
 
@@ -832,20 +832,20 @@ export default {
 
 .username {
   font-weight: 600;
-  color: #1a1a1a;
-  font-size: 1rem;
+  color: var(--color-text);
+  font-size: var(--text-base);
 }
 
 .bet-date {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
   margin-bottom: 0.25rem;
 }
 
 .game-start-time {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
   margin: 0 0 1rem 0;
 }
@@ -853,7 +853,7 @@ export default {
 .bet-status {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -875,8 +875,8 @@ export default {
 
 .bet-game h4 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.1rem;
+  color: var(--color-text);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
@@ -894,14 +894,14 @@ export default {
 }
 
 .bet-type {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .bet-selection {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amounts {
@@ -918,17 +918,17 @@ export default {
 }
 
 .bet-amount .label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .bet-amount .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .bet-amount .value.potential {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .bet-odds {
@@ -939,18 +939,18 @@ export default {
 }
 
 .bet-odds .label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .bet-odds .value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 /* Final Score Inline Styles */
 .final-score-inline {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: #64748b;
   font-weight: 400;
 }
@@ -977,7 +977,7 @@ export default {
   padding: 1rem;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border-radius: 0.5rem;
-  border: 1px solid #f59e0b;
+  border: 1px solid var(--color-warning);
 }
 
 .live-score {
@@ -986,7 +986,7 @@ export default {
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: #92400e;
 }
@@ -1008,14 +1008,14 @@ export default {
 }
 
 .live-indicator {
-  color: #dc2626;
+  color: var(--color-danger);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   animation: pulse 2s infinite;
 }
 
 .game-time {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: #92400e;
   font-weight: 600;
 }
@@ -1089,7 +1089,7 @@ export default {
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
 }
 
@@ -1100,17 +1100,17 @@ export default {
 }
 
 .page-size-label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .page-size-select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
@@ -1119,7 +1119,7 @@ export default {
 
 .page-size-select:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -1132,9 +1132,9 @@ export default {
 
 .pagination-btn {
   padding: 0.75rem 1.5rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   color: #374151;
   cursor: pointer;
@@ -1143,21 +1143,21 @@ export default {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
   transform: translateY(-1px);
 }
 
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f9fafb;
+  background: var(--color-surface-muted);
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
   min-width: 100px;
   text-align: center;

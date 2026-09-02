@@ -334,8 +334,8 @@ export default {
 <style scoped>
 .league-management {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
@@ -349,15 +349,15 @@ export default {
 
 .league-management-header h3 {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
 .league-description {
   margin: 0;
-  color: #6b7280;
-  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
 }
 
 .league-management-content {
@@ -370,17 +370,17 @@ export default {
 .join-league-section,
 .my-leagues-section {
   padding: 1.5rem;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .create-league-section h4,
 .join-league-section h4,
 .my-leagues-section h4 {
   margin: 0 0 1rem 0;
-  color: #1a1a1a;
-  font-size: 1.1rem;
+  color: var(--color-text);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
@@ -393,25 +393,25 @@ export default {
 .league-input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   transition: border-color 0.2s ease;
 }
 
 .league-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .create-btn,
 .join-btn {
   padding: 0.75rem 1.5rem;
-  background: #3b82f6;
+  background: var(--color-primary-light);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -421,7 +421,7 @@ export default {
 }
 
 .create-btn:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--color-primary);
 }
 
 .create-btn:disabled {
@@ -430,11 +430,11 @@ export default {
 }
 
 .join-btn {
-  background: #10b981;
+  background: var(--color-success-light);
 }
 
 .join-btn:hover:not(:disabled) {
-  background: #059669;
+  background: var(--color-success);
 }
 
 .join-btn:disabled {
@@ -459,8 +459,8 @@ export default {
   flex-direction: column;
   padding: 1rem;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
   box-sizing: border-box;
   min-width: 0;
@@ -469,12 +469,12 @@ export default {
 }
 
 .league-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .league-item.my-league {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-color: #3b82f6;
+  background: linear-gradient(135deg, var(--color-primary-soft) 0%, #dbeafe 100%);
+  border-color: var(--color-primary-light);
 }
 
 .league-header {
@@ -492,9 +492,9 @@ export default {
 }
 
 .league-name {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.25rem;
   white-space: nowrap;
 }
@@ -503,8 +503,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 @media (min-width: 1280px) {
@@ -519,9 +519,9 @@ export default {
   background: #fbbf24;
   color: #78350f;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   display: inline-block;
   width: 70px;
   text-align: center;
@@ -538,8 +538,8 @@ export default {
 }
 
 .members-label {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -548,8 +548,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  color: #1a1a1a;
+  font-size: var(--text-sm);
+  color: var(--color-text);
   justify-content: flex-end;
   align-items: flex-start;
   padding: 0.25rem;
@@ -562,12 +562,12 @@ export default {
 
 .members-list::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 .members-list::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 .members-list::-webkit-scrollbar-thumb:hover {
@@ -581,25 +581,25 @@ export default {
 
 .member-username {
   font-weight: 500;
-  color: #3b82f6;
+  color: var(--color-primary-light);
   white-space: nowrap;
 }
 
 .member-comma {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-left: 0.25rem;
 }
 
 .league-id-section {
   margin-top: auto;
   padding-top: 0.75rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .league-id-label {
   display: block;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -614,12 +614,12 @@ export default {
 .league-id {
   flex: 1;
   background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  color: #1a1a1a;
+  color: var(--color-text);
   overflow-x: auto;
   word-break: break-all;
   overflow-wrap: break-word;
@@ -627,10 +627,10 @@ export default {
 }
 
 .league-id.invite-code {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #3b82f6;
+  color: var(--color-primary-light);
   text-align: center;
 }
 
@@ -639,8 +639,8 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 
 .alt-label {
@@ -649,13 +649,13 @@ export default {
 
 .league-id-small {
   flex: 1;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   padding: 0.25rem 0.5rem;
   font-size: 0.7rem;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  color: #6b7280;
+  color: var(--color-text-muted);
   overflow-x: auto;
 }
 
@@ -663,8 +663,8 @@ export default {
   padding: 0.25rem 0.5rem;
   background: #f3f4f6;
   color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
@@ -672,19 +672,19 @@ export default {
 }
 
 .copy-btn-small:hover {
-  background: #e5e7eb;
+  background: var(--color-border);
 }
 
 .share-link-section {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .share-link-label {
   display: block;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -699,12 +699,12 @@ export default {
 .share-link-input {
   flex: 1;
   background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  color: #1a1a1a;
+  color: var(--color-text);
   overflow-x: auto;
   min-width: 0;
   word-break: break-all;
@@ -713,18 +713,18 @@ export default {
 
 .share-link-hint {
   margin: 0.5rem 0 0 0;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
 .copy-btn {
   padding: 0.5rem 1rem;
-  background: #3b82f6;
+  background: var(--color-primary-light);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -732,26 +732,26 @@ export default {
 }
 
 .copy-btn:hover {
-  background: #2563eb;
+  background: var(--color-primary);
 }
 
 .copy-btn.copied {
-  background: #10b981;
+  background: var(--color-success-light);
 }
 
 .copy-btn.copied:hover {
-  background: #059669;
+  background: var(--color-success);
 }
 
 .error-message {
-  color: #dc2626;
-  font-size: 0.875rem;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
   margin-top: 0.5rem;
 }
 
 .success-message {
-  color: #059669;
-  font-size: 0.875rem;
+  color: var(--color-success);
+  font-size: var(--text-sm);
   margin-top: 0.5rem;
 }
 
@@ -759,14 +759,14 @@ export default {
 .loading-state {
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #3b82f6;
+  border: 2px solid var(--color-border);
+  border-top: 2px solid var(--color-primary-light);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -792,8 +792,8 @@ export default {
 
 .join-instructions {
   margin: 0 0 0.75rem 0;
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 
@@ -859,13 +859,13 @@ export default {
   .league-id {
     width: 100%;
     min-width: 0;
-    font-size: 1rem;
+    font-size: var(--text-base);
     word-break: break-all;
     overflow-wrap: break-word;
   }
   
   .league-id.invite-code {
-    font-size: 1.1rem;
+    font-size: var(--text-lg);
   }
   
   .share-link-input {
@@ -873,7 +873,7 @@ export default {
     min-width: 0;
     word-break: break-all;
     overflow-wrap: break-word;
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
   
   .copy-btn {

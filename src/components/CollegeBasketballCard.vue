@@ -529,8 +529,8 @@ export default {
 <style scoped>
 /* Live Game State Styles */
 .live-game-state {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-text) 0%, #2d2d2d 100%);
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
   color: white;
@@ -550,15 +550,15 @@ export default {
 }
 
 .time {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 700;
-  color: #10b981;
+  color: var(--color-success-light);
   text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 }
 
 .quarter {
-  font-size: 0.9rem;
-  color: #9ca3af;
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
   font-weight: 500;
 }
 
@@ -569,27 +569,27 @@ export default {
 
 .team:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .team.winning {
-  box-shadow: 0 0 0 2px var(--team-primary-color, #10b981);
+  box-shadow: 0 0 0 2px var(--team-primary-color, var(--color-success-light));
 }
 
 .team-name {
-  color: var(--team-primary-color, #1a1a1a);
+  color: var(--team-primary-color, var(--color-text));
   font-weight: 700;
 }
 
 .score {
-  color: var(--team-primary-color, #1a1a1a);
+  color: var(--team-primary-color, var(--color-text));
 }
 
 .odds-indicator {
   text-align: center;
   margin-top: 8px;
-  font-size: 12px;
-  color: #059669;
+  font-size: var(--text-xs);
+  color: var(--color-success);
   font-weight: 500;
   cursor: pointer;
 }
@@ -598,11 +598,11 @@ export default {
   width: 100%;
   margin-top: 12px;
   padding: 10px 16px;
-  background: #4169e1;
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -615,7 +615,7 @@ export default {
 .ask-ai-button:hover {
   background: #3151c7;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .ask-ai-button:active {
@@ -627,8 +627,8 @@ export default {
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-success-light) 0%, var(--color-success) 100%);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
@@ -643,15 +643,15 @@ export default {
   background: transparent;
   color: white;
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   padding: 2px 6px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   min-width: 18px;
   text-align: center;
 }
 
 .bet-icon {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 /* Ask AI button is now visible on mobile - it will navigate to chat page */

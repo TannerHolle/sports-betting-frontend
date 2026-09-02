@@ -418,15 +418,15 @@ export default {
 .betting-interface {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   margin-top: 1rem;
 }
 
 .betting-title {
   margin: 0 0 1.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.25rem;
+  color: var(--color-text);
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 
@@ -438,7 +438,7 @@ export default {
 .bet-type h5 {
   margin: 0 0 1rem 0;
   color: #374151;
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 600;
 }
 
@@ -450,8 +450,8 @@ export default {
 
 .bet-option {
   background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -459,46 +459,46 @@ export default {
 }
 
 .bet-option:hover {
-  border-color: #2563eb;
+  border-color: var(--color-primary);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 .bet-option.selected {
-  border-color: #2563eb;
-  background: #eff6ff;
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .bet-team {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.25rem;
 }
 
 .bet-line {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   margin-bottom: 0.25rem;
 }
 
 .bet-odds {
   font-weight: 700;
-  color: #059669;
-  font-size: 1.1rem;
+  color: var(--color-success);
+  font-size: var(--text-lg);
 }
 
 .bet-amount {
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
 }
 
 .bet-amount h5 {
   margin: 0 0 1rem 0;
   color: #374151;
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 600;
 }
 
@@ -509,7 +509,7 @@ export default {
 }
 
 .currency-symbol {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 600;
   color: #374151;
   margin-right: 0.5rem;
@@ -518,15 +518,15 @@ export default {
 .amount-input {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 1.1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .amount-input:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -540,16 +540,16 @@ export default {
 .quick-amount-btn {
   padding: 0.5rem 1rem;
   background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .quick-amount-btn:hover:not(:disabled) {
-  background: #e5e7eb;
-  border-color: #9ca3af;
+  background: var(--color-border);
+  border-color: var(--color-text-subtle);
 }
 
 .quick-amount-btn:disabled {
@@ -558,9 +558,9 @@ export default {
 }
 
 .bet-summary {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -575,27 +575,27 @@ export default {
   margin-bottom: 0;
   font-weight: 600;
   padding-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .potential-win {
-  color: #059669;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .total-return {
-  color: #2563eb;
+  color: var(--color-primary);
   font-weight: 700;
 }
 
 .place-bet-btn {
   width: 100%;
   padding: 1rem;
-  background: #059669;
+  background: var(--color-success);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -606,7 +606,7 @@ export default {
 }
 
 .place-bet-btn:disabled {
-  background: #9ca3af;
+  background: var(--color-text-subtle);
   cursor: not-allowed;
 }
 
@@ -616,7 +616,7 @@ export default {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-top: 1rem;
   font-weight: 500;
   animation: slideIn 0.3s ease-out;
@@ -636,17 +636,17 @@ export default {
 .error-message {
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .success-message {
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;
-  color: #059669;
+  color: var(--color-success);
 }
 
 .message-icon {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 

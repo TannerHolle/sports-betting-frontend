@@ -262,8 +262,8 @@ export default {
 <style scoped>
 .leaderboard {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
@@ -277,15 +277,15 @@ export default {
 
 .leaderboard-header h3 {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
 .leaderboard-description {
   margin: 0;
-  color: #6b7280;
-  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
 }
 
 .leaderboard-controls {
@@ -311,7 +311,7 @@ export default {
 
 .league-selector label,
 .limit-selector label {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: #374151;
   font-weight: 500;
 }
@@ -319,11 +319,11 @@ export default {
 .league-dropdown,
 .limit-dropdown {
   padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
   background: white;
-  font-size: 0.9rem;
-  color: #1a1a1a;
+  font-size: var(--text-sm);
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -338,14 +338,14 @@ export default {
 
 .league-dropdown:hover,
 .limit-dropdown:hover {
-  border-color: #3b82f6;
+  border-color: var(--color-primary-light);
 }
 
 .league-dropdown:focus,
 .limit-dropdown:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .leaderboard-content {
@@ -358,21 +358,21 @@ export default {
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   transition: all 0.3s ease;
 }
 
 .leaderboard-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .leaderboard-item.current-user {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: linear-gradient(135deg, var(--color-primary-soft) 0%, #dbeafe 100%);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .rank {
@@ -384,7 +384,7 @@ export default {
 }
 
 .rank-number {
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
   color: #374151;
   width: 30px;
@@ -392,7 +392,7 @@ export default {
 }
 
 .rank-medal {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
 }
 
 .user-info {
@@ -401,9 +401,9 @@ export default {
 }
 
 .username {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.25rem;
 }
 
@@ -414,12 +414,12 @@ export default {
 }
 
 .stat {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   background: white;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
 }
 
 .user-amount {
@@ -427,9 +427,9 @@ export default {
 }
 
 .amount {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 700;
-  color: #059669;
+  color: var(--color-success);
 }
 
 .amount.positive {
@@ -443,14 +443,14 @@ export default {
 .loading-state {
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #3b82f6;
+  border: 2px solid var(--color-border);
+  border-top: 2px solid var(--color-primary-light);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -464,7 +464,7 @@ export default {
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 @media (max-width: 768px) {

@@ -345,17 +345,17 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .brand-icon {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
 }
 
 .brand-text {
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -381,12 +381,12 @@ export default {
   padding: 0.75rem 1.5rem;
   border: 2px solid transparent;
   background: #f8fafc;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 1rem;
+  font-size: var(--text-base);
   height: 48px;
   box-sizing: border-box;
 }
@@ -398,7 +398,7 @@ export default {
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -410,7 +410,7 @@ export default {
 }
 
 .nav-link.primary {
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -424,7 +424,7 @@ export default {
 
 .nav-link.secondary {
   background: #f8fafc;
-  color: #6b7280;
+  color: var(--color-text-muted);
   border: 2px solid #e2e8f0;
 }
 
@@ -435,9 +435,9 @@ export default {
 }
 
 .nav-link.auth-btn {
-  background: #059669;
+  background: var(--color-success);
   color: white;
-  border: 2px solid #059669;
+  border: 2px solid var(--color-success);
 }
 
 .nav-link.auth-btn:hover {
@@ -459,7 +459,7 @@ export default {
 
 .user-info {
   background: #f8fafc;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.5rem 1rem;
   border: 2px solid #e2e8f0;
   height: 48px;
@@ -480,7 +480,7 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -490,7 +490,7 @@ export default {
 .avatar-text {
   color: white;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .user-details {
@@ -504,8 +504,8 @@ export default {
 
 .username {
   font-weight: 600;
-  color: #1a1a1a;
-  font-size: 0.875rem;
+  color: var(--color-text);
+  font-size: var(--text-sm);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -514,13 +514,13 @@ export default {
 
 .balance {
   font-weight: 700;
-  color: #059669;
-  font-size: 0.75rem;
+  color: var(--color-success);
+  font-size: var(--text-xs);
   line-height: 1.2;
 }
 
 .dropdown-arrow {
-  color: #6b7280;
+  color: var(--color-text-muted);
   transition: transform 0.3s ease;
   flex-shrink: 0;
 }
@@ -534,7 +534,7 @@ export default {
   top: calc(100% + 0.5rem);
   right: 0;
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid #e2e8f0;
   min-width: 160px;
@@ -564,8 +564,8 @@ export default {
   background: none;
   width: 100%;
   text-align: left;
-  font-size: 0.875rem;
-  color: #1a1a1a;
+  font-size: var(--text-sm);
+  color: var(--color-text);
 }
 
 .dropdown-item:hover {
@@ -585,8 +585,8 @@ export default {
 }
 
 .dropdown-label {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -594,12 +594,12 @@ export default {
 
 .dropdown-value {
   font-weight: 600;
-  color: #1a1a1a;
-  font-size: 0.875rem;
+  color: var(--color-text);
+  font-size: var(--text-sm);
 }
 
 .balance-value {
-  color: #059669;
+  color: var(--color-success);
   font-weight: 700;
 }
 
@@ -610,7 +610,7 @@ export default {
 }
 
 .logout-item {
-  color: #dc2626;
+  color: var(--color-danger);
   font-weight: 600;
   gap: 0.5rem;
 }
@@ -625,14 +625,14 @@ export default {
 }
 
 .suggestions-item {
-  color: #4169e1;
+  color: var(--color-primary);
   font-weight: 600;
   gap: 0.5rem;
 }
 
 .suggestions-item:hover {
-  background: #eff6ff;
-  color: #1e3a8a;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
 }
 
 .suggestions-icon {
@@ -646,7 +646,7 @@ export default {
 }
 
 .nav-icon {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   flex-shrink: 0;
 }
 
@@ -675,8 +675,8 @@ export default {
 .hamburger-line {
   width: 100%;
   height: 3px;
-  background: #1a1a1a;
-  border-radius: 3px;
+  background: var(--color-text);
+  border-radius: var(--radius-sm);
   transition: all 0.3s ease;
 }
 
@@ -727,12 +727,12 @@ export default {
   padding: 1rem 1.25rem;
   border: 2px solid #e2e8f0;
   background: #f8fafc;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 1rem;
+  font-size: var(--text-base);
   text-align: left;
   width: 100%;
 }
@@ -743,16 +743,16 @@ export default {
 }
 
 .mobile-nav-link.active {
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .mobile-nav-link.auth-btn {
-  background: #059669;
+  background: var(--color-success);
   color: white;
-  border-color: #059669;
+  border-color: var(--color-success);
 }
 
 .mobile-nav-link.auth-btn:hover {
@@ -760,9 +760,9 @@ export default {
 }
 
 .logout-btn-mobile {
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
-  border-color: #dc2626;
+  border-color: var(--color-danger);
 }
 
 .logout-btn-mobile:hover {
@@ -770,14 +770,14 @@ export default {
 }
 
 .suggestions-btn-mobile {
-  background: #eff6ff;
-  color: #4169e1;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
   border-color: #bfdbfe;
 }
 
 .suggestions-btn-mobile:hover {
   background: #dbeafe;
-  color: #1e3a8a;
+  color: var(--color-primary-dark);
 }
 
 .suggestions-icon-mobile {
@@ -790,7 +790,7 @@ export default {
 
 .user-info-mobile {
   background: #f8fafc;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.5rem 1rem;
   border: 2px solid #e2e8f0;
   font-size: 0.85rem;
@@ -798,7 +798,7 @@ export default {
 
 .username-mobile {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
   white-space: nowrap;
 }
 
@@ -848,7 +848,7 @@ export default {
   }
   
   .nav-brand {
-    font-size: 1.1rem;
+    font-size: var(--text-lg);
     flex-shrink: 0;
   }
 
@@ -857,7 +857,7 @@ export default {
   }
 
   .username-mobile {
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 }
 
@@ -867,7 +867,7 @@ export default {
   }
 
   .nav-brand {
-    font-size: 1rem;
+    font-size: var(--text-base);
   }
 
   .mobile-menu {
@@ -877,7 +877,7 @@ export default {
 
   .mobile-nav-link {
     padding: 0.875rem 1rem;
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
 
   .user-info-mobile {
@@ -885,7 +885,7 @@ export default {
   }
 
   .username-mobile {
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
   }
 }
 </style>

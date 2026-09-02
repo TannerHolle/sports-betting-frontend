@@ -683,7 +683,7 @@ export default {
 <style scoped>
 .betting-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   padding: 2rem 0;
 }
 
@@ -706,7 +706,7 @@ export default {
 }
 
 .page-description {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   margin: 0;
   opacity: 0.9;
   max-width: 600px;
@@ -725,10 +725,10 @@ export default {
 
 .stat-card {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.2);
   min-width: 150px;
@@ -741,23 +741,23 @@ export default {
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .leaderboard-notice {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin: 0 auto 2rem auto;
   max-width: 800px;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--color-primary-light);
   position: relative;
 }
 
@@ -767,15 +767,15 @@ export default {
   right: 1rem;
   background: transparent;
   border: none;
-  font-size: 1.5rem;
-  color: #6b7280;
+  font-size: var(--text-2xl);
+  color: var(--color-text-muted);
   cursor: pointer;
   width: 2rem;
   height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
   line-height: 1;
   padding: 0;
@@ -783,11 +783,11 @@ export default {
 
 .notice-close:hover {
   background: #f3f4f6;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .notice-close:active {
-  background: #e5e7eb;
+  background: var(--color-border);
 }
 
 .notice-icon {
@@ -801,34 +801,34 @@ export default {
 
 .notice-title {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
 .notice-message {
   margin: 0 0 1.25rem 0;
-  color: #6b7280;
-  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
   line-height: 1.6;
 }
 
 .notice-button {
   padding: 0.75rem 1.5rem;
-  background: #3b82f6;
+  background: var(--color-primary-light);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: var(--text-base);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .notice-button:hover {
-  background: #2563eb;
+  background: var(--color-primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .notice-button:active {
@@ -836,16 +836,16 @@ export default {
 }
 
 .stat-value.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .stat-value.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -872,11 +872,11 @@ export default {
   border-radius: 50px;
   color: white;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: var(--text-base);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
 }
@@ -905,25 +905,25 @@ export default {
 
 .league-chip.active {
   background: rgba(255, 255, 255, 0.95);
-  color: #1e3a8a;
+  color: var(--color-primary-dark);
   border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3), 0 0 20px rgba(65, 105, 225, 0.3);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3), 0 0 20px rgba(37, 99, 235, 0.3);
   transform: translateY(-2px);
 }
 
 .league-chip.active:hover {
   background: white;
-  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.4), 0 0 24px rgba(65, 105, 225, 0.4);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.4), 0 0 24px rgba(37, 99, 235, 0.4);
 }
 
 .chip-icon {
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .league-chip.active .chip-icon {
-  filter: drop-shadow(0 2px 4px rgba(65, 105, 225, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
 }
 
 .chip-text {
@@ -938,7 +938,7 @@ export default {
 
 .games-header h2 {
   color: white;
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 700;
   margin: 0 0 1rem 0;
   text-align: center;
@@ -949,7 +949,7 @@ export default {
   text-align: center;
   margin: 0;
   opacity: 0.9;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
 }
 
 .games-section {
@@ -976,29 +976,29 @@ export default {
 
 .error-message {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   margin-bottom: 2rem;
 }
 
 .error-message h3 {
-  color: #dc2626;
+  color: var(--color-danger);
   margin: 0 0 1rem 0;
 }
 
 .error-message p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0 0 1.5rem 0;
 }
 
 .retry-btn {
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -1010,18 +1010,18 @@ export default {
 
 .loading-container {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 3rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   margin-bottom: 2rem;
 }
 
 .spinner-large {
   width: 50px;
   height: 50px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #2563eb;
+  border: 4px solid var(--color-border);
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem auto;
@@ -1033,29 +1033,29 @@ export default {
 }
 
 .loading-container p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
 }
 
 .no-games {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 3rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   margin-bottom: 2rem;
 }
 
 .no-games h3 {
-  color: #1a1a1a;
+  color: var(--color-text);
   margin: 0 0 1rem 0;
 }
 
 .no-games p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
 }
 
 @media (max-width: 768px) {
@@ -1064,7 +1064,7 @@ export default {
   }
   
   .page-title {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
   }
   
   .title-icon {
@@ -1072,7 +1072,7 @@ export default {
   }
   
   .page-description {
-    font-size: 1rem;
+    font-size: var(--text-base);
     padding: 0 1rem;
   }
   
@@ -1089,7 +1089,7 @@ export default {
   }
   
   .stat-value {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
   }
   
   .games-section {
@@ -1109,12 +1109,12 @@ export default {
   
   .league-chip {
     padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     gap: 0.5rem;
   }
   
   .chip-icon {
-    font-size: 1.2rem;
+    font-size: var(--text-xl);
   }
 
   .leaderboard-notice {
@@ -1129,7 +1129,7 @@ export default {
     right: 0.75rem;
     width: 1.75rem;
     height: 1.75rem;
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
   }
 
   .notice-icon {
@@ -1137,11 +1137,11 @@ export default {
   }
 
   .notice-title {
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
   }
 
   .notice-message {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
 
   .notice-button {

@@ -488,8 +488,8 @@ export default {
 <style scoped>
 .admin-panel {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
@@ -502,15 +502,15 @@ export default {
 
 .admin-header h3 {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
 .admin-description {
   margin: 0;
-  color: #6b7280;
-  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
 }
 
 .admin-actions {
@@ -520,38 +520,38 @@ export default {
 }
 
 .action-group {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
 }
 
 .action-group h4 {
   margin: 0 0 0.5rem 0;
   color: #374151;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .action-description {
   margin: 0 0 1rem 0;
-  color: #6b7280;
-  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
   line-height: 1.4;
 }
 
 .admin-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .resolve-btn {
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
 }
 
@@ -560,7 +560,7 @@ export default {
 }
 
 .odds-btn {
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
 }
 
@@ -576,8 +576,8 @@ export default {
 .message {
   margin: 1rem 0 0 0;
   padding: 0.75rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 
@@ -610,8 +610,8 @@ export default {
 
 .suggestions-header h3 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
@@ -623,12 +623,12 @@ export default {
 
 .filter-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   background: white;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -637,12 +637,12 @@ export default {
 }
 
 .filter-btn:hover {
-  border-color: #4169e1;
-  color: #4169e1;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   color: white;
   border-color: transparent;
 }
@@ -650,8 +650,8 @@ export default {
 .count-badge {
   background: rgba(255, 255, 255, 0.2);
   padding: 0.125rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -661,12 +661,12 @@ export default {
 
 .refresh-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   background: white;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -675,8 +675,8 @@ export default {
 }
 
 .refresh-btn:hover:not(:disabled) {
-  border-color: #4169e1;
-  color: #4169e1;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .refresh-btn:disabled {
@@ -686,12 +686,12 @@ export default {
 
 .delete-all-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #dc2626;
+  border: 2px solid var(--color-danger);
   background: white;
-  color: #dc2626;
-  border-radius: 6px;
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -700,7 +700,7 @@ export default {
 }
 
 .delete-all-btn:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--color-danger);
   color: white;
 }
 
@@ -713,14 +713,14 @@ export default {
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #4169e1;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 1rem;
@@ -739,28 +739,28 @@ export default {
 }
 
 .suggestion-card {
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   transition: all 0.2s ease;
 }
 
 .suggestion-card:hover {
   border-color: #cbd5e1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .suggestion-card.status-new {
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--color-primary-light);
 }
 
 .suggestion-card.status-reviewed {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--color-warning);
 }
 
 .suggestion-card.status-implemented {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--color-success-light);
 }
 
 .suggestion-card.status-rejected {
@@ -784,45 +784,45 @@ export default {
 
 .username {
   font-weight: 700;
-  color: #1a1a1a;
-  font-size: 0.95rem;
+  color: var(--color-text);
+  font-size: var(--text-base);
 }
 
 .date {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 
 .status-select {
   padding: 0.5rem 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: white;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: #374151;
   cursor: pointer;
 }
 
 .suggestion-text {
-  color: #1a1a1a;
+  color: var(--color-text);
   line-height: 1.6;
   margin-bottom: 1rem;
   white-space: pre-wrap;
 }
 
 .admin-notes {
-  background: #eff6ff;
-  border-left: 3px solid #4169e1;
+  background: var(--color-primary-soft);
+  border-left: 3px solid var(--color-primary);
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin-bottom: 1rem;
-  font-size: 0.9rem;
-  color: #1e3a8a;
+  font-size: var(--text-sm);
+  color: var(--color-primary-dark);
 }
 
 .admin-notes strong {
-  color: #1e3a8a;
+  color: var(--color-primary-dark);
 }
 
 .suggestion-actions {
@@ -832,33 +832,33 @@ export default {
 
 .action-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   background: white;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  border-color: #4169e1;
-  color: #4169e1;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .notes-editor {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .notes-input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-family: inherit;
   resize: vertical;
   margin-bottom: 0.75rem;
@@ -867,7 +867,7 @@ export default {
 
 .notes-input:focus {
   outline: none;
-  border-color: #4169e1;
+  border-color: var(--color-primary);
 }
 
 .notes-actions {
@@ -878,7 +878,7 @@ export default {
 
 .btn-sm {
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 768px) {
@@ -933,8 +933,8 @@ export default {
 
 .ai-questions-header h3 {
   margin: 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
@@ -951,16 +951,16 @@ export default {
 }
 
 .ai-question-card {
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   transition: all 0.2s ease;
 }
 
 .ai-question-card:hover {
   border-color: #cbd5e1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .question-header {
@@ -980,41 +980,41 @@ export default {
 
 .question-meta .username {
   font-weight: 700;
-  color: #1a1a1a;
-  font-size: 0.95rem;
+  color: var(--color-text);
+  font-size: var(--text-base);
 }
 
 .question-meta .username.anonymous {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
 .question-meta .date {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 
 .game-context-badge {
   padding: 0.25rem 0.75rem;
-  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  background: var(--gradient-brand);
   color: white;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
 .game-info {
-  background: #eff6ff;
-  border-left: 3px solid #4169e1;
+  background: var(--color-primary-soft);
+  border-left: 3px solid var(--color-primary);
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin-bottom: 1rem;
-  font-size: 0.9rem;
-  color: #1e3a8a;
+  font-size: var(--text-sm);
+  color: var(--color-primary-dark);
 }
 
 .game-info strong {
-  color: #1e3a8a;
+  color: var(--color-primary-dark);
 }
 
 .question-text {
@@ -1025,11 +1025,11 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   color: #374151;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .question-text p {
-  color: #1a1a1a;
+  color: var(--color-text);
   line-height: 1.6;
   margin: 0;
   white-space: pre-wrap;
@@ -1037,9 +1037,9 @@ export default {
 
 .answer-text {
   background: #f0fdf4;
-  border-left: 3px solid #10b981;
+  border-left: 3px solid var(--color-success-light);
   padding: 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin-top: 1rem;
 }
 
@@ -1047,11 +1047,11 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   color: #065f46;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .answer-text p {
-  color: #1a1a1a;
+  color: var(--color-text);
   line-height: 1.6;
   margin: 0;
   white-space: pre-wrap;
@@ -1061,23 +1061,23 @@ export default {
   text-align: center;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .load-more-btn {
   padding: 0.75rem 2rem;
-  border: 2px solid #4169e1;
+  border: 2px solid var(--color-primary);
   background: white;
-  color: #4169e1;
-  border-radius: 6px;
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .load-more-btn:hover:not(:disabled) {
-  background: #4169e1;
+  background: var(--color-primary);
   color: white;
 }
 

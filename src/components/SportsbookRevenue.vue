@@ -229,8 +229,8 @@ export default {
 <style scoped>
 .sportsbook-revenue {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 2rem;
   margin-bottom: 2rem;
 }
@@ -243,28 +243,28 @@ export default {
 
 .revenue-header h3 {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
-  font-size: 1.5rem;
+  color: var(--color-text);
+  font-size: var(--text-2xl);
   font-weight: 700;
 }
 
 .revenue-description {
   margin: 0;
-  color: #6b7280;
-  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
 }
 
 .loading-state {
   text-align: center;
   padding: 3rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #2563eb;
+  border: 4px solid var(--color-border);
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem auto;
@@ -286,9 +286,9 @@ export default {
 }
 
 .stat-card {
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--color-surface-muted);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   display: flex;
   align-items: center;
@@ -298,12 +298,12 @@ export default {
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-card.primary {
-background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
-border-color: #4169e1;
+background: var(--gradient-brand);
+border-color: var(--color-primary);
   color: white;
 }
 
@@ -313,7 +313,7 @@ border-color: #4169e1;
 }
 
 .stat-icon {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   line-height: 1;
 }
 
@@ -324,12 +324,12 @@ border-color: #4169e1;
 .stat-value {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--color-text);
   margin-bottom: 0.25rem;
 }
 
 .stat-value.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .stat-card.primary .stat-value.positive {
@@ -337,7 +337,7 @@ border-color: #4169e1;
 }
 
 .stat-value.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .stat-card.primary .stat-value.negative {
@@ -345,8 +345,8 @@ border-color: #4169e1;
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -357,8 +357,8 @@ border-color: #4169e1;
 }
 
 .revenue-breakdown {
-  background: #f9fafb;
-  border-radius: 8px;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -366,7 +366,7 @@ border-color: #4169e1;
 .revenue-breakdown h4 {
   margin: 0 0 1rem 0;
   color: #374151;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
@@ -382,40 +382,40 @@ border-color: #4169e1;
   align-items: center;
   padding: 0.75rem;
   background: white;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
 }
 
 .breakdown-item.total {
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   font-weight: 700;
   padding: 1rem;
 }
 
 .breakdown-label {
-  color: #6b7280;
-  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
 }
 
 .breakdown-item.total .breakdown-label {
   color: #374151;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
 .breakdown-value {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
 }
 
 .breakdown-value.positive {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .breakdown-value.negative {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .breakdown-item.total .breakdown-value {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
 }
 
 .refresh-controls {
@@ -423,19 +423,19 @@ border-color: #4169e1;
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .refresh-btn {
   padding: 0.75rem 1.5rem;
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .refresh-btn:hover:not(:disabled) {
@@ -450,8 +450,8 @@ border-color: #4169e1;
 
 .last-updated {
   margin: 0;
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 1024px) {
@@ -466,7 +466,7 @@ border-color: #4169e1;
   }
 
   .stat-value {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
   }
 }
 
@@ -486,7 +486,7 @@ border-color: #4169e1;
   }
 
   .stat-value {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
   }
 
   .refresh-controls {
