@@ -178,44 +178,13 @@ export default {
     const fetchLeaderboard = async () => {
       loading.value = true
       try {
-        const url = selectedLeagueId.value 
-          ? `${API_BASE_URL}/users?leagueId=${selectedLeagueId.value}`
-          : `${API_BASE_URL}/users`
+        // The server computes these rows - fetching every user's full bet
+        // history just to reduce it here cost hundreds of KB per load.
+        const url = selectedLeagueId.value
+          ? `${API_BASE_URL}/leaderboard?leagueId=${selectedLeagueId.value}`
+          : `${API_BASE_URL}/leaderboard`
         const response = await axios.get(url)
-        const users = response.data
-
-        // Calculate leaderboard data for all users
-        const allLeaderboardData = Object.values(users)
-          .map(user => {
-            const totalWon = user.totalWon || 0
-            const totalLost = user.totalLost || 0
-            const netProfit = totalWon - totalLost  // Net profit/loss
-            const balance = user.balance || 0
-            const totalBets = user.bets?.length || 0
-            const completedBets = user.bets?.filter(bet => bet.status === 'won' || bet.status === 'lost') || []
-            const wonBets = completedBets.filter(bet => bet.status === 'won').length
-            const winRate = completedBets.length > 0 ? Math.round((wonBets / completedBets.length) * 100) : 0
-            
-            // Calculate outstanding bets (pending bets)
-            const outstandingBets = user.bets?.filter(bet => bet.status === 'pending') || []
-            const outstandingAmount = outstandingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0)
-            const totalCash = balance + outstandingAmount  // Available cash + outstanding bets
-
-            return {
-              username: user.username,
-              balance,
-              outstandingAmount,
-              totalCash,
-              netProfit,
-              totalWon,
-              totalLost,
-              winRate,
-              totalBets,
-              completedBets: completedBets.length
-            }
-          })
-          .filter(user => user.completedBets > 0) // Only show users with completed bets
-          .sort((a, b) => b.netProfit - a.netProfit) // Sort by net profit
+        const allLeaderboardData = response.data || []
 
         // Find current user's actual rank (1-based)
         const currentUsername = currentUser.value?.username

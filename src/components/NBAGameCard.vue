@@ -200,7 +200,9 @@ export default {
     const fetchGameOdds = async () => {
       try {
         const allOdds = await oddsService.getAllOdds()
-        const gameOddsData = oddsService.findGameOdds(allOdds, 'nba', homeTeamName.value, awayTeamName.value)
+        const homeTeam = competitors.value.find(c => c.homeAway === 'home')?.team
+        const awayTeam = competitors.value.find(c => c.homeAway === 'away')?.team
+        const gameOddsData = oddsService.findGameOdds(allOdds, 'nba', homeTeam, awayTeam, props.game.date)
         
         if (gameOddsData) {
           gameOdds.value = gameOddsData

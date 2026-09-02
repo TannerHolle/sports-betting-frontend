@@ -280,21 +280,10 @@ export default {
       try {
         const allOdds = await oddsService.getAllOdds()
         
-        // Try matching with shortDisplayName first
-        let gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-basketball', homeTeamName.value, awayTeamName.value)
-        
-        // If no match, try with displayName as fallback
-        if (!gameOddsData) {
-          const homeTeam = competitors.value.find(c => c.homeAway === 'home')
-          const awayTeam = competitors.value.find(c => c.homeAway === 'away')
-          const homeDisplayName = homeTeam?.team?.displayName || ''
-          const awayDisplayName = awayTeam?.team?.displayName || ''
-          
-          if (homeDisplayName && awayDisplayName && 
-              (homeDisplayName !== homeTeamName.value || awayDisplayName !== awayTeamName.value)) {
-            gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-basketball', homeDisplayName, awayDisplayName)
-          }
-        }
+        const homeTeam = competitors.value.find(c => c.homeAway === 'home')?.team
+        const awayTeam = competitors.value.find(c => c.homeAway === 'away')?.team
+        const gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-basketball', homeTeam, awayTeam, props.game.date)
+
         if (gameOddsData) {
           gameOdds.value = gameOddsData
           return

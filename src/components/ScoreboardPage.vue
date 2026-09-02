@@ -527,22 +527,44 @@ export default {
       return nfcSouthTeams.includes(teamName.toUpperCase())
     }
 
+    // Polling ESPN. Only refresh quickly while a game is actually in progress,
+    // and stop entirely while the tab is hidden - this used to hit ESPN every
+    // 10 seconds forever, including overnight and in background tabs.
+    const LIVE_REFRESH_MS = 10000
+    const IDLE_REFRESH_MS = 60000
+
+    const hasLiveGame = () => games.value.some(
+      game => game.competitions?.[0]?.status?.type?.state === 'in'
+    )
+
+    const scheduleRefresh = () => {
+      stopAutoRefresh()
+      if (typeof document !== 'undefined' && document.hidden) return
+
+      refreshInterval.value = setTimeout(async () => {
+        await fetchData()
+        scheduleRefresh()
+      }, hasLiveGame() ? LIVE_REFRESH_MS : IDLE_REFRESH_MS)
+    }
+
     const startAutoRefresh = () => {
-      // Clear any existing interval
-      if (refreshInterval.value) {
-        clearInterval(refreshInterval.value)
-      }
-      
-      // Set up auto-refresh every 10 seconds
-      refreshInterval.value = setInterval(() => {
-        fetchData()
-      }, 10000) // 10 seconds
+      scheduleRefresh()
     }
 
     const stopAutoRefresh = () => {
       if (refreshInterval.value) {
-        clearInterval(refreshInterval.value)
+        clearTimeout(refreshInterval.value)
         refreshInterval.value = null
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAutoRefresh()
+      } else {
+        // Catch up on whatever was missed while hidden, then resume
+        fetchData()
+        scheduleRefresh()
       }
     }
 
@@ -555,10 +577,12 @@ export default {
       }
       fetchData()
       startAutoRefresh()
+      document.addEventListener('visibilitychange', handleVisibilityChange)
     })
 
     onUnmounted(() => {
       stopAutoRefresh()
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     })
 
     return {
