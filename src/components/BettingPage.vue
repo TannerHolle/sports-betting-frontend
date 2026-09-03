@@ -51,28 +51,14 @@
       </div>
     </div>
 
+    <!-- Live wagers -->
+    <LiveBets />
+
     <!-- Parlays -->
     <ParlayHistory />
 
     <!-- Bet History -->
     <BetHistory />
-
-    <!-- Leaderboard Moved Notice -->
-    <div class="leaderboard-notice" v-if="showLeaderboardNotice">
-      <button @click="dismissLeaderboardNotice" class="notice-close" aria-label="Close notice">
-        ×
-      </button>
-      <div class="notice-icon">🏆</div>
-      <div class="notice-content">
-        <h3 class="notice-title">Leaderboard Moved</h3>
-        <p class="notice-message">
-          The leaderboard has been moved to the Leagues page! Check out how you rank against your friends and league members.
-        </p>
-        <button @click="goToLeagues" class="notice-button">
-          Go to Leaderboard
-        </button>
-      </div>
-    </div>
 
     <!-- Games Header -->
     <div class="games-header">
@@ -146,6 +132,7 @@ import { API_BASE_URL } from '../config/api.js'
 import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
 import ParlayHistory from './ParlayHistory.vue'
+import LiveBets from './LiveBets.vue'
 import Leaderboard from './Leaderboard.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
@@ -155,6 +142,7 @@ import NBAGameCard from './NBAGameCard.vue'
 export default {
   name: 'BettingPage',
   components: {
+    LiveBets,
     ParlayHistory,
     BetHistory,
     Leaderboard,
@@ -640,12 +628,6 @@ export default {
       window.dispatchEvent(new CustomEvent('change-page', { detail: 'leagues' }))
     }
 
-    const dismissLeaderboardNotice = () => {
-      showLeaderboardNotice.value = false
-      // Store dismissal in localStorage so it doesn't show again
-      localStorage.setItem('leaderboardNoticeDismissed', 'true')
-    }
-
     // Function to reset the notice (can be called from console: window.showLeaderboardNotice())
     const resetLeaderboardNotice = () => {
       localStorage.removeItem('leaderboardNoticeDismissed')
@@ -678,8 +660,7 @@ export default {
       userLeaguesForLeaderboard,
       showingDate,
       goToLeagues,
-      showLeaderboardNotice,
-      dismissLeaderboardNotice
+      showLeaderboardNotice
     }
   }
 }

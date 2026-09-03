@@ -14,83 +14,108 @@ class LiveScoreService {
     return `${year}${month}${day}`
   }
 
-  // Get live score data for a specific game
-  async getLiveScore(gameId, sport = 'nba') {
-    try {
-      // Check cache first
-      const cached = this.cache.get(gameId)
-      if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-        return cached.data
-      }
-
-      // Determine API URL based on sport
-      let apiUrl
-      const currentDate = new Date()
-      const formattedDate = this.formatDateForAPI(currentDate)
-      
-      switch (sport.toLowerCase()) {
-        case 'nba':
-          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`
-          break
-        case 'nfl':
-          apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
-          break
-        case 'ncaa-basketball':
-          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${formattedDate}`
-          break
-        case 'ncaa-football':
-          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${formattedDate}`
-          break
-        default:
-          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`
-      }
-
-      const response = await axios.get(apiUrl)
-      const games = response.data.events || []
-
-      // Find the specific game
-      const game = games.find(g => g.id === gameId)
-      if (!game) {
-        return null
-      }
-
-      const competition = game.competitions?.[0]
-      if (!competition) {
-        return null
-      }
-
-      const competitors = competition.competitors || []
-      const homeTeam = competitors.find(c => c.homeAway === 'home')
-      const awayTeam = competitors.find(c => c.homeAway === 'away')
-      const status = competition.status
-
-      if (!homeTeam || !awayTeam) {
-        return null
-      }
-
-      const liveData = {
-        homeTeam: homeTeam.team?.shortDisplayName || homeTeam.team?.displayName || 'Home',
-        awayTeam: awayTeam.team?.shortDisplayName || awayTeam.team?.displayName || 'Away',
-        homeScore: homeTeam.score || '0',
-        awayScore: awayTeam.score || '0',
-        status: this.formatStatus(status),
-        isLive: status?.type?.state === 'in',
-        isCompleted: status?.type?.completed || false,
-        gameStartTime: game.date || competition.date,
-        gameStartTimeFormatted: status?.type?.shortDetail || null
-      }
-
-      // Cache the result
-      this.cache.set(gameId, {
-        data: liveData,
-        timestamp: Date.now()
-      })
-
-      return liveData
-    } catch (error) {
-      console.error('Error fetching live score:', error)
-      return null
+  // Scoreboard URL for a sport.
+  //
+  // Deliberately undated. ESPN's undated scoreboard returns the current window
+  // - the current week for NFL and college football, the current slate for the
+  // basketball feeds - and a game that is live is by definition inside it.
+  // Pinning ?dates=<today> breaks exactly when you need it: on 2026-09-02 the
+  // dated college football feed returned 0 games while the undated one returned
+  // the 25 games of that week. Completed games in the window are harmless here
+  // because callers filter on isLive.
+  scoreboardUrl(sport) {
+    switch ((sport || '').toLowerCase()) {
+      case 'nfl':
+        return 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
+      case 'ncaa-basketball':
+        return 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard'
+      case 'ncaa-football':
+        return 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard'
+      case 'nba':
+      default:
+        return 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard'
     }
+  }
+
+  // Turn one ESPN event into the shape the UI wants
+  parseGame(game) {
+    const competition = game.competitions?.[0]
+    if (!competition) return null
+    const competitors = competition.competitors || []
+    const homeTeam = competitors.find(c => c.homeAway === 'home')
+    const awayTeam = competitors.find(c => c.homeAway === 'away')
+    if (!homeTeam || !awayTeam) return null
+    const status = competition.status
+
+    return {
+      gameId: String(game.id),
+      homeTeam: homeTeam.team?.shortDisplayName || homeTeam.team?.displayName || 'Home',
+      awayTeam: awayTeam.team?.shortDisplayName || awayTeam.team?.displayName || 'Away',
+      homeScore: homeTeam.score || '0',
+      awayScore: awayTeam.score || '0',
+      status: this.formatStatus(status),
+      isLive: status?.type?.state === 'in',
+      isCompleted: status?.type?.completed || false,
+      period: status?.period ?? null,
+      displayClock: status?.displayClock || null,
+      gameStartTime: game.date || competition.date,
+      gameStartTimeFormatted: status?.type?.shortDetail || null
+    }
+  }
+
+  // Fetch a sport's whole scoreboard once and cache every game in it.
+  // getLiveScore used to fetch the full scoreboard per game, so five bets on
+  // one slate meant five identical requests.
+  async getScoresForSport(sport) {
+    try {
+      const response = await axios.get(this.scoreboardUrl(sport))
+      const games = response.data.events || []
+      const now = Date.now()
+      const byId = new Map()
+
+      for (const game of games) {
+        const parsed = this.parseGame(game)
+        if (!parsed) continue
+        byId.set(parsed.gameId, parsed)
+        this.cache.set(parsed.gameId, { data: parsed, timestamp: now })
+      }
+      return byId
+    } catch (error) {
+      console.error(`Error fetching ${sport} scoreboard:`, error)
+      return new Map()
+    }
+  }
+
+  // Live data for a set of games, grouped so each sport costs one request
+  async getScoresForBets(wagers = []) {
+    const bySport = new Map()
+    for (const w of wagers) {
+      const sport = w.sport || 'nba'
+      if (!bySport.has(sport)) bySport.set(sport, [])
+      bySport.get(sport).push(String(w.gameId))
+    }
+
+    const results = new Map()
+    await Promise.all([...bySport.entries()].map(async ([sport, ids]) => {
+      const scores = await this.getScoresForSport(sport)
+      for (const id of ids) {
+        const found = scores.get(id)
+        if (found) results.set(id, found)
+      }
+    }))
+    return results
+  }
+
+  // Live score for one game. Shares the undated URL and the parsing with the
+  // batched path above, so both agree on which games exist and what they say.
+  async getLiveScore(gameId, sport = 'nba') {
+    const id = String(gameId)
+    const cached = this.cache.get(id)
+    if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+      return cached.data
+    }
+    const scores = await this.getScoresForSport(sport)
+    return scores.get(id) || null
   }
 
   // Format game status
