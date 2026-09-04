@@ -186,7 +186,7 @@ export default {
 
 <style scoped>
 .bet-resolver {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 2rem;
@@ -244,7 +244,7 @@ export default {
 }
 
 .bet-owner {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   color: var(--color-text-muted);
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius-sm);
@@ -291,27 +291,27 @@ export default {
 
 .resolve-btn.won {
   background: var(--color-success);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .resolve-btn.won:hover {
-  background: #047857;
+  background: var(--color-success);
   transform: translateY(-1px);
 }
 
 .resolve-btn.lost {
   background: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .resolve-btn.lost:hover {
-  background: #b91c1c;
+  background: var(--color-danger);
   transform: translateY(-1px);
 }
 
 .resolve-btn.push {
-  background: #6366f1;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .resolve-btn.push:hover {
@@ -329,20 +329,20 @@ export default {
 
 .resolution-message.success {
   background: var(--color-success-soft);
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  color: var(--color-success);
+  border: 1px solid var(--color-success-soft);
 }
 
 .resolution-message.error {
-  background: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-soft);
 }
 
 .resolution-message.info {
-  background: #eef2ff;
-  color: #4338ca;
-  border: 1px solid #c7d2fe;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-primary-soft);
 }
 
 @media (max-width: 768px) {

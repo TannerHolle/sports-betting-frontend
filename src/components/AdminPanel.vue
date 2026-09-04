@@ -487,7 +487,7 @@ export default {
 
 <style scoped>
 .admin-panel {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 2rem;
@@ -497,7 +497,7 @@ export default {
 .admin-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-surface-muted);
 }
 
 .admin-header h3 {
@@ -528,7 +528,7 @@ export default {
 
 .action-group h4 {
   margin: 0 0 0.5rem 0;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-lg);
   font-weight: 600;
 }
@@ -552,20 +552,20 @@ export default {
 
 .resolve-btn {
   background: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .resolve-btn:hover:not(:disabled) {
-  background: #b91c1c;
+  background: var(--color-danger);
 }
 
 .odds-btn {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .odds-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--color-primary-dark);
 }
 
 .admin-btn:disabled {
@@ -582,21 +582,21 @@ export default {
 }
 
 .message.success {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-soft);
 }
 
 .message.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-soft);
 }
 
 .suggestions-section {
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 2px solid #f0f0f0;
+  border-top: 2px solid var(--color-surface-muted);
 }
 
 .suggestions-header {
@@ -624,7 +624,7 @@ export default {
 .filter-btn {
   padding: 0.5rem 1rem;
   border: 2px solid var(--color-border);
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: var(--text-sm);
@@ -642,8 +642,8 @@ export default {
 }
 
 .filter-btn.active {
-  background: var(--gradient-brand);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border-color: transparent;
 }
 
@@ -662,7 +662,7 @@ export default {
 .refresh-btn {
   padding: 0.5rem 1rem;
   border: 2px solid var(--color-border);
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: var(--text-sm);
@@ -687,7 +687,7 @@ export default {
 .delete-all-btn {
   padding: 0.5rem 1rem;
   border: 2px solid var(--color-danger);
-  background: white;
+  background: var(--color-surface);
   color: var(--color-danger);
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -701,7 +701,7 @@ export default {
 
 .delete-all-btn:hover:not(:disabled) {
   background: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .delete-all-btn:disabled {
@@ -747,7 +747,7 @@ export default {
 }
 
 .suggestion-card:hover {
-  border-color: #cbd5e1;
+  border-color: var(--color-text-subtle);
   box-shadow: var(--shadow-sm);
 }
 
@@ -764,7 +764,7 @@ export default {
 }
 
 .suggestion-card.status-rejected {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--color-danger-light);
 }
 
 .suggestion-header {
@@ -797,10 +797,10 @@ export default {
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: white;
+  background: var(--color-surface);
   font-weight: 600;
   font-size: var(--text-sm);
-  color: #374151;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
@@ -833,7 +833,7 @@ export default {
 .action-btn {
   padding: 0.5rem 1rem;
   border: 2px solid var(--color-border);
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: var(--text-sm);
@@ -919,7 +919,7 @@ export default {
 .ai-questions-section {
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 2px solid #f0f0f0;
+  border-top: 2px solid var(--color-surface-muted);
 }
 
 .ai-questions-header {
@@ -959,7 +959,7 @@ export default {
 }
 
 .ai-question-card:hover {
-  border-color: #cbd5e1;
+  border-color: var(--color-text-subtle);
   box-shadow: var(--shadow-sm);
 }
 
@@ -996,8 +996,8 @@ export default {
 
 .game-context-badge {
   padding: 0.25rem 0.75rem;
-  background: var(--gradient-brand);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border-radius: var(--radius-lg);
   font-size: var(--text-xs);
   font-weight: 700;
@@ -1024,7 +1024,7 @@ export default {
 .question-text strong {
   display: block;
   margin-bottom: 0.5rem;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
 
@@ -1036,7 +1036,7 @@ export default {
 }
 
 .answer-text {
-  background: #f0fdf4;
+  background: var(--color-success-soft);
   border-left: 3px solid var(--color-success-light);
   padding: 1rem;
   border-radius: var(--radius-md);
@@ -1046,7 +1046,7 @@ export default {
 .answer-text strong {
   display: block;
   margin-bottom: 0.5rem;
-  color: #065f46;
+  color: var(--color-success);
   font-size: var(--text-sm);
 }
 
@@ -1067,7 +1067,7 @@ export default {
 .load-more-btn {
   padding: 0.75rem 2rem;
   border: 2px solid var(--color-primary);
-  background: white;
+  background: var(--color-surface);
   color: var(--color-primary);
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -1078,7 +1078,7 @@ export default {
 
 .load-more-btn:hover:not(:disabled) {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .load-more-btn:disabled {

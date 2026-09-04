@@ -1,7 +1,7 @@
 <template>
   <div class="sportsbook-revenue" v-if="isAuthenticated">
     <div class="revenue-header">
-      <h3>💰 Sportsbook Revenue</h3>
+      <h3>Sportsbook Revenue</h3>
       <p class="revenue-description">
         Track how much the sportsbook has made across all users
       </p>
@@ -228,7 +228,7 @@ export default {
 
 <style scoped>
 .sportsbook-revenue {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 2rem;
@@ -238,7 +238,7 @@ export default {
 .revenue-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-surface-muted);
 }
 
 .revenue-header h3 {
@@ -302,14 +302,14 @@ export default {
 }
 
 .stat-card.primary {
-background: var(--gradient-brand);
+background: var(--color-primary);
 border-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .stat-card.primary .stat-label,
 .stat-card.primary .stat-value {
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .stat-icon {
@@ -333,7 +333,7 @@ border-color: var(--color-primary);
 }
 
 .stat-card.primary .stat-value.positive {
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .stat-value.negative {
@@ -341,7 +341,7 @@ border-color: var(--color-primary);
 }
 
 .stat-card.primary .stat-value.negative {
-  color: #fecaca;
+  color: var(--color-danger-soft);
 }
 
 .stat-label {
@@ -365,7 +365,7 @@ border-color: var(--color-primary);
 
 .revenue-breakdown h4 {
   margin: 0 0 1rem 0;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-lg);
   font-weight: 600;
 }
@@ -381,7 +381,7 @@ border-color: var(--color-primary);
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
 }
 
@@ -397,7 +397,7 @@ border-color: var(--color-primary);
 }
 
 .breakdown-item.total .breakdown-label {
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-base);
 }
 
@@ -429,7 +429,7 @@ border-color: var(--color-primary);
 .refresh-btn {
   padding: 0.75rem 1.5rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -439,7 +439,7 @@ border-color: var(--color-primary);
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--color-primary-dark);
   transform: translateY(-1px);
 }
 

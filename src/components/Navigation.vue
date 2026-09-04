@@ -71,6 +71,15 @@
               </svg>
             </div>
             <div v-if="isUserMenuOpen" class="user-dropdown">
+              <button @click="cycleTheme" class="dropdown-item theme-item">
+                <svg class="theme-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="3.25" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8 1.25v1.5M8 13.25v1.5M14.75 8h-1.5M2.75 8h-1.5M12.77 3.23l-1.06 1.06M4.29 11.71l-1.06 1.06M12.77 12.77l-1.06-1.06M4.29 4.29L3.23 3.23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Appearance</span>
+                <span class="theme-value">{{ themeLabel }}</span>
+              </button>
+              <div class="dropdown-divider"></div>
               <button @click="handleSuggestions" class="dropdown-item suggestions-item">
                 <svg class="suggestions-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M8 1L10.09 5.26L15 6.27L11 9.14L11.82 14.02L8 11.77L4.18 14.02L5 9.14L1 6.27L5.91 5.26L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -181,6 +190,15 @@
           <span class="nav-text">Suggestions</span>
         </button>
 
+        <!-- Appearance -->
+        <button
+          @click="cycleTheme"
+          class="mobile-nav-link theme-btn-mobile"
+        >
+          <span class="nav-text">Appearance</span>
+          <span class="theme-value">{{ themeLabel }}</span>
+        </button>
+
         <!-- Logout - only when authenticated -->
         <button 
           v-if="isAuthenticated"
@@ -198,6 +216,7 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import SuggestionsModal from './SuggestionsModal.vue'
+import { useTheme } from '../composables/useTheme.js'
 
 export default {
   name: 'Navigation',
@@ -213,6 +232,7 @@ export default {
   emits: ['change-page'],
   setup(props, { emit }) {
     const userStore = useUserStore()
+    const { themeLabel, cycleTheme } = useTheme()
     const isMobileMenuOpen = ref(false)
     const isUserMenuOpen = ref(false)
     const isSuggestionsModalOpen = ref(false)
@@ -301,6 +321,8 @@ export default {
     })
 
     return {
+      themeLabel,
+      cycleTheme,
       isAuthenticated,
       currentUser,
       userBalance,
@@ -325,29 +347,31 @@ export default {
 
 <style scoped>
 .navigation {
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-strong);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .nav-container {
-  max-width: 1500px;
+  max-width: 1440px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
+  align-items: stretch;
+  gap: var(--space-10);
+  height: 66px;
+  padding: 0 var(--space-10);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   font-size: var(--text-2xl);
-  font-weight: 800;
   color: var(--color-text);
+  flex: 0 0 auto;
 }
 
 .brand-icon {
@@ -355,63 +379,55 @@ export default {
 }
 
 .brand-text {
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--color-text);
+  letter-spacing: -0.005em;
 }
 
 .nav-links {
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: stretch;
+  flex: 1 1 auto;
+  justify-content: space-between;
 }
 
 .nav-buttons {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: stretch;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: 2px solid transparent;
-  background: #f8fafc;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 500;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: var(--text-base);
-  height: 48px;
-  box-sizing: border-box;
+  transition: color 0.14s ease, border-color 0.14s ease;
 }
 
 .nav-link:hover {
-  background: #e2e8f0;
-  color: #374151;
-  transform: translateY(-1px);
+  color: var(--color-text);
 }
 
 .nav-link.active {
-  background: var(--gradient-brand);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.nav-link.active:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 600;
 }
 
 .nav-link.primary {
-  background: var(--gradient-brand);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   font-weight: 700;
@@ -423,33 +439,43 @@ export default {
 }
 
 .nav-link.secondary {
-  background: #f8fafc;
+  background: var(--color-surface-muted);
   color: var(--color-text-muted);
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border);
 }
 
 .nav-link.secondary:hover {
-  background: #e2e8f0;
-  color: #374151;
+  background: var(--color-border);
+  color: var(--color-text-muted);
   transform: translateY(-1px);
+}
+
+.auth-section {
+  display: flex;
+  align-items: center;
 }
 
 .nav-link.auth-btn {
-  background: var(--color-success);
-  color: white;
-  border: 2px solid var(--color-success);
+  align-self: center;
+  height: 34px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
 }
 
 .nav-link.auth-btn:hover {
-  background: #047857;
-  border-color: #047857;
-  transform: translateY(-1px);
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: var(--color-text-inverse);
 }
 
 .user-section {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   position: relative;
 }
 
@@ -458,10 +484,10 @@ export default {
 }
 
 .user-info {
-  background: #f8fafc;
+  background: var(--color-surface-muted);
   border-radius: var(--radius-md);
   padding: 0.5rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border);
   height: 48px;
   box-sizing: border-box;
   display: flex;
@@ -472,15 +498,15 @@ export default {
 }
 
 .user-info:hover {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
+  background: var(--color-border);
+  border-color: var(--color-text-subtle);
 }
 
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--gradient-brand);
+  background: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -488,7 +514,7 @@ export default {
 }
 
 .avatar-text {
-  color: white;
+  color: var(--color-text-inverse);
   font-weight: 700;
   font-size: var(--text-sm);
 }
@@ -533,10 +559,10 @@ export default {
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   min-width: 160px;
   padding: 0.25rem 0;
   z-index: 1000;
@@ -569,7 +595,7 @@ export default {
 }
 
 .dropdown-item:hover {
-  background: #f8fafc;
+  background: var(--color-surface-muted);
 }
 
 .user-info-item {
@@ -603,9 +629,22 @@ export default {
   font-weight: 700;
 }
 
+.theme-value {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.theme-btn-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .dropdown-divider {
   height: 1px;
-  background: #e2e8f0;
+  background: var(--color-border);
   margin: 0.5rem 0;
 }
 
@@ -616,8 +655,8 @@ export default {
 }
 
 .logout-item:hover {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
 .logout-icon {
@@ -641,7 +680,7 @@ export default {
 
 .dropdown-divider {
   height: 1px;
-  background: #e2e8f0;
+  background: var(--color-border);
   margin: 0.25rem 0;
 }
 
@@ -710,7 +749,7 @@ export default {
   right: 0;
   width: 280px;
   height: 100%;
-  background: white;
+  background: var(--color-surface);
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
   padding: 4rem 1.5rem 2rem;
   display: flex;
@@ -725,8 +764,8 @@ export default {
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  border: 2px solid #e2e8f0;
-  background: #f8fafc;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface-muted);
   border-radius: var(--radius-md);
   font-weight: 600;
   color: var(--color-text-muted);
@@ -738,45 +777,45 @@ export default {
 }
 
 .mobile-nav-link:hover {
-  background: #e2e8f0;
-  color: #374151;
+  background: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .mobile-nav-link.active {
-  background: var(--gradient-brand);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .mobile-nav-link.auth-btn {
   background: var(--color-success);
-  color: white;
+  color: var(--color-text-inverse);
   border-color: var(--color-success);
 }
 
 .mobile-nav-link.auth-btn:hover {
-  background: #047857;
+  background: var(--color-success);
 }
 
 .logout-btn-mobile {
   background: var(--color-danger);
-  color: white;
+  color: var(--color-text-inverse);
   border-color: var(--color-danger);
 }
 
 .logout-btn-mobile:hover {
-  background: #b91c1c;
+  background: var(--color-danger);
 }
 
 .suggestions-btn-mobile {
   background: var(--color-primary-soft);
   color: var(--color-primary);
-  border-color: #bfdbfe;
+  border-color: var(--color-primary-soft);
 }
 
 .suggestions-btn-mobile:hover {
-  background: #dbeafe;
+  background: var(--color-primary-soft);
   color: var(--color-primary-dark);
 }
 
@@ -789,10 +828,10 @@ export default {
 }
 
 .user-info-mobile {
-  background: #f8fafc;
+  background: var(--color-surface-muted);
   border-radius: var(--radius-md);
   padding: 0.5rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border);
   font-size: 0.85rem;
 }
 

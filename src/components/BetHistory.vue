@@ -464,669 +464,294 @@ export default {
 
 <style scoped>
 .bet-history {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .bet-history-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
 }
 
 .bet-history-header h3 {
   margin: 0;
-  color: var(--color-text);
-  font-size: var(--text-2xl);
+  font-size: var(--label-size);
   font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
 }
 
+/* .tab-btn is global (the league tabs) and sets flex:1 with 16/24px padding —
+   inside the history header that produced full-width slabs. Scoped rules win. */
 .bet-tabs {
   display: flex;
-  gap: 0.5rem;
-}
-
-.tab-btn {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid var(--color-border);
-  background: white;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.tab-btn.active {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-}
-
-.tab-btn:hover:not(.active) {
-  border-color: var(--color-text-subtle);
-  color: #374151;
-}
-
-.bets-section {
-  min-height: 200px;
-}
-
-.no-bets {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--color-text-muted);
-}
-
-.no-bets p {
-  font-size: var(--text-lg);
-  margin: 0;
-}
-
-.bets-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 1084px) {
-  .bets-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.bet-card {
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.bet-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.bet-card.active {
-  border-left: 4px solid var(--color-warning);
-  background: #fffbeb;
-}
-
-.bet-card.won {
-  border-left: 4px solid var(--color-success);
-  background: var(--color-success-soft);
-}
-
-.bet-card.lost {
-  border-left: 4px solid var(--color-danger);
-  background: #fef2f2;
-}
-
-.bet-card.push {
-  border-left: 4px solid #6366f1;
-  background: #eef2ff;
-}
-
-.bet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.bet-header-right {
-  display: flex;
-  align-items: center;
-}
-
-.bet-header-right-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.bet-game h4 {
-  margin: 0 0 0.25rem 0;
-  color: var(--color-text);
-  font-size: var(--text-lg);
-  font-weight: 600;
-}
-
-.bet-date {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.game-start-time {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  display: block;
-}
-
-.bet-status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.bet-status.pending {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.bet-status.won {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.bet-status.lost {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.bet-status.push {
-  background: #e0e7ff;
-  color: #4338ca;
-}
-
-.bet-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
-  align-items: center;
-}
-
-.bet-type-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.bet-type {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.bet-selection {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.bet-amounts {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.bet-amount {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.bet-amount .label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.bet-amount .value {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.bet-amount .value.potential {
-  color: var(--color-success);
-}
-
-.bet-amount .value.won {
-  color: var(--color-success);
-}
-
-.bet-amount .value.lost {
-  color: var(--color-danger);
-}
-
-.bet-odds {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.bet-odds .label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.bet-odds .value {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-@media (max-width: 768px) {
-  .bet-history {
-    padding: 1.5rem;
-  }
-  
-  .bet-history-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .bet-history-header h3 {
-    font-size: var(--text-xl);
-  }
-  
-  .bet-tabs {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .tab-btn {
-    padding: 0.5rem 1rem;
-    font-size: var(--text-sm);
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-  
-  .bet-details {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .bet-header {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-}
-
-/* Final Score Inline Styles */
-.final-score-inline {
-  font-size: var(--text-xs);
-  color: #64748b;
-  font-weight: 400;
-}
-
-.final-score-text {
-  display: inline-block;
-}
-
-.total-badge {
-  color: #475569;
-  font-weight: 500;
-  margin-left: 0.25rem;
-}
-
-.spread-badge {
-  color: #475569;
-  font-weight: 500;
-  margin-left: 0.25rem;
-}
-
-/* Live Game Data Styles */
-.live-game-data {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: 0.5rem;
-  border: 1px solid var(--color-warning);
-}
-
-.live-score {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: var(--text-lg);
-  font-weight: 700;
-  color: #92400e;
-}
-
-.team-score {
-  color: #92400e;
-}
-
-.score-separator {
-  color: #a16207;
-  font-weight: 500;
-}
-
-.live-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.live-indicator {
-  color: var(--color-danger);
-  font-weight: 700;
-  font-size: var(--text-sm);
-  animation: pulse 2s infinite;
-}
-
-.game-time {
-  font-size: var(--text-sm);
-  color: #92400e;
-  font-weight: 600;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Cancel Button in Header */
-.cancel-bet-btn-header {
-  padding: 0.25rem 0.75rem;
-  background: var(--color-danger);
-  color: white;
+.bet-tabs .tab-btn {
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
   border: none;
-  border-radius: 20px;
-  font-weight: 600;
+  border-left: 1px solid var(--color-border-strong);
+  border-bottom: none;
+  border-radius: 0;
+  font-family: inherit;
   font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.3s ease;
   white-space: nowrap;
 }
 
-.cancel-bet-btn-header:hover:not(:disabled) {
-  background: #b91c1c;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+.bet-tabs .tab-btn:first-child { border-left: none; }
+
+.bet-tabs .tab-btn:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
 }
 
-.cancel-bet-btn-header:disabled {
-  background: var(--color-text-subtle);
-  cursor: not-allowed;
-  opacity: 0.7;
+.bet-tabs .tab-btn.active {
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  border-bottom: none;
 }
 
-/* Modal Styles */
+.bets-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+}
+
+.no-bets {
+  padding: var(--space-8) 0;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.bets-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.section-label {
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.loading-state {
+  padding: var(--space-8) 0;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination-left,
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pagination-info {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination-btn {
+  height: 32px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.pagination-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.page-size-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.page-size-select {
+  height: 32px;
+  padding: 0 var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+/* ── Confirm modal ── */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  padding: var(--space-5);
+  background: rgba(35, 29, 24, 0.45);
+  z-index: 1100;
 }
 
 .modal-content {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 450px;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-top: 2px solid var(--color-text);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
 }
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
   border-bottom: 1px solid var(--color-border);
 }
 
-.modal-header h3 {
+.modal-header h3,
+.modal-header h4 {
   margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 400;
   color: var(--color-text);
-  font-size: var(--text-xl);
-  font-weight: 700;
 }
 
 .modal-close-btn {
-  background: none;
-  border: none;
-  font-size: var(--text-2xl);
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  font-size: var(--text-xl);
+  line-height: 1;
+  color: var(--color-text-subtle);
+  cursor: pointer;
 }
 
 .modal-close-btn:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   color: var(--color-text);
 }
 
 .modal-body {
-  padding: 1.5rem;
-}
-
-.modal-body p {
-  margin: 0 0 0.75rem 0;
-  color: #374151;
+  padding: var(--space-4);
   font-size: var(--text-base);
-  line-height: 1.5;
-}
-
-.modal-body p:last-of-type {
-  margin-bottom: 0;
+  color: var(--color-text-muted);
 }
 
 .modal-info {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
   background: var(--color-surface-muted);
-  padding: 1rem;
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--color-warning);
-  margin-top: 1rem;
-}
-
-.modal-info strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   color: var(--color-text);
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .modal-footer {
   display: flex;
-  gap: 0.75rem;
-  padding: 1.5rem;
-  border-top: 1px solid var(--color-border);
   justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-muted);
+  border-top: 1px solid var(--color-border);
 }
 
 .modal-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
+  height: 40px;
+  padding: 0 var(--space-4);
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: var(--text-sm);
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 100px;
 }
 
 .modal-btn-cancel {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
 }
 
-.modal-btn-cancel:hover {
-  background: var(--color-border);
-}
+.modal-btn-cancel:hover { background: var(--color-surface-muted); color: var(--color-text); }
 
 .modal-btn-confirm {
   background: var(--color-danger);
-  color: white;
-}
-
-.modal-btn-confirm:hover:not(:disabled) {
-  background: #b91c1c;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-}
-
-.modal-btn-confirm:disabled {
-  background: var(--color-text-subtle);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-@media (max-width: 768px) {
-  .modal-content {
-    width: 95%;
-    margin: 1rem;
-  }
-  
-  .modal-footer {
-    flex-direction: column-reverse;
-  }
-  
-  .modal-btn {
-    width: 100%;
-  }
-}
-
-/* Pagination Styles */
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--color-border);
-  flex-wrap: wrap;
-}
-
-.pagination-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.page-size-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.page-size-select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-  min-width: 60px;
-}
-
-.page-size-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.pagination-right {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-}
-
-.pagination-btn {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid var(--color-border);
-  background: white;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-danger);
+  color: var(--color-text-inverse);
   font-weight: 600;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 100px;
 }
 
-.pagination-btn:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-  transform: translateY(-1px);
-}
+.modal-btn-confirm:hover { filter: brightness(0.92); }
 
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: var(--color-surface-muted);
-}
-
-.pagination-info {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 500;
-  min-width: 100px;
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .pagination {
-    flex-direction: column;
-    gap: 1rem;
+@media (max-width: 720px) {
+  .bet-history-header {
     align-items: stretch;
-  }
-  
-  .pagination-left {
-    justify-content: center;
-  }
-  
-  .pagination-right {
     flex-direction: column;
-    gap: 0.75rem;
-    width: 100%;
   }
-  
-  .pagination-btn {
-    width: 100%;
+
+  /* The header stacks here, and a stretched flex item would pull the bordered
+     group to full width - leaving empty space inside the border that reads as
+     one more tab. It hugs its buttons and only scrolls if they overflow. */
+  .bet-tabs {
+    align-self: flex-start;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+  .bet-tabs::-webkit-scrollbar { display: none; }
 }
 </style>

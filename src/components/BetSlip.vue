@@ -6,7 +6,7 @@
         {{ legCount }}-leg parlay
         <span v-if="legCount >= minLegs" class="slip-handle-odds">{{ combinedOdds }}</span>
       </span>
-      <span class="slip-chevron">{{ isOpen ? '▾' : '▴' }}</span>
+      <span class="slip-chevron" :class="{ open: isOpen }"><svg class="icon-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </button>
 
     <div v-show="isOpen" class="slip-body">
@@ -77,7 +77,7 @@
 <script>
 import { ref } from 'vue'
 import { useBetSlip } from '../stores/betSlipStore.js'
-import { formatAmerican } from '../utils/oddsMath.js'
+import { formatAmerican, formatLine } from '../utils/oddsMath.js'
 
 export default {
   name: 'BetSlip',
@@ -90,12 +90,6 @@ export default {
 
     const legKey = (leg) => `${leg.gameId}:${leg.betType}:${leg.selection}:${leg.line ?? ''}`
 
-    const displayLine = (leg) => {
-      if (!leg.line) return ''
-      if (leg.betType === 'total') return `${leg.selection === 'Over' ? 'o' : 'u'}${leg.line}`
-      const n = parseFloat(leg.line)
-      return Number.isNaN(n) ? leg.line : (n > 0 ? `+${n}` : `${n}`)
-    }
 
     const onStake = (value) => {
       slip.setStake(value)
@@ -116,235 +110,374 @@ export default {
       }
     }
 
-    return { ...slip, error, success, placing, quickAmounts, legKey, displayLine, onStake, submit, formatAmerican }
+    return { ...slip, error, success, placing, quickAmounts, legKey, displayLine: formatLine, onStake, submit, formatAmerican }
   }
 }
 </script>
 
 <style scoped>
+/* The slip is the one element that genuinely floats, so it keeps a shadow
+   where the rest of the redesign uses rules. Comments about sitting on a blue
+   gradient no longer apply — the page is paper now. */
 .bet-slip {
   /* ChatWidget owns the bottom-right corner (z-index 1000), so the slip lives
      on the left. On mobile the chat widget is hidden and this goes full width. */
   position: fixed;
-  left: 24px;
+  left: var(--space-6);
   bottom: 0;
-  width: 340px;
-  max-width: calc(100vw - 48px);
+  width: 360px;
+  max-width: calc(100vw - var(--space-12));
   background: var(--color-surface);
-  /* Every main page uses --gradient-brand as its background, so a brand-colored
-     ticket disappears into it. A white card with a brand stripe on top reads
-     clearly against the blue without shouting. */
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-border-strong);
   border-bottom: none;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.18);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  box-shadow: var(--shadow-lg);
   z-index: 900;
   overflow: hidden;
 }
 
+/* ── Handle ── */
 .slip-handle {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 15px 16px;
-  /* Light green ties the ticket to the money theme and to the green Place
-     button, and reads clearly against the blue page background. */
-  background: var(--color-success-soft);
-  color: var(--color-text);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-text);
   border: none;
-  border-top: 3px solid var(--color-success);
-  border-bottom: 1px solid #a7f3d0;
   cursor: pointer;
-  font-size: var(--text-lg);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-family: inherit;
+  text-align: left;
 }
 
 .slip-badge {
-  background: var(--color-success);
-  color: white;
-  border-radius: 999px;
-  min-width: 24px;
-  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.slip-handle-text { flex: 1; text-align: left; }
+.slip-handle-text {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-bg);
+}
+
 .slip-handle-odds {
-  color: var(--color-success);
-  font-weight: 700;
-  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-success-light);
   font-variant-numeric: tabular-nums;
 }
-.slip-chevron { color: var(--color-text-subtle); }
 
+.slip-chevron {
+  display: inline-flex;
+  color: var(--color-text-muted);
+}
+
+.slip-chevron .icon-chevron { transition: transform 0.16s ease; }
+.slip-chevron.open .icon-chevron { transform: rotate(180deg); }
+
+/* the slip is anchored to the bottom of the viewport, so the whole panel needs
+   a ceiling — not just the legs list — or a long parlay pushes the Place button
+   off screen on a short window */
 .slip-body {
-  padding: 16px;
-  max-height: 60vh;
+  max-height: 82vh;
   overflow-y: auto;
 }
 
-.slip-legs { display: flex; flex-direction: column; gap: 8px; }
+/* ── Legs ── */
+.slip-legs {
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow-y: auto;
+}
 
 .slip-leg {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.slip-leg-main { flex: 1; min-width: 0; }
+.slip-leg-main {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .slip-leg-pick {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--color-text);
-  font-size: var(--text-sm);
 }
-.slip-leg-line { color: var(--color-text-muted); font-weight: 500; margin-left: 4px; }
+
+.slip-leg-line {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
 .slip-leg-game {
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
+
 .slip-leg-odds {
-  font-weight: 700;
-  color: var(--color-success);
-  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
 }
+
 .slip-leg-remove {
-  background: none;
-  border: none;
-  color: var(--color-text-subtle);
-  font-size: var(--text-xl);
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 4px;
-}
-.slip-leg-remove:hover { color: var(--color-danger); }
-
-.slip-hint {
-  margin: 10px 0 0;
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
-.slip-stake { margin-top: 14px; }
-.slip-stake label {
-  display: block;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
-}
-.slip-amount-wrap { display: flex; align-items: center; }
-.slip-currency {
-  padding: 0 8px;
-  color: var(--color-text-muted);
-  font-weight: 600;
-  border: 1px solid var(--color-border-strong);
-  border-right: none;
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
-  height: 40px;
   display: flex;
   align-items: center;
-}
-.slip-amount-input {
-  flex: 1;
-  height: 40px;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  padding: 0 10px;
-  font-size: var(--text-base);
-  font-family: inherit;
-  font-variant-numeric: tabular-nums;
-  min-width: 0;
-}
-.slip-amount-input:focus { outline: none; border-color: var(--color-primary); box-shadow: var(--shadow-focus); }
-
-.slip-quick { display: flex; gap: 6px; margin-top: 8px; }
-.slip-quick-btn {
-  flex: 1;
-  padding: 7px 0;
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border);
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.slip-leg-remove:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-danger);
+}
+
+.slip-hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ── Stake ── */
+.slip-stake {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+.slip-stake label {
+  font-size: var(--label-size);
   font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  flex: 0 0 auto;
+}
+
+.slip-amount-wrap {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 42px;
+  padding: 0 var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.slip-amount-wrap:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.slip-currency {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  color: var(--color-text-subtle);
+}
+
+.slip-amount-input {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.slip-amount-input::-webkit-outer-spin-button,
+.slip-amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.slip-quick {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.slip-quick-btn {
+  height: 36px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   cursor: pointer;
   font-variant-numeric: tabular-nums;
 }
-.slip-quick-btn.active,
-.slip-quick-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
 
-.slip-summary {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--color-border);
+.slip-quick-btn:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
 }
+
+.slip-quick-btn.active {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-text-inverse);
+}
+
+/* ── Summary ── */
+.slip-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-muted);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
 .slip-row {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  font-size: var(--text-sm);
+  gap: var(--space-3);
+  font-size: var(--text-base);
   color: var(--color-text-muted);
-  margin-bottom: 6px;
 }
-.slip-row strong { color: var(--color-text); font-variant-numeric: tabular-nums; }
-.slip-payout { color: var(--color-success); }
 
-.slip-error, .slip-success {
-  margin: 10px 0 0;
-  font-size: var(--text-xs);
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
+.slip-row strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
-.slip-error { background: #fef2f2; color: var(--color-danger); }
-.slip-success { background: var(--color-success-soft); color: var(--color-success); }
 
-.slip-actions { display: flex; gap: 8px; margin-top: 14px; }
+.slip-row .slip-payout {
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-success);
+}
+
+/* ── Actions ── */
+.slip-actions {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
 .slip-clear {
-  padding: 0.75rem 1rem;
-  font-family: inherit;
-  background: var(--color-surface-muted);
+  height: 44px;
+  padding: 0 var(--space-4);
+  background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: var(--text-sm);
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 500;
   color: var(--color-text-muted);
   cursor: pointer;
+  flex: 0 0 auto;
 }
+
+.slip-clear:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
 .slip-place {
-  /* Matches .place-bet-btn - in this app, green means "place the bet" */
-  flex: 1;
-  padding: 0.75rem 1rem;
-  background: var(--color-success);
-  color: white;
-  border: none;
+  flex: 1 1 0;
+  height: 44px;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
   border-radius: var(--radius-md);
-  font-weight: 700;
-  font-size: var(--text-base);
   font-family: inherit;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text-inverse);
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.slip-place:hover:not(:disabled) { background: #047857; }
-.slip-place:disabled { opacity: 0.5; cursor: not-allowed; }
+.slip-place:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
 
-@media (max-width: 768px) {
-  .bet-slip { left: 0; right: 0; width: 100%; max-width: 100%; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-  .slip-body { max-height: 55vh; }
+.slip-place:disabled,
+.slip-clear:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.slip-error,
+.slip-success {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.slip-error { color: var(--color-danger); background: var(--color-danger-soft); }
+.slip-success { color: var(--color-success); background: var(--color-success-soft); }
+
+@media (max-width: 720px) {
+  .bet-slip {
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
 }
 </style>

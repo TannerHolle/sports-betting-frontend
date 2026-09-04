@@ -1,124 +1,134 @@
 <template>
   <div class="betting-page">
-    <div class="page-header">
-      <h1 class="page-title">
-        Betting Summary
-      </h1>
-      <p class="page-description">
-        {{ userBalance > 1000 ? "Don't you wish this were real money?" : "Aren't you glad this isnt real money?" }}
-      </p>
-    </div>
+    <div class="container">
 
-    <!-- Quick Stats Dashboard -->
-    <div class="stats-dashboard" v-if="userStats">
-      <div class="stat-card">
-        <div class="stat-value">${{ userBalance.toLocaleString() }}</div>
-        <div class="stat-label">Available Cash</div>
-      </div>
-      <div class="stat-card" v-if="outstandingBetAmount > 0">
-        <div class="stat-value">${{ outstandingBetAmount.toLocaleString() }}</div>
-        <div class="stat-label">Outstanding Bets</div>
-      </div>
-      <div class="stat-card" v-if="userStats.activeBets > 0">
-        <div class="stat-value">{{ userStats.activeBets }}</div>
-        <div class="stat-label">Active Bets</div>
-      </div>
-      <div class="stat-card" v-if="userStats.winRate > 0">
-        <div class="stat-value" :class="{ 'positive': userStats.winRate > 50, 'negative': userStats.winRate < 50 }">
-          {{ userStats.winRate }}%
+      <!-- Masthead -->
+      <header class="page-masthead">
+        <div class="masthead-title">
+          <h1 class="page-title">Betting Summary</h1>
+          <p class="page-description">
+            {{ userBalance > 1000 ? "Don't you wish this were real money?" : "Aren't you glad this isnt real money?" }}
+          </p>
         </div>
-        <div class="stat-label">Win Rate</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ userStats.totalBets }}</div>
-        <div class="stat-label">Total Bets</div>
-      </div>
-      <div class="stat-card" v-if="userStats.currentStreak !== 0">
-        <div class="stat-value" :class="{ 'positive': userStats.currentStreak > 0, 'negative': userStats.currentStreak < 0 }">
-          {{ userStats.currentStreak > 0 ? '+' : '' }}{{ userStats.currentStreak }}
+        <div class="masthead-date">
+          <span class="eyebrow">{{ boardDate.weekday }}</span>
+          <span class="masthead-date-value figure">{{ boardDate.date }}</span>
         </div>
-        <div class="stat-label">Current Streak</div>
-      </div>
-      <div class="stat-card" v-if="winPotential > 0">
-        <div class="stat-value positive">${{ winPotential.toLocaleString() }}</div>
-        <div class="stat-label">Win Potential</div>
-      </div>
-      <div class="stat-card" v-if="userStats.todaysProfitLoss !== 0">
-        <div class="stat-value" :class="{ 'positive': userStats.todaysProfitLoss > 0, 'negative': userStats.todaysProfitLoss < 0 }">
-          {{ userStats.todaysProfitLoss >= 0 ? '+' : '' }}${{ userStats.todaysProfitLoss.toLocaleString() }}
+      </header>
+
+      <!-- Ledger band: one rule-divided strip, so it can't re-wrap unevenly
+           as conditional stats appear and disappear -->
+      <section class="ledger" v-if="userStats">
+        <div class="ledger-primary">
+          <span class="eyebrow">Available cash</span>
+          <span class="ledger-primary-value figure">${{ userBalance.toLocaleString() }}</span>
         </div>
-        <div class="stat-label">Today's P/L</div>
-      </div>
-    </div>
+        <div class="ledger-cell" v-if="outstandingBetAmount > 0">
+          <span class="eyebrow">Outstanding</span>
+          <span class="ledger-value figure">${{ outstandingBetAmount.toLocaleString() }}</span>
+        </div>
+        <div class="ledger-cell" v-if="userStats.activeBets > 0">
+          <span class="eyebrow">Active bets</span>
+          <span class="ledger-value figure">{{ userStats.activeBets }}</span>
+        </div>
+        <div class="ledger-cell" v-if="userStats.winRate > 0">
+          <span class="eyebrow">Win rate</span>
+          <span class="ledger-value figure" :class="{ positive: userStats.winRate > 50, negative: userStats.winRate < 50 }">{{ userStats.winRate }}%</span>
+        </div>
+        <div class="ledger-cell">
+          <span class="eyebrow">Total bets</span>
+          <span class="ledger-value figure">{{ userStats.totalBets }}</span>
+        </div>
+        <div class="ledger-cell" v-if="userStats.currentStreak !== 0">
+          <span class="eyebrow">Streak</span>
+          <span class="ledger-value figure" :class="{ positive: userStats.currentStreak > 0, negative: userStats.currentStreak < 0 }">{{ userStats.currentStreak > 0 ? '+' : '' }}{{ userStats.currentStreak }}</span>
+        </div>
+        <div class="ledger-cell" v-if="winPotential > 0">
+          <span class="eyebrow">Win potential</span>
+          <span class="ledger-value figure positive">${{ winPotential.toLocaleString() }}</span>
+        </div>
+        <div class="ledger-cell" v-if="userStats.todaysProfitLoss !== 0">
+          <span class="eyebrow">Today P/L</span>
+          <span class="ledger-value figure" :class="{ positive: userStats.todaysProfitLoss > 0, negative: userStats.todaysProfitLoss < 0 }">{{ userStats.todaysProfitLoss >= 0 ? '+' : '' }}${{ userStats.todaysProfitLoss.toLocaleString() }}</span>
+        </div>
+      </section>
 
-    <!-- Live wagers -->
-    <LiveBets />
+      <div class="dash">
+        <main class="dash-main">
 
-    <!-- Parlays -->
-    <ParlayHistory />
+          <LiveBets />
 
-    <!-- Bet History -->
-    <BetHistory />
+          <section class="board">
+            <div class="section-head">
+              <h2>{{ showingDate === 'tomorrow' ? "Tomorrow's board" : "Today's board" }}</h2>
+              <span class="section-meta" v-if="gamesWithBetting.length">
+                {{ gamesWithBetting.length }} game{{ gamesWithBetting.length === 1 ? '' : 's' }} with lines
+              </span>
+            </div>
 
-    <!-- Games Header -->
-    <div class="games-header">
-      <h2>
-        Games {{ showingDate === 'tomorrow' ? 'Tomorrow' : 'Today' }} Available for Betting
-      </h2>
-      <p class="section-description" v-if="!loading && gamesWithBetting.length === 0">
-        No games with betting lines available at this time.
-      </p>
-      <p class="section-description" v-else>
-        Games with betting lines scheduled for {{ showingDate === 'tomorrow' ? 'tomorrow' : 'today' }} are shown below. To browse and bet on games from other dates or leagues, visit the Live Scores page.
-      </p>
-    </div>
+            <div class="board-controls">
+              <div class="board-controls-left">
+                <div class="league-switch" v-if="availableSports.length">
+                  <button
+                    v-for="sport in availableSports"
+                    :key="sport.id"
+                    @click="setActiveLeague(sport.id)"
+                    :class="{ active: activeLeague === sport.id }"
+                    class="league-chip"
+                  >
+                    {{ sport.name }}
+                  </button>
+                </div>
+                <p class="board-note">
+                  To bet on other dates or leagues, visit Live Scores.
+                </p>
+              </div>
+              <!-- printed once for the whole board rather than per game -->
+              <div class="board-market-heads" v-if="gamesWithBetting.length">
+                <span>Spread</span>
+                <span>Moneyline</span>
+                <span>Total</span>
+              </div>
+            </div>
 
-    <!-- League Selection -->
-    <div class="league-selection">
-      <button 
-        v-for="sport in availableSports" 
-        :key="sport.id"
-        @click="setActiveLeague(sport.id)" 
-        :class="{ active: activeLeague === sport.id }"
-        class="league-chip"
-      >
-        <span class="chip-icon">{{ sport.icon }}</span>
-        <span class="chip-text">{{ sport.name }}</span>
-      </button>
-    </div>
+            <div v-if="error" class="error-message">
+              <h3>Could not load games</h3>
+              <p>{{ error }}</p>
+              <button @click="fetchData" class="retry-btn">Try again</button>
+            </div>
 
-    <!-- Games with Betting -->
-    <div class="games-section">
-      
-      <div v-if="error" class="error-message">
-        <h3>⚠️ Error Loading Games</h3>
-        <p>{{ error }}</p>
-        <button @click="fetchData" class="retry-btn">Try Again</button>
-      </div>
+            <div v-else-if="switchingSports" class="loading-container">
+              <div class="spinner-large"></div>
+              <p>Loading {{ currentSport.name }} games…</p>
+            </div>
 
-      <div v-else-if="switchingSports" class="loading-container">
-        <div class="spinner-large"></div>
-        <p>Loading {{ currentSport.name }} games...</p>
-      </div>
+            <div v-else-if="loading && !games.length" class="loading-container">
+              <div class="spinner-large"></div>
+              <p>Loading games…</p>
+            </div>
 
-      <div v-else-if="loading && !games.length" class="loading-container">
-        <div class="spinner-large"></div>
-        <p>Loading games...</p>
-      </div>
+            <div v-else-if="gamesWithBetting.length === 0" class="no-games">
+              <h3>No games with betting lines</h3>
+              <p>Nothing is priced for {{ currentSport.name }} right now. Try another league, or check back later.</p>
+            </div>
 
-      <div v-else-if="gamesWithBetting.length === 0" class="no-games">
-        <h3>No games with betting lines</h3>
-        <p>There are no games with betting lines available for {{ currentSport.name }} at the moment. Try switching to a different league or check back later.</p>
-      </div>
+            <div v-else class="board-list">
+              <GameBoardRow
+                v-for="game in gamesWithBetting"
+                :key="game.id"
+                :game="game"
+                :sport="activeLeague"
+              />
+            </div>
+          </section>
 
-      <div v-else class="games-grid">
-        <component 
-          :is="currentGameCardComponent"
-          v-for="game in gamesWithBetting" 
-          :key="game.id" 
-          :game="game"
-          :sport="activeLeague"
-        />
+          <BetHistory />
+        </main>
+
+        <aside class="dash-rail">
+          <ParlayHistory />
+          <Leaderboard :user-leagues="userLeaguesForLeaderboard" />
+        </aside>
       </div>
     </div>
   </div>
@@ -133,23 +143,17 @@ import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
 import ParlayHistory from './ParlayHistory.vue'
 import LiveBets from './LiveBets.vue'
+import GameBoardRow from './GameBoardRow.vue'
 import Leaderboard from './Leaderboard.vue'
-import NCAAFootballCard from './NCAAFootballCard.vue'
-import NFLGameCard from './NFLGameCard.vue'
-import CollegeBasketballCard from './CollegeBasketballCard.vue'
-import NBAGameCard from './NBAGameCard.vue'
 
 export default {
   name: 'BettingPage',
   components: {
     LiveBets,
+    GameBoardRow,
     ParlayHistory,
     BetHistory,
     Leaderboard,
-    NCAAFootballCard,
-    NFLGameCard,
-    CollegeBasketballCard,
-    NBAGameCard
   },
   setup() {
     const userStore = useUserStore()
@@ -157,8 +161,6 @@ export default {
     const loading = ref(false)
     const switchingSports = ref(false)
     const error = ref(null)
-    // Check if notice was previously dismissed
-    const showLeaderboardNotice = ref(localStorage.getItem('leaderboardNoticeDismissed') !== 'true')
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
     const refreshInterval = ref(null)
     const allSportsRefreshInterval = ref(null)
@@ -171,6 +173,16 @@ export default {
     const userBalance = computed(() => userStore.userBalance.value)
     const userStats = computed(() => userStore.userStats.value)
     
+    // Masthead date follows whichever slate is being shown
+    const boardDate = computed(() => {
+      const d = new Date()
+      if (showingDate.value === 'tomorrow') d.setDate(d.getDate() + 1)
+      return {
+        weekday: d.toLocaleDateString(undefined, { weekday: 'long' }),
+        date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+      }
+    })
+
     // Calculate outstanding bet amount (sum of all pending bets)
     const outstandingBetAmount = computed(() => {
       if (!userStore.currentUser.value?.bets) return 0
@@ -197,39 +209,27 @@ export default {
       {
         id: 'ncaa-football',
         name: 'NCAA Football',
-        icon: '🎓',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard',
-        component: 'NCAAFootballCard'
       },
       {
         id: 'nfl',
         name: 'NFL',
-        icon: '🏈',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',
-        component: 'NFLGameCard'
       },
       {
         id: 'ncaa-basketball',
         name: 'NCAA Basketball',
-        icon: '🏀',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard',
-        component: 'CollegeBasketballCard'
       },
       {
         id: 'nba',
         name: 'NBA',
-        icon: '🏀',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
-        component: 'NBAGameCard'
       }
     ])
 
     const currentSport = computed(() => {
       return sports.value.find(sport => sport.id === activeLeague.value)
-    })
-
-    const currentGameCardComponent = computed(() => {
-      return currentSport.value?.component || 'NCAAFootballCard'
     })
 
     // Format date for ESPN API (YYYYMMDD)
@@ -240,50 +240,10 @@ export default {
       return `${year}${month}${day}`
     }
 
-    // Check if a game has odds available (check external odds API first, then ESPN embedded odds)
+    // Check if a game has odds available. oddsService owns the decision so this
+    // filter and the row it renders always agree - see resolveBetting.
     const gameHasOdds = (game, sportId) => {
-      if (!game || !game.competitions?.[0]) return false
-      
-      const competition = game.competitions[0]
-      const competitors = competition.competitors || []
-      const homeTeam = competitors.find(c => c.homeAway === 'home')
-      const awayTeam = competitors.find(c => c.homeAway === 'away')
-      
-      if (!homeTeam || !awayTeam) return false
-      
-      const homeTeamName = homeTeam.team?.shortDisplayName || homeTeam.team?.displayName || ''
-      const awayTeamName = awayTeam.team?.shortDisplayName || awayTeam.team?.displayName || ''
-      
-      if (!homeTeamName || !awayTeamName) {
-        return false
-      }
-      
-      // First, check external odds database
-      if (allOdds.value && allOdds.value[sportId]) {
-        // Try matching with shortDisplayName first (same as game cards do)
-        let gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeTeamName, awayTeamName)
-        
-        if (!gameOdds) {
-          // Try with displayName if shortDisplayName didn't match
-          const homeDisplayName = homeTeam.team?.displayName || ''
-          const awayDisplayName = awayTeam.team?.displayName || ''
-          if (homeDisplayName && awayDisplayName && (homeDisplayName !== homeTeamName || awayDisplayName !== awayTeamName)) {
-            gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeDisplayName, awayDisplayName)
-          }
-        }
-        
-        if (gameOdds) {
-          return true
-        }
-      }
-      
-      // Fall back to checking if odds are embedded in the game data (ESPN format)
-      const embeddedOdds = competition.odds?.[0]
-      if (embeddedOdds && (embeddedOdds.pointSpread || embeddedOdds.moneyline || embeddedOdds.total)) {
-        return true
-      }
-      
-      return false
+      return !!oddsService.resolveBetting(allOdds.value, sportId, game)
     }
 
 
@@ -622,24 +582,7 @@ export default {
       stopAllSportsRefresh()
     })
 
-    const goToLeagues = () => {
-      // Store the tab preference in sessionStorage
-      sessionStorage.setItem('leaguesTab', 'leaderboard')
-      window.dispatchEvent(new CustomEvent('change-page', { detail: 'leagues' }))
-    }
-
-    // Function to reset the notice (can be called from console: window.showLeaderboardNotice())
-    const resetLeaderboardNotice = () => {
-      localStorage.removeItem('leaderboardNoticeDismissed')
-      showLeaderboardNotice.value = true
-    }
-
-    // Expose reset function to window for easy access
-    if (typeof window !== 'undefined') {
-      window.showLeaderboardNotice = resetLeaderboardNotice
-    }
-
-      return {
+    return {
       games,
       loading,
       switchingSports,
@@ -648,7 +591,6 @@ export default {
       sports,
       availableSports,
       currentSport,
-      currentGameCardComponent,
       gamesWithBetting,
       userBalance,
       userStats,
@@ -658,9 +600,8 @@ export default {
       fetchData,
       setActiveLeague,
       userLeaguesForLeaderboard,
+      boardDate,
       showingDate,
-      goToLeagues,
-      showLeaderboardNotice
     }
   }
 }
@@ -669,470 +610,314 @@ export default {
 <style scoped>
 .betting-page {
   min-height: 100vh;
-  background: var(--gradient-brand);
-  padding: 2rem 0;
+  background: var(--color-bg);
+  padding-bottom: var(--space-12);
 }
 
-.page-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  color: white;
+/* ── Masthead ── */
+.page-masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-8) 0 var(--space-5);
+}
+
+.masthead-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .page-title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin: 0 0 1rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.title-icon {
-  font-size: 3.5rem;
-  margin-right: 1rem;
+  margin: 0;
+  font-size: var(--text-display);
+  line-height: 1;
+  color: var(--color-text);
 }
 
 .page-description {
-  font-size: var(--text-xl);
   margin: 0;
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-.stats-dashboard {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin: 2rem auto;
-  max-width: 800px;
-  padding: 0 2rem;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  min-width: 150px;
-  transition: transform 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.stat-value {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  color: var(--color-text);
-  margin-bottom: 0.5rem;
-}
-
-.leaderboard-notice {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
-  margin: 0 auto 2rem auto;
-  max-width: 800px;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  border-left: 4px solid var(--color-primary-light);
-  position: relative;
-}
-
-.notice-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  font-size: var(--text-2xl);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-xl);
   color: var(--color-text-muted);
-  cursor: pointer;
-  width: 2rem;
-  height: 2rem;
+}
+
+.masthead-date {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-  line-height: 1;
-  padding: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 0 0 auto;
 }
 
-.notice-close:hover {
-  background: #f3f4f6;
-  color: var(--color-text);
-}
-
-.notice-close:active {
-  background: var(--color-border);
-}
-
-.notice-icon {
-  font-size: 3rem;
-  flex-shrink: 0;
-}
-
-.notice-content {
-  flex: 1;
-}
-
-.notice-title {
-  margin: 0 0 0.5rem 0;
-  color: var(--color-text);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-}
-
-.notice-message {
-  margin: 0 0 1.25rem 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-base);
-  line-height: 1.6;
-}
-
-.notice-button {
-  padding: 0.75rem 1.5rem;
-  background: var(--color-primary-light);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: var(--text-base);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.notice-button:hover {
-  background: var(--color-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
-
-.notice-button:active {
-  transform: translateY(0);
-}
-
-.stat-value.positive {
-  color: var(--color-success);
-}
-
-.stat-value.negative {
-  color: var(--color-danger);
-}
-
-.stat-label {
+.masthead-date-value {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-.league-selection {
+/* ── Ledger band ──
+   Replaces the old floating stat cards. Those were a centred flex row of
+   min-width:150px cards whose members render conditionally, so the row
+   re-wrapped into a different shape depending on which stats existed. One
+   strip divided by rules can't do that. */
+.ledger {
   display: flex;
+  align-items: stretch;
+  background: var(--color-surface-muted);
+  border-top: 2px solid var(--color-text);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+.ledger-primary,
+.ledger-cell {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 0 auto 3rem auto;
-  max-width: 900px;
-  padding: 0 2rem;
+  gap: var(--space-1);
+  /* Side padding is the first thing to give when the band gets tight. */
+  padding: var(--space-5) clamp(var(--space-3), 1.4vw, var(--space-5));
+  min-width: 0;
+}
+
+.ledger-primary {
+  /* 260px is the width it wants, not a floor. A fixed basis here was what
+     pushed the band past the page and turned it into a sideways scroll. */
+  flex: 0 1 260px;
+  padding-left: 0;
+}
+
+.ledger-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  /* stats are conditional, so the band can hold anywhere from one cell to
+     seven. Uncapped, a lone cell stretches across the whole row. */
+  max-width: 240px;
+  border-left: 1px solid var(--color-border-strong);
+}
+
+.ledger-primary-value {
+  font-size: clamp(1.75rem, 3.4vw, var(--text-display));
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.ledger-value {
+  font-size: clamp(1.0625rem, 1.9vw, var(--text-2xl));
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--color-text);
+}
+
+.ledger-value.positive { color: var(--color-success); }
+.ledger-value.negative { color: var(--color-danger); }
+
+/* ── Two-column body ── */
+.dash {
+  display: flex;
+  gap: var(--space-8);
+  align-items: flex-start;
+  padding: var(--space-8) 0;
+}
+
+.dash-main {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.dash-rail {
+  flex: 0 0 340px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  position: sticky;
+  top: var(--space-5);
+}
+
+/* ── Board ── */
+.board {
+  display: flex;
+  flex-direction: column;
+}
+
+.board-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0 var(--space-2);
+}
+
+/* A segmented control. The old chips were 50px-radius glass pills with a
+   backdrop blur and a sweep animation, which only read against the gradient. */
+.league-switch {
+  display: flex;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
 }
 
 .league-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  color: white;
-  font-weight: 600;
-  font-size: var(--text-base);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-left: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
+  transition: background 0.14s ease, color 0.14s ease;
 }
 
-.league-chip::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
+.league-chip:first-child { border-left: none; }
 
-.league-chip:hover::before {
-  left: 100%;
-}
-
-.league-chip:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
+.league-chip:hover { background: var(--color-surface-muted); color: var(--color-text); }
 
 .league-chip.active {
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--color-primary-dark);
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3), 0 0 20px rgba(37, 99, 235, 0.3);
-  transform: translateY(-2px);
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+  font-weight: 600;
 }
 
-.league-chip.active:hover {
-  background: white;
-  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.4), 0 0 24px rgba(37, 99, 235, 0.4);
+.board-controls-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
-.chip-icon {
-  font-size: var(--text-2xl);
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.league-chip.active .chip-icon {
-  filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
-}
-
-.chip-text {
-  white-space: nowrap;
-}
-
-.games-header {
-  max-width: 1200px;
-  margin: 0 auto 2rem auto;
-  padding: 0 2rem;
-}
-
-.games-header h2 {
-  color: white;
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  margin: 0 0 1rem 0;
-  text-align: center;
-}
-
-.section-description {
-  color: white;
-  text-align: center;
+.board-note {
   margin: 0;
-  opacity: 0.9;
-  font-size: var(--text-lg);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
 }
 
-.games-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-.games-grid {
+/* aligned to GameBoardRow's 448px odds column */
+.board-market-heads {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  width: 448px;
+  flex: 0 0 auto;
 }
 
-.stats-dashboard {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem auto;
-  max-width: 1000px;
-  padding: 0 2rem;
+.board-market-heads span {
+  text-align: center;
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+/* Cards carry a full-width odds layout, so one column reads better than two */
+/* Deliberately NOT .games-grid — that class belongs to the scoreboard's 2-up
+   card grid in style.css, whose `align-items: start` leaked in here and stopped
+   these rows stretching, so every row sized its columns to its own team names
+   and no two boards lined up. GameBoardRow draws its own bottom rule, so the
+   list needs no gap. */
+.board-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── States ── */
+.error-message,
+.loading-container,
+.no-games {
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
 
 .error-message {
-  background: white;
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 2rem;
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
-.error-message h3 {
-  color: var(--color-danger);
-  margin: 0 0 1rem 0;
-}
-
-.error-message p {
-  color: var(--color-text-muted);
-  margin: 0 0 1.5rem 0;
-}
-
-.retry-btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.retry-btn:hover {
-  background: #1d4ed8;
-}
-
-.loading-container {
-  background: white;
-  border-radius: var(--radius-lg);
-  padding: 3rem;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 2rem;
-}
-
-.spinner-large {
-  width: 50px;
-  height: 50px;
-  border: 4px solid var(--color-border);
-  border-top: 4px solid var(--color-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-container p {
-  color: var(--color-text-muted);
-  margin: 0;
-  font-size: var(--text-lg);
-}
-
-.no-games {
-  background: white;
-  border-radius: var(--radius-lg);
-  padding: 3rem;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 2rem;
-}
-
-.no-games h3 {
-  color: var(--color-text);
-  margin: 0 0 1rem 0;
-}
-
-.no-games p {
-  color: var(--color-text-muted);
-  margin: 0;
-  font-size: var(--text-lg);
-}
-
-@media (max-width: 768px) {
-  .betting-page {
-    padding: 1rem 0;
-  }
-  
-  .page-title {
-    font-size: var(--text-3xl);
-  }
-  
-  .title-icon {
-    font-size: 2.5rem;
-  }
-  
-  .page-description {
-    font-size: var(--text-base);
-    padding: 0 1rem;
-  }
-  
-  .stats-dashboard {
+/* ── Responsive ── */
+@media (max-width: 1180px) {
+  .dash {
     flex-direction: column;
-    gap: 1rem;
-    margin: 1.5rem auto;
-    padding: 0 1rem;
-  }
-  
-  .stat-card {
-    min-width: auto;
-    padding: 1rem;
-  }
-  
-  .stat-value {
-    font-size: var(--text-2xl);
-  }
-  
-  .games-section {
-    padding: 0 1rem;
-  }
-  
-  .games-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .league-selection {
-    padding: 0 1rem;
-    margin: 0 auto 2rem auto;
-    gap: 0.75rem;
-  }
-  
-  .league-chip {
-    padding: 0.75rem 1.5rem;
-    font-size: var(--text-sm);
-    gap: 0.5rem;
-  }
-  
-  .chip-icon {
-    font-size: var(--text-xl);
   }
 
-  .leaderboard-notice {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.5rem;
-    margin: 0 1rem 2rem 1rem;
-  }
-
-  .notice-close {
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    font-size: var(--text-xl);
-  }
-
-  .notice-icon {
-    font-size: 2.5rem;
-  }
-
-  .notice-title {
-    font-size: var(--text-xl);
-  }
-
-  .notice-message {
-    font-size: var(--text-sm);
-  }
-
-  .notice-button {
+  .dash-rail {
+    flex: 1 1 auto;
     width: 100%;
-    padding: 0.875rem 1.5rem;
+    position: static;
   }
 }
+
+@media (max-width: 900px) {
+  .page-masthead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-top: var(--space-6);
+  }
+
+  .masthead-date {
+    align-items: flex-start;
+  }
+
+  .page-title { font-size: var(--text-3xl); }
+  .page-description { font-size: var(--text-lg); }
+
+  /* Everything on the band stays on the band - it scales down to fit rather
+     than hiding stats behind a sideways scroll. */
+  .ledger-primary,
+  .ledger-cell {
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+  }
+
+  .ledger-primary { flex: 0 1 auto; }
+
+  .ledger-cell { max-width: none; }
+
+  .ledger .eyebrow { letter-spacing: 0.08em; }
+
+  .board-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .board-market-heads { display: none; }
+
+  .league-switch { overflow-x: auto; }
+
+  .board-note { text-align: left; }
+}
+
+/* Below this the cells are narrower than the figures in them, so the band wraps
+   into rows instead of shrinking further. Still no sideways scroll. */
+@media (max-width: 560px) {
+  .ledger {
+    flex-wrap: wrap;
+  }
+
+  .ledger-primary {
+    flex: 1 1 100%;
+    padding-bottom: var(--space-3);
+  }
+
+  .ledger-cell {
+    flex: 1 1 33%;
+    border-top: 1px solid var(--color-border-strong);
+  }
+}
+
 </style>

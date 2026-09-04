@@ -55,7 +55,7 @@
 
       <!-- Team Statistics -->
       <div class="stats-section" v-if="stats.teamStats && Object.keys(stats.teamStats).length > 0">
-        <h4>🏈 Team Statistics</h4>
+        <h4>Team Statistics</h4>
         <div class="fun-stats-grid">
           <div class="fun-stat-card" v-if="stats.mostBetTeam">
             <div class="fun-stat-label">Most Bet On</div>
@@ -82,7 +82,7 @@
 
       <!-- Betting Patterns -->
       <div class="stats-section" v-if="stats.bettingPatterns">
-        <h4>📊 Betting Patterns</h4>
+        <h4>Betting Patterns</h4>
         <div class="fun-stats-grid">
           <div class="fun-stat-card" v-if="stats.bettingPatterns.favoriteSport">
             <div class="fun-stat-label">Favorite Sport</div>
@@ -114,7 +114,7 @@
 
       <!-- Record Bets -->
       <div class="stats-section" v-if="stats.recordBets">
-        <h4>🏆 Record Bets</h4>
+        <h4>Record Bets</h4>
         <div class="fun-stats-grid">
           <div class="fun-stat-card" v-if="stats.recordBets.largestBet">
             <div class="fun-stat-label">Largest Bet</div>
@@ -559,17 +559,17 @@ export default {
 .error-message {
   text-align: center;
   padding: 2rem;
-  background: #fef2f2;
-  border: 1px solid #fee2e2;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-soft);
   border-radius: var(--radius-md);
-  color: #991b1b;
+  color: var(--color-danger);
 }
 
 .retry-btn {
   margin-top: 1rem;
   padding: 0.5rem 1.5rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -578,7 +578,7 @@ export default {
 }
 
 .retry-btn:hover {
-  background: #1d4ed8;
+  background: var(--color-primary-dark);
 }
 
 .stats-content {
@@ -597,7 +597,7 @@ export default {
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: white;
+  background: var(--color-surface);
   font-size: var(--text-sm);
   color: var(--color-text);
   cursor: pointer;
@@ -663,7 +663,7 @@ export default {
 }
 
 .stat-card {
-  background: white;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 1.5rem;
@@ -742,7 +742,7 @@ export default {
 
 .outcome-section h5 {
   margin: 0 0 1rem 0;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-lg);
   font-weight: 600;
 }
@@ -759,7 +759,7 @@ export default {
 }
 
 .outcome-card {
-  background: white;
+  background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 1.5rem;
@@ -779,7 +779,7 @@ export default {
 
 .outcome-card.under {
   border-color: var(--color-danger);
-  background: #fef2f2;
+  background: var(--color-danger-soft);
 }
 
 .outcome-card.covered {
@@ -789,7 +789,7 @@ export default {
 
 .outcome-card.covered-low {
   border-color: var(--color-warning);
-  background: #fffbeb;
+  background: var(--color-warning-soft);
 }
 
 .outcome-card.covered-zero {
@@ -798,8 +798,8 @@ export default {
 }
 
 .outcome-card.push {
-  border-color: #6366f1;
-  background: #eef2ff;
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
 }
 
 .outcome-label {
@@ -847,7 +847,7 @@ export default {
   text-align: center;
   padding: 2rem;
   color: var(--color-text-muted);
-  background: white;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
@@ -874,7 +874,7 @@ export default {
 }
 
 .fun-stat-card {
-  background: white;
+  background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 1.5rem;

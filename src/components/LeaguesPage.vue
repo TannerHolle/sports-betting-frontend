@@ -1,92 +1,56 @@
 <template>
   <div class="leagues-page">
-    <div class="page-header">
-      <h1 class="page-title">
-        Leagues
-      </h1>
-      <p class="page-description">
-        Show your friends you know ball way better than them
-      </p>
-    </div>
+    <div class="container">
+      <header class="page-masthead">
+        <div class="masthead-title">
+          <h1 class="page-title">Leagues</h1>
+          <p class="page-description">
+            Show your friends you know ball way better than them
+          </p>
+        </div>
+      </header>
 
-    <div class="tabs-container">
-      <div class="tabs-header">
-        <button 
-          @click="activeTab = 'friends'" 
+      <div class="tab-switch">
+        <button
+          @click="activeTab = 'friends'"
           :class="{ active: activeTab === 'friends' }"
-          class="tab-btn"
+          class="tab-chip"
         >
           Friends' Bets
         </button>
-        <button 
-          @click="activeTab = 'leaderboard'" 
-          :class="{ active: activeTab === 'leaderboard' }"
-          class="tab-btn"
-        >
-          Leaderboard
-        </button>
-        <button 
-          @click="activeTab = 'management'" 
+        <button
+          @click="activeTab = 'management'"
           :class="{ active: activeTab === 'management' }"
-          class="tab-btn"
+          class="tab-chip"
         >
           Management
         </button>
       </div>
 
       <div class="tab-content">
-        <LeagueManagement v-if="activeTab === 'management'" />
         <FriendsBets v-if="activeTab === 'friends'" />
-        <Leaderboard v-if="activeTab === 'leaderboard'" :user-leagues="userLeagues" />
+        <LeagueManagement v-if="activeTab === 'management'" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import LeagueManagement from './LeagueManagement.vue'
 import FriendsBets from './FriendsBets.vue'
-import Leaderboard from './Leaderboard.vue'
-import { useUserStore } from '../stores/userStore.js'
-import axios from 'axios'
-import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'LeaguesPage',
   components: {
     LeagueManagement,
-    FriendsBets,
-    Leaderboard
+    FriendsBets
   },
   setup() {
-    const userStore = useUserStore()
-    // Check for tab preference from sessionStorage (set when navigating from BettingPage)
-    const initialTab = sessionStorage.getItem('leaguesTab') || 'friends'
-    const activeTab = ref(initialTab)
-    const userLeagues = ref([])
-
-    const fetchUserLeagues = async () => {
-      if (!userStore.currentUser.value?.username) return
-      
-      try {
-        const response = await axios.get(`${API_BASE_URL}/user/${userStore.currentUser.value.username}/leagues`)
-        userLeagues.value = response.data || []
-      } catch (error) {
-        console.error('Error fetching user leagues:', error)
-        userLeagues.value = []
-      }
-    }
-
-    onMounted(async () => {
-      // Clear the tab preference after using it (so it doesn't persist on manual navigation)
-      sessionStorage.removeItem('leaguesTab')
-      await fetchUserLeagues()
-    })
+    const activeTab = ref('friends')
 
     return {
-      activeTab,
-      userLeagues
+      activeTab
     }
   }
 }
@@ -95,85 +59,81 @@ export default {
 <style scoped>
 .leagues-page {
   min-height: 100vh;
-  background: var(--gradient-brand);
-  padding: 2rem 0;
+  background: var(--color-bg);
+  padding-bottom: var(--space-12);
 }
 
-.page-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: white;
+/* Masthead, ledger band and section heads are the betting dashboard's; this
+   page reads as the same publication rather than its own thing. */
+.page-masthead {
+  padding: var(--space-8) 0 var(--space-5);
+}
+
+.masthead-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .page-title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin: 0 0 1rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  font-size: var(--text-display);
+  line-height: 1;
+  color: var(--color-text);
 }
 
 .page-description {
-  font-size: var(--text-xl);
   margin: 0;
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-.tabs-container {
-  margin: 0 auto;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.tabs-header {
-  display: flex;
-  gap: 0;
-  margin-bottom: 0;
-  background: white;
-  border-radius: 12px 12px 0 0;
-  box-shadow: var(--shadow-lg);
-  padding: 0;
-  overflow: hidden;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 1rem 2rem;
-  border: none;
-  background: var(--color-surface-muted);
-  border-bottom: 3px solid transparent;
-  font-weight: 600;
-  font-size: var(--text-base);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-xl);
   color: var(--color-text-muted);
+}
+
+/* Same switch as the board's league chips. Two tabs don't need the full page
+   width - the group hugs its buttons. */
+.tab-switch {
+  display: inline-flex;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+  margin-bottom: var(--space-4);
+}
+
+.tab-chip {
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-left: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
+  transition: background 0.14s ease, color 0.14s ease;
 }
 
-.tab-btn:hover {
-  color: #374151;
-  background: #f3f4f6;
-}
+.tab-chip:first-child { border-left: none; }
 
-.tab-btn.active {
-  background: white;
-  color: var(--color-primary-light);
-  border-bottom-color: var(--color-primary-light);
+.tab-chip:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.tab-chip.active {
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+  font-weight: 600;
 }
 
 .tab-content {
-  min-height: 400px;
-  background: white;
-  border-radius: 0 0 12px 12px;
-  box-shadow: var(--shadow-lg);
+  min-height: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
 .tab-content :deep(.league-management),
-.tab-content :deep(.friends-bets),
-.tab-content :deep(.leaderboard) {
+.tab-content :deep(.friends-bets) {
   background: transparent;
   box-shadow: none;
   border-radius: 0;
@@ -181,38 +141,26 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .leagues-page {
-    padding: 1rem 0;
+  .page-masthead {
+    padding: var(--space-6) 0 var(--space-4);
   }
-  
+
   .page-title {
     font-size: var(--text-3xl);
   }
-  
+
   .page-description {
     font-size: var(--text-base);
-    padding: 0 1rem;
   }
 
-  .tabs-container {
-    padding: 0 0.5rem;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .tab-content {
-    overflow-x: hidden;
-  }
-
-  .tabs-header {
+  .tab-switch {
+    display: flex;
     width: 100%;
-    max-width: 100%;
   }
 
-  .tab-btn {
-    padding: 0.75rem 1rem;
-    font-size: var(--text-sm);
+  .tab-chip {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
   }
 }
 </style>
-

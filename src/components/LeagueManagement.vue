@@ -333,7 +333,7 @@ export default {
 
 <style scoped>
 .league-management {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 2rem;
@@ -344,7 +344,7 @@ export default {
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-surface-muted);
 }
 
 .league-management-header h3 {
@@ -409,7 +409,7 @@ export default {
 .join-btn {
   padding: 0.75rem 1.5rem;
   background: var(--color-primary-light);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -458,7 +458,7 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: white;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   transition: all 0.2s ease;
@@ -473,7 +473,7 @@ export default {
 }
 
 .league-item.my-league {
-  background: linear-gradient(135deg, var(--color-primary-soft) 0%, #dbeafe 100%);
+  background: var(--color-primary-soft);
   border-color: var(--color-primary-light);
 }
 
@@ -516,8 +516,8 @@ export default {
 }
 
 .creator-badge {
-  background: #fbbf24;
-  color: #78350f;
+  background: var(--color-warning);
+  color: var(--color-warning);
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius-sm);
   font-weight: 600;
@@ -613,7 +613,7 @@ export default {
 
 .league-id {
   flex: 1;
-  background: white;
+  background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
@@ -661,8 +661,8 @@ export default {
 
 .copy-btn-small {
   padding: 0.25rem 0.5rem;
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   font-size: 0.7rem;
@@ -698,7 +698,7 @@ export default {
 
 .share-link-input {
   flex: 1;
-  background: white;
+  background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
@@ -721,7 +721,7 @@ export default {
 .copy-btn {
   padding: 0.5rem 1rem;
   background: var(--color-primary-light);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);

@@ -18,15 +18,21 @@
         <div v-if="inParlaySlip" class="bet-indicator parlay-indicator">
           <span class="bet-badge">In parlay</span>
         </div>
-        <button @click="toggleCollapsed" class="collapse-btn">
-          {{ isCollapsed ? '▼' : '▲' }}
+        <button
+          @click="toggleCollapsed"
+          class="collapse-btn"
+          :class="{ expanded: !isCollapsed }"
+          :aria-label="isCollapsed ? 'Expand game' : 'Collapse game'"
+        >
+          <svg class="icon-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
     </div>
 
     <!-- Collapsed view - just scores -->
     <div v-if="isCollapsed" class="collapsed-scores">
-      <div class="collapsed-team" v-for="competitor in competitors" :key="competitor.id" :class="{ 'winning': isWinning(competitor) }">
+      <div class="collapsed-team" v-for="competitor in competitors" :key="competitor.id" :class="{ 'winning': isWinning(competitor) }" :style="teamRailStyle(competitor)">
+        <span class="team-rail"></span>
         <img :src="competitor.team.logo" :alt="competitor.team.displayName" class="team-logo-tiny" />
         <span class="team-name-tiny">
           {{ competitor.team.shortDisplayName }}
@@ -38,7 +44,8 @@
       </div>
       <!-- Show if betting options are available -->
       <div v-if="betting && gameScheduled" class="odds-indicator" @click="toggleCollapsed">
-        ✓ Odds Available - Click to expand
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Odds available</span>
       </div>
     </div>
 
@@ -54,9 +61,10 @@
             'away': competitor.homeAway === 'away',
             'winning': isWinning(competitor)
           }"
-          :style="getTeamStyle(competitor)"
+          :style="teamRailStyle(competitor)"
         >
           <div class="team-info">
+            <span class="team-rail"></span>
             <img :src="competitor.team.logo" :alt="competitor.team.displayName" class="team-logo" />
             <div class="team-details">
               <div class="team-name">{{ competitor.team.shortDisplayName }}</div>
@@ -161,6 +169,7 @@ import { useChatWidget } from '../composables/useChatWidget.js'
 import { FEATURES } from '../config/features.js'
 import { useUserStore } from '../stores/userStore.js'
 import { useBetSlip } from '../stores/betSlipStore.js'
+import { teamRailStyle } from '../utils/teamColors.js'
 
 export default {
   name: 'CollegeBasketballCard',
@@ -184,7 +193,7 @@ export default {
     // Mirrors the existing "n bets" badge so a slipped game reads the same way
     const inParlaySlip = computed(() => betSlip.hasGame(props.game.id))
     const isCollapsed = ref(true)
-    const gameOdds = ref(null)
+    const betting = ref(null)
     const showBetsModal = ref(false)
     const competition = computed(() => props.game.competitions?.[0])
     const competitors = computed(() => competition.value?.competitors || [])
@@ -220,111 +229,17 @@ export default {
       return awayTeam ? awayTeam.team.shortDisplayName : ''
     })
     
-    // Convert ESPN odds format to betting format
-    const convertESPNOddsToBettingFormat = (espnOdds) => {
-      if (!espnOdds) return null
-      
-      const betting = {}
-      
-      // Point Spread
-      if (espnOdds.pointSpread) {
-        betting.pointSpread = {
-          home: {
-            close: {
-              line: espnOdds.pointSpread.home.close.line,
-              odds: espnOdds.pointSpread.home.close.odds
-            }
-          },
-          away: {
-            close: {
-              line: espnOdds.pointSpread.away.close.line,
-              odds: espnOdds.pointSpread.away.close.odds
-            }
-          }
-        }
-      }
-      
-      // Moneyline
-      if (espnOdds.moneyline) {
-        betting.moneyline = {
-          home: {
-            close: {
-              odds: espnOdds.moneyline.home.close.odds
-            }
-          },
-          away: {
-            close: {
-              odds: espnOdds.moneyline.away.close.odds
-            }
-          }
-        }
-      }
-      
-      // Total (Over/Under)
-      if (espnOdds.total) {
-        betting.total = {
-          over: {
-            close: {
-              line: espnOdds.total.over.close.line,
-              odds: espnOdds.total.over.close.odds
-            }
-          },
-          under: {
-            close: {
-              line: espnOdds.total.under.close.line,
-              odds: espnOdds.total.under.close.odds
-            }
-          }
-        }
-      }
-      
-      return Object.keys(betting).length > 0 ? betting : null
-    }
-    
-    // Fetch odds from odds service first, fall back to ESPN embedded odds
+    // The odds feed is remote, ESPN's embedded book rides along with the game
+    // we already have - so a failed fetch still resolves against the fallback.
     const fetchGameOdds = async () => {
-      // First, try external odds service
+      let allOdds = null
       try {
-        const allOdds = await oddsService.getAllOdds()
-        
-        const homeTeam = competitors.value.find(c => c.homeAway === 'home')?.team
-        const awayTeam = competitors.value.find(c => c.homeAway === 'away')?.team
-        const gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-basketball', homeTeam, awayTeam, props.game.date)
-
-        if (gameOddsData) {
-          gameOdds.value = gameOddsData
-          return
-        }
+        allOdds = await oddsService.getAllOdds()
       } catch (error) {
         console.error('Error fetching game odds from service:', error)
       }
-      
-      // Fall back to embedded odds in game data (ESPN format)
-      const embeddedOdds = competition.value?.odds?.[0]
-      if (embeddedOdds) {
-        const convertedOdds = convertESPNOddsToBettingFormat(embeddedOdds)
-        if (convertedOdds) {
-          gameOdds.value = { type: 'espn', betting: convertedOdds }
-        }
-      }
+      betting.value = oddsService.resolveBetting(allOdds, 'ncaa-basketball', props.game)
     }
-    
-    // Convert odds data to betting format
-    const betting = computed(() => {
-      if (!gameOdds.value) return null
-      
-      // If odds are from ESPN (embedded), use the already converted format
-      if (gameOdds.value.type === 'espn') {
-        return gameOdds.value.betting
-      }
-      
-      // Otherwise, convert from external odds service format
-      return oddsService.convertOddsToBettingFormat(
-        gameOdds.value,
-        homeTeamName.value,
-        awayTeamName.value
-      )
-    })
     
     onMounted(() => {
       fetchGameOdds()
@@ -473,19 +388,6 @@ export default {
       return currentScore === Math.max(homeScore, awayScore)
     }
 
-    const getTeamStyle = (competitor) => {
-      if (!competitor.team?.color) return {}
-      
-      const primaryColor = `#${competitor.team.color}`
-      const alternateColor = competitor.team.alternateColor ? `#${competitor.team.alternateColor}` : '#ffffff'
-      
-      return {
-        '--team-primary-color': primaryColor,
-        '--team-alternate-color': alternateColor,
-        'border-left': `4px solid ${primaryColor}`,
-        'background': `linear-gradient(90deg, ${primaryColor}15 0%, transparent 100%)`
-      }
-    }
 
     // Get the openChatWithGame method from the composable
     const { openChatWithGame } = useChatWidget()
@@ -519,7 +421,7 @@ export default {
       getHomeTeamName,
       getAwayTeamName,
       isWinning,
-      getTeamStyle,
+      teamRailStyle,
       handleAskAI,
       FEATURES,
       hasBets,
@@ -535,14 +437,22 @@ export default {
 </script>
 
 <style scoped>
+.collapse-btn .icon-chevron {
+  transition: transform 0.16s ease;
+}
+
+.collapse-btn.expanded .icon-chevron {
+  transform: rotate(180deg);
+}
+
 /* Live Game State Styles */
 .live-game-state {
-  background: linear-gradient(135deg, var(--color-text) 0%, #2d2d2d 100%);
+  background: var(--color-text);
   border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
-  color: white;
-  border: 1px solid #374151;
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-text-muted);
 }
 
 .game-clock {
@@ -570,27 +480,13 @@ export default {
   font-weight: 500;
 }
 
-/* Team Color Integration */
-.team {
-  transition: all 0.3s ease;
-}
-
-.team:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.team.winning {
-  box-shadow: 0 0 0 2px var(--team-primary-color, var(--color-success-light));
-}
+/* Team rows are not interactive - no lift or shadow on hover, which read as a
+   button and promised a click that never existed. The card's real affordances
+   are the collapse control, the bet badge and the links in the footer. */
 
 .team-name {
-  color: var(--team-primary-color, var(--color-text));
-  font-weight: 700;
-}
-
-.score {
-  color: var(--team-primary-color, var(--color-text));
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 .odds-indicator {
@@ -607,7 +503,7 @@ export default {
   margin-top: 12px;
   padding: 10px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
@@ -621,7 +517,7 @@ export default {
 }
 
 .ask-ai-button:hover {
-  background: #3151c7;
+  background: var(--color-primary-dark);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
@@ -635,7 +531,7 @@ export default {
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background: linear-gradient(135deg, var(--color-success-light) 0%, var(--color-success) 100%);
+  background: var(--color-success-light);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -649,7 +545,7 @@ export default {
 
 .bet-badge {
   background: transparent;
-  color: white;
+  color: var(--color-text-inverse);
   font-weight: 700;
   font-size: var(--text-xs);
   padding: 2px 6px;

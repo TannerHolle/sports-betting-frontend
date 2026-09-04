@@ -77,7 +77,7 @@
             <span>Learn about odds</span>
           </button>
           <button class="action-button" @click="sendSuggestedMessage('What types of bets can I make on this app?')">
-            <span class="action-icon">📊</span>
+            <span class="action-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 14V8.5M6 14V3M10 14V6.5M14 14V1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
             <span>Bet types</span>
           </button>
           <button class="action-button" @click="sendSuggestedMessage('What is expected value in betting?')">
@@ -744,12 +744,14 @@ export default {
 </script>
 
 <style scoped>
+.action-icon { display: inline-flex; align-items: center; }
+
 .chat-page {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 80px);
   max-height: calc(100vh - 80px);
-  background: white;
+  background: var(--color-surface);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   position: relative;
   overflow: hidden;
@@ -764,8 +766,8 @@ export default {
 
 /* Chat Header */
 .chat-page-header {
-  background: #2d3748;
-  color: white;
+  background: var(--color-text);
+  color: var(--color-text-inverse);
   padding: 16px 20px;
   display: flex;
   align-items: center;
@@ -794,13 +796,13 @@ export default {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .header-back-button {
   background: transparent;
   border: none;
-  color: white;
+  color: var(--color-text-inverse);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -822,7 +824,7 @@ export default {
 /* Game Selector */
 .game-selector-container {
   padding: 12px 16px;
-  background: white;
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
 }
@@ -864,8 +866,8 @@ export default {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: var(--text-xs);
-  background: white;
-  color: #374151;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
@@ -902,7 +904,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: white;
+  background: var(--color-surface);
   min-height: 0;
   max-height: 100%;
 }
@@ -916,7 +918,7 @@ export default {
 
 .welcome-text {
   margin: 0;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
   line-height: 1.5;
 }
@@ -945,13 +947,13 @@ export default {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   text-align: left;
   font-size: var(--text-sm);
-  color: #374151;
+  color: var(--color-text-muted);
   transition: all 0.2s ease;
 }
 
@@ -980,7 +982,7 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -989,11 +991,11 @@ export default {
 }
 
 .message.user .message-avatar.user-avatar {
-  background: var(--gradient-brand);
+  background: var(--color-primary);
 }
 
 .message.user .message-avatar.user-avatar .avatar-text {
-  color: white;
+  color: var(--color-text-inverse);
   font-weight: 700;
   font-size: var(--text-sm);
 }
@@ -1012,11 +1014,11 @@ export default {
 }
 
 .message-text {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   padding: 10px 14px;
   border-radius: var(--radius-lg);
   line-height: 1.5;
-  color: #1f2937;
+  color: var(--color-text);
   font-size: var(--text-sm);
   word-wrap: break-word;
   display: inline-block;
@@ -1025,7 +1027,7 @@ export default {
 
 .message.user .message-text {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .message-time {
@@ -1085,7 +1087,7 @@ export default {
 .chat-page-input-container {
   padding: 16px;
   border-top: 1px solid var(--color-border);
-  background: white;
+  background: var(--color-surface);
   flex-shrink: 0;
 }
 
@@ -1104,7 +1106,7 @@ export default {
   font-size: var(--text-sm);
   outline: none;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--color-surface);
 }
 
 /* Prevent zoom on mobile when focusing input */
@@ -1130,7 +1132,7 @@ export default {
   border-radius: var(--radius-md);
   border: none;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1140,7 +1142,7 @@ export default {
 }
 
 .send-button:hover:not(:disabled) {
-  background: #3151c7;
+  background: var(--color-primary-dark);
   transform: translateY(-1px);
 }
 
@@ -1153,7 +1155,7 @@ export default {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: var(--color-text-inverse);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

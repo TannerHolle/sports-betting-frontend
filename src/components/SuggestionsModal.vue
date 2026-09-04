@@ -163,7 +163,7 @@ export default {
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   width: 90%;
   max-width: 600px;
@@ -214,7 +214,7 @@ export default {
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   color: var(--color-text);
 }
 
@@ -239,7 +239,7 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
 
@@ -280,15 +280,15 @@ export default {
 }
 
 .message.success {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-soft);
 }
 
 .message.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-soft);
 }
 
 .modal-footer {
@@ -315,8 +315,8 @@ export default {
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -324,8 +324,8 @@ export default {
 }
 
 .btn-primary {
-  background: var(--gradient-brand);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .btn-primary:hover:not(:disabled) {

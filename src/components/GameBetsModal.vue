@@ -128,7 +128,7 @@ export default {
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   width: 90%;
   max-width: 800px;
@@ -179,7 +179,7 @@ export default {
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   color: var(--color-text);
 }
 
@@ -219,8 +219,8 @@ export default {
 }
 
 .btn-primary {
-  background: var(--gradient-brand);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .btn-primary:hover {

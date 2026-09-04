@@ -1,56 +1,167 @@
 /* ---------------------------------------------------------------------------
-   Design tokens
-   Single source of truth for color, radius, shadow and type. Previously these
-   were 97 hard-coded literals spread across 24 components - including five
-   different blues and the brand gradient pasted in 17 places.
+   Design tokens — "Press Box"
+   Single source of truth for color, space, radius, shadow and type.
+
+   Ground is warm paper, not a blue gradient; structure is carried by hairline
+   rules rather than drop shadows. Headlines are a serif, every number is
+   monospaced so odds and balances stop shifting as they tick over.
+
+   Token NAMES are stable — components referencing --color-primary and friends
+   keep working; only the values moved.
    --------------------------------------------------------------------------- */
 :root {
-  /* Brand - one blue, replacing #4169e1 / #2563eb / #3b82f6 doing the same job */
-  --color-primary: #2563eb;
-  --color-primary-light: #3b82f6;
-  --color-primary-dark: #1e3a8a;
-  --color-primary-soft: #eff6ff;
-  --gradient-brand: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color-scheme: light;
 
-  /* Status */
-  --color-success: #059669;
-  --color-success-light: #10b981;
-  --color-success-soft: #ecfdf5;
-  --color-danger: #dc2626;
-  --color-warning: #f59e0b;
+  /* ── Ground and ink ── */
+  --color-bg: #faf9f6;
+  --color-surface: #fffefd;
+  --color-surface-muted: #f4f2ee;
+  --color-surface-sunk: #f4f2ee;
+  --color-border: #e2dfda;
+  --color-border-strong: #d0cbc5;
+  --color-text: #231d18;
+  --color-text-muted: #726a64;
+  --color-text-subtle: #918b84;
+  --color-text-inverse: #faf9f6;
 
-  /* Surfaces and text */
-  --color-bg: #f5f5f5;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f9fafb;
-  --color-border: #e5e7eb;
-  --color-border-strong: #d1d5db;
-  --color-text: #1a1a1a;
-  --color-text-muted: #6b7280;
-  --color-text-subtle: #9ca3af;
+  /* ── Brand: one blue, deep enough to read as ink ── */
+  --color-primary: #1a609e;
+  --color-primary-light: #2b76b8;
+  --color-primary-dark: #144a79;
+  --color-primary-soft: rgba(26, 99, 158, 0.07);
+  /* Kept for components still referencing it — now a flat ground, not a gradient */
+  --gradient-brand: var(--color-bg);
 
-  /* Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* ── Status: same lightness and chroma, hue apart ── */
+  --color-success: #00713e;
+  --color-success-light: #0d8a51;
+  --color-success-soft: #e6f4ea;
+  --color-danger: #963d3a;
+  --color-danger-light: #b04b47;
+  --color-danger-soft: #feebe9;
+  --color-warning: #845100;
+  --color-warning-soft: #fbf1de;
 
-  /* Elevation */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.1);
-  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  /* ── Type ── */
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
 
-  /* Type scale */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-display: 2.75rem;
+
+  /* Uppercase micro-labels — the section heads and stat captions */
+  --label-size: 0.6875rem;
+  --label-tracking: 0.14em;
+
+  /* ── Space ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ── Radius: tight. Pills and 12px cards read soft against hairlines ── */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-pill: 999px;
+
+  /* ── Elevation: reserved for things that genuinely float ── */
+  --shadow-sm: 0 1px 2px rgba(35, 29, 24, 0.05);
+  --shadow-md: 0 1px 2px rgba(35, 29, 24, 0.05), 0 4px 12px rgba(35, 29, 24, 0.07);
+  --shadow-lg: 0 1px 2px rgba(35, 29, 24, 0.05), 0 14px 34px rgba(35, 29, 24, 0.11);
+  --shadow-focus: 0 0 0 3px rgba(26, 96, 158, 0.18);
 }
 
-/* Reset and base styles */
+/* ── Dark ─────────────────────────────────────────────────────────────────
+   Same structure, warm-dark ground. Accents lift; ink and paper swap roles. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --color-bg: #15120f;
+    --color-surface: #211e1a;
+    --color-surface-muted: #1c1916;
+    --color-surface-sunk: #1c1916;
+    --color-border: #302c28;
+    --color-border-strong: #3d3934;
+    --color-text: #efece8;
+    --color-text-muted: #a29e98;
+    --color-text-subtle: #78746e;
+    --color-text-inverse: #15120f;
+
+    --color-primary: #67aaed;
+    --color-primary-light: #8cc0f2;
+    --color-primary-dark: #4a8fd4;
+    --color-primary-soft: rgba(103, 170, 237, 0.16);
+    --gradient-brand: var(--color-bg);
+
+    --color-success: #60bb83;
+    --color-success-light: #7fcc9c;
+    --color-success-soft: #173221;
+    --color-danger: #e6857e;
+    --color-danger-light: #f0a09a;
+    --color-danger-soft: #3f2220;
+    --color-warning: #d09945;
+    --color-warning-soft: #3a2d16;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0 0 0 3px rgba(103, 170, 237, 0.3);
+  }
+}
+
+/* Explicit choice wins over the system setting, in both directions */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #15120f;
+  --color-surface: #211e1a;
+  --color-surface-muted: #1c1916;
+  --color-surface-sunk: #1c1916;
+  --color-border: #302c28;
+  --color-border-strong: #3d3934;
+  --color-text: #efece8;
+  --color-text-muted: #a29e98;
+  --color-text-subtle: #78746e;
+  --color-text-inverse: #15120f;
+
+  --color-primary: #67aaed;
+  --color-primary-light: #8cc0f2;
+  --color-primary-dark: #4a8fd4;
+  --color-primary-soft: rgba(103, 170, 237, 0.16);
+  --gradient-brand: var(--color-bg);
+
+  --color-success: #60bb83;
+  --color-success-light: #7fcc9c;
+  --color-success-soft: #173221;
+  --color-danger: #e6857e;
+  --color-danger-light: #f0a09a;
+  --color-danger-soft: #3f2220;
+  --color-warning: #d09945;
+  --color-warning-soft: #3a2d16;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 3px rgba(103, 170, 237, 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+   Reset and base
+   --------------------------------------------------------------------------- */
 * {
   margin: 0;
   padding: 0;
@@ -58,13 +169,13 @@
 }
 
 body {
-  /* Inter is already fetched in index.html - it was being downloaded and never applied */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
+  line-height: 1.55;
+  font-size: var(--text-base);
   color: var(--color-text);
-  background: #f5f5f5;
+  background: var(--color-bg);
   min-height: 100vh;
 }
 
@@ -72,17 +183,216 @@ body {
   min-height: 100vh;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+img {
+  max-width: 100%;
 }
 
-/* Header */
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--space-10);
+}
+
+/* ---------------------------------------------------------------------------
+   Shared primitives
+   .section-head / .eyebrow / .figure / .section-meta are in use on the betting
+   dashboard. .card / .btn / .pill / .input are here as the vocabulary for the
+   per-component CSS still to be folded in — components keep their own styles
+   until then, so nothing here is load-bearing for them yet.
+   --------------------------------------------------------------------------- */
+
+/* A section rule — the heavy hairline that titles sit on */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
+}
+
+.section-head h2,
+.section-head h3,
+.section-title {
+  margin: 0;
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.section-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Micro-label above a figure */
+.eyebrow {
+  font-size: var(--label-size);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Any figure the eye reads in a column */
+.figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-top: 2px solid var(--color-text);
+  border-radius: var(--radius-md);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+  border-color: var(--color-text-subtle);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: var(--color-text-inverse);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text-muted);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+  border-color: transparent;
+  color: var(--color-text);
+}
+
+/* Status pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pill-neutral { background: var(--color-surface-muted); color: var(--color-text-muted); }
+.pill-live    { background: var(--color-danger-soft);  color: var(--color-danger); }
+.pill-win     { background: var(--color-success-soft); color: var(--color-success); }
+.pill-loss    { background: var(--color-danger-soft);  color: var(--color-danger); }
+.pill-open    { background: var(--color-surface-muted); color: var(--color-text-muted); }
+
+/* Inputs */
+.input,
+.filter-select,
+.date-input {
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.input:focus,
+.filter-select:focus,
+.date-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+/* The 3px team-identity rail. Its color comes from utils/teamColors.js. */
+.team-rail {
+  display: block;
+  width: 3px;
+  border-radius: 1px;
+  background: var(--team-rail, var(--color-border-strong));
+  flex: 0 0 auto;
+  align-self: stretch;
+  min-height: 26px;
+}
+
+/* teamRailStyle() emits BOTH the light and dark rail as custom properties and
+   CSS picks which is live — so switching theme costs nothing and needs no
+   re-render. Anything carrying a team identity opts in by class. */
+.team,
+.collapsed-team,
+.team-row {
+  --team-rail: var(--team-rail-light);
+  --team-ink: var(--team-ink-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .team,
+  :root:not([data-theme='light']) .collapsed-team,
+  :root:not([data-theme='light']) .team-row {
+    --team-rail: var(--team-rail-dark);
+    --team-ink: var(--team-ink-dark);
+  }
+}
+
+:root[data-theme='dark'] .team,
+:root[data-theme='dark'] .collapsed-team,
+:root[data-theme='dark'] .team-row {
+  --team-rail: var(--team-rail-dark);
+  --team-ink: var(--team-ink-dark);
+}
+
+/* ---------------------------------------------------------------------------
+   App header
+   --------------------------------------------------------------------------- */
 .header {
-  background: white;
-  border-bottom: 1px solid var(--color-border);
-  padding: 20px 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-strong);
+  padding: var(--space-4) 0;
 }
 
 .header .container {
@@ -90,47 +400,49 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .title {
+  font-family: var(--font-display);
   font-size: var(--text-3xl);
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-text);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
+  letter-spacing: -0.005em;
 }
 
 .title-icon {
-  font-size: 2.2rem;
+  font-size: var(--text-2xl);
 }
 
 .header-info {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-5);
   flex-wrap: wrap;
 }
 
 .header-buttons {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .auto-refresh-indicator {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   color: var(--color-success);
   font-size: var(--text-sm);
   font-weight: 500;
 }
 
 .auto-refresh-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: var(--color-success);
   border-radius: 50%;
   animation: pulse 2s infinite;
@@ -138,51 +450,61 @@ body {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
 }
 
 .season-info {
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-weight: 400;
   color: var(--color-text-muted);
-  font-size: var(--text-lg);
+  font-size: var(--text-sm);
 }
 
-.refresh-btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
+.refresh-btn,
+.auto-refresh-btn,
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+}
+
+.refresh-btn:hover:not(:disabled),
+.auto-refresh-btn:hover:not(:disabled) {
+  background: var(--color-surface-muted);
 }
 
 .refresh-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .auto-refresh-btn {
-  background: var(--color-success);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  border-color: var(--color-success);
+  color: var(--color-success);
 }
 
-/* League Tabs */
+.retry-btn {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  margin-top: var(--space-4);
+}
+
+/* ---------------------------------------------------------------------------
+   League tabs — a segmented control, not glass pills
+   --------------------------------------------------------------------------- */
 .league-tabs {
-  background: white;
-  border-bottom: 1px solid var(--color-border);
-  padding: 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-strong);
 }
 
 .tab-buttons {
@@ -193,381 +515,347 @@ body {
 .tab-btn {
   background: transparent;
   border: none;
-  padding: 16px 24px;
+  border-bottom: 2px solid transparent;
+  padding: var(--space-4) var(--space-6);
+  font-family: inherit;
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--color-text-muted);
   cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s ease;
+  transition: color 0.14s ease, border-color 0.14s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   flex: 1;
   justify-content: center;
 }
 
 .tab-btn:hover {
-  color: #374151;
-  background: #f8fafc;
+  color: var(--color-text);
 }
 
 .tab-btn.active {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
-  background: #f8fafc;
+  font-weight: 600;
 }
 
 .tab-icon {
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
 }
 
-/* Filters */
+/* ---------------------------------------------------------------------------
+   Filters
+   --------------------------------------------------------------------------- */
 .filters {
-  background: #f8fafc;
-  padding: 16px 0;
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) 0;
 }
 
 .filter-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .filter-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .filter-label {
-  font-weight: 500;
-  color: #374151;
-  font-size: var(--text-sm);
+  font-size: var(--label-size);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
-.filter-select {
-  background: white;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  padding: 8px 12px;
-  font-size: var(--text-sm);
-  color: #374151;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.date-input {
-  background: white;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  padding: 8px 12px;
-  font-size: var(--text-sm);
-  color: #374151;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.date-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-/* Scoreboard page */
+/* ---------------------------------------------------------------------------
+   Pages
+   --------------------------------------------------------------------------- */
 .scoreboard-page {
   min-height: 100vh;
-  background: var(--gradient-brand);
+  background: var(--color-bg);
 }
 
-/* Main content */
 .main {
-  padding: 40px 0;
+  padding: var(--space-8) 0;
 }
 
-/* Loading and error states */
+/* ---------------------------------------------------------------------------
+   Loading, error, empty
+   --------------------------------------------------------------------------- */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: var(--space-12) var(--space-5);
   text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 .spinner-large {
-  width: 50px;
-  height: 50px;
-  border: 4px solid var(--color-border);
-  border-top: 4px solid var(--color-primary);
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: var(--space-4);
 }
 
 .spinner {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 2px solid transparent;
-  border-top: 2px solid currentColor;
+  border-top-color: currentColor;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 .error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-lg);
-  padding: 30px;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
   text-align: center;
   color: var(--color-danger);
 }
 
 .error-message h3 {
-  margin-bottom: 10px;
-  font-size: var(--text-xl);
-}
-
-.retry-btn {
-  background: var(--color-danger);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 15px;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 600;
 }
 
 .no-games {
   text-align: center;
-  padding: 80px 20px;
-  color: white;
+  padding: var(--space-12) var(--space-5);
+  color: var(--color-text-muted);
 }
 
 .no-games-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  opacity: 0.8;
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
 }
 
 .no-games h3 {
-  margin-bottom: 12px;
-  color: white;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--color-text);
   font-size: var(--text-2xl);
-  font-weight: 600;
 }
 
 .no-games p {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text-muted);
   font-size: var(--text-base);
-  line-height: 1.6;
-  max-width: 500px;
+  max-width: 480px;
   margin: 0 auto;
+  text-wrap: pretty;
 }
 
-/* Games grid */
+/* ---------------------------------------------------------------------------
+   Games grid
+   --------------------------------------------------------------------------- */
 .games-grid {
   display: block;
-  margin-top: 20px;
+  margin-top: var(--space-4);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1100px) {
   .games-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
     align-items: start;
   }
 }
 
-/* Game card */
+/* ---------------------------------------------------------------------------
+   Game card
+   --------------------------------------------------------------------------- */
 .game-card {
-  background: white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-top: 2px solid var(--color-text);
   border-radius: var(--radius-md);
-  padding: 20px;
-  border: 1px solid var(--color-border);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
+  overflow: hidden;
 }
 
 .game-card.collapsed {
-  padding: 12px;
+  border-top-width: 1px;
 }
 
 .game-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
-  gap: 16px;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .game-card.collapsed .game-header {
-  margin-bottom: 8px;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: none;
 }
 
 .game-card.collapsed .game-title {
-  font-size: var(--text-base);
-  margin-bottom: 4px;
-}
-
-.game-card.collapsed .game-meta {
-  font-size: var(--text-xs);
+  font-size: var(--text-lg);
 }
 
 .game-header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-2);
 }
 
 .collapse-btn {
-  background: #f3f4f6;
-  border: 1px solid var(--color-border-strong);
-  color: #374151;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  min-width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.collapse-btn:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
 }
 
 .game-info {
   flex: 1;
+  min-width: 0;
 }
 
 .game-title {
-  font-size: var(--text-xl);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 400;
   color: var(--color-text);
-  margin-bottom: 8px;
-  line-height: 1.4;
+  line-height: 1.15;
+  margin-bottom: var(--space-1);
+  letter-spacing: -0.005em;
 }
 
 .game-meta {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
 }
 
-.venue {
-  font-weight: 500;
-}
+.venue { font-weight: 400; }
 
 .broadcast {
-  color: var(--color-primary);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .game-status {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
   white-space: nowrap;
 }
 
 .game-status.scheduled {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   color: var(--color-text-muted);
 }
 
 .game-status.in-progress {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
 .game-status.completed {
-  background: #dbeafe;
-  color: #1e40af;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
 }
 
-/* Teams */
+/* ── Teams ── */
 .teams {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
 }
 
 .team {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  border: 1px solid var(--color-border);
-  margin-bottom: 8px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
-.team.home {
-  background: #f8fafc;
-}
-
+.team.home,
 .team.away {
-  background: white;
-}
-
-.team.winning {
-  /* No green border for expanded cards - handled by component-specific styles */
-}
-
-.collapsed-team.winning {
-  background: #dcfce7;
-  border-color: #16a34a;
-  border-width: 2px;
+  background: var(--color-surface);
 }
 
 .team-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   flex: 1;
+  min-width: 0;
 }
 
 .team-logo {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
-  border-radius: var(--radius-md);
+  flex: 0 0 auto;
 }
 
 .team-details {
   flex: 1;
+  min-width: 0;
 }
 
 .team-name {
   font-weight: 600;
   font-size: var(--text-lg);
   color: var(--color-text);
-  margin-bottom: 4px;
 }
 
-.team-record {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin-bottom: 2px;
+.team-record,
+.team-conference {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
 }
 
 .team-rank {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--color-primary);
   font-weight: 600;
@@ -575,295 +863,294 @@ body {
 
 .team-score {
   text-align: right;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .score {
+  font-family: var(--font-mono);
   font-size: var(--text-3xl);
-  font-weight: 700;
+  font-weight: 500;
+  line-height: 1;
   color: var(--color-text);
-  margin-bottom: 4px;
+}
+
+/* The winner carries its team color as a filled chip rather than a green wash.
+   Scoped component rules compile to `.score[data-v-x]` — specificity (0,2,0),
+   the same as `.score.winning-score` — and land later in the bundle, so this
+   needs the extra class to win. */
+.team .score.winning-score,
+.team .winning-score,
+.collapsed-team .winning-score,
+.winning-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--team-rail, var(--color-text));
+  color: var(--team-ink, var(--color-text-inverse));
+  font-weight: 600;
 }
 
 .quarters {
   display: flex;
-  gap: 8px;
+  gap: var(--space-1);
   justify-content: flex-end;
 }
 
 .quarter-score {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--color-primary);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: 600;
+  color: var(--color-text-muted);
+  min-width: 22px;
+  text-align: center;
 }
 
-/* Game details */
-.game-details {
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  margin-bottom: 16px;
+/* ── Situation ── */
+.game-details,
+.game-situation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border);
   font-size: var(--text-sm);
 }
 
 .situation {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  gap: var(--space-3);
 }
 
 .down-distance {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
 }
 
-.possession {
-  color: var(--color-text-muted);
-}
+.possession { color: var(--color-text-muted); }
 
 .last-play {
-  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-style: italic;
+  color: var(--color-text-muted);
 }
 
-/* Game actions */
+/* ── Actions ── */
 .game-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--space-2);
   flex-wrap: wrap;
+  padding: var(--space-3) var(--space-5);
 }
 
 .action-link {
-  background: #f3f4f6;
-  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   text-decoration: none;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
   font-size: var(--text-sm);
   font-weight: 500;
-  border: 1px solid var(--color-border-strong);
 }
 
-/* Betting Information */
+.action-link:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+/* ---------------------------------------------------------------------------
+   Betting lines summary
+   --------------------------------------------------------------------------- */
 .betting-info {
-  background: #f8fafc;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  margin-bottom: 16px;
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .betting-title {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 8px;
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
 }
 
 .betting-lines {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-1);
 }
 
 .betting-line {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
+  align-items: baseline;
+  font-size: var(--text-sm);
 }
 
-.betting-label {
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
+.betting-label { color: var(--color-text-muted); }
 
 .betting-value {
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-weight: 500;
   color: var(--color-text);
 }
 
 .favorite-team {
-  background: #dcfce7;
-  color: #166534;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
-  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-text);
 }
 
-.moneyline-team {
-  font-weight: 500;
-}
+.moneyline-team { font-weight: 400; }
 
-/* Collapsed view styles */
+/* ---------------------------------------------------------------------------
+   Collapsed view
+   --------------------------------------------------------------------------- */
 .collapsed-scores {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
+  padding: 0 var(--space-4) var(--space-3);
 }
 
 .collapsed-team {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: #f8fafc;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
 }
 
+.collapsed-team:last-of-type { border-bottom: none; }
+
+.collapsed-team.winning { background: transparent; }
+
 .team-logo-tiny {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .team-name-tiny {
   font-weight: 500;
   color: var(--color-text);
   flex: 1;
-  font-size: var(--text-sm);
+  min-width: 0;
+  font-size: var(--text-base);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .team-rank-small {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--color-primary);
   font-weight: 600;
 }
 
 .score-medium {
+  font-family: var(--font-mono);
   font-size: var(--text-xl);
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-text);
 }
 
-.winning-score {
-  color: #16a34a;
-  font-weight: 800;
+.odds-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  cursor: pointer;
 }
 
+.odds-indicator:hover { color: var(--color-primary); }
 
-/* Responsive design */
-@media (max-width: 768px) {
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .container { padding: 0 var(--space-5); }
+
   .header .container {
     flex-direction: column;
-    text-align: center;
+    align-items: flex-start;
   }
 
-  /* Make league tabs mobile-friendly with horizontal scroll */
   .tab-buttons {
-    gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 0 8px;
+    scrollbar-width: none;
   }
 
-  .tab-buttons::-webkit-scrollbar {
-    display: none;
-  }
+  .tab-buttons::-webkit-scrollbar { display: none; }
 
   .tab-btn {
     flex: 0 0 auto;
-    padding: 12px 16px;
-    font-size: var(--text-base);
-    border-bottom-width: 2px;
+    padding: var(--space-3) var(--space-4);
   }
 
-  .title {
-    font-size: var(--text-2xl);
-  }
+  .title { font-size: var(--text-2xl); }
 
-  /* Stack filters vertically and make inputs full-width */
   .filter-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: var(--space-3);
   }
 
-  .filter-group {
-    justify-content: space-between;
-  }
+  .filter-group { justify-content: space-between; }
 
   .filter-select,
   .date-input {
     min-width: 0;
     width: 100%;
-    max-width: 100%;
   }
 
-  .game-card {
-    padding: 16px;
-  }
-
-  .game-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .team {
-    padding: 10px;
-  }
-
-  .score {
-    font-size: var(--text-2xl);
-  }
-
-  .quarters {
-    flex-wrap: wrap;
-  }
-
+  .game-header,
+  .team,
+  .betting-info,
+  .game-situation,
+  .game-details,
   .game-actions {
-    justify-content: center;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
   }
+
+  .score { font-size: var(--text-2xl); }
+  .quarters { display: none; }
 }
 
-@media (max-width: 480px) {
-  .container {
-    padding: 0 16px;
-  }
-
-  .header {
-    padding: 16px 0;
-  }
-
-  .season-info {
-    font-size: var(--text-base);
-  }
+@media (max-width: 520px) {
+  .container { padding: 0 var(--space-4); }
+  .header { padding: var(--space-3) 0; }
+  .main { padding: var(--space-5) 0; }
 
   .header-buttons {
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
-  .main {
-    padding: 20px 0;
-  }
-
-  .game-card {
-    padding: 16px;
-  }
-
-  .team-info {
-    gap: 8px;
-  }
-
-  .team-logo {
-    width: 32px;
-    height: 32px;
-  }
-
-  .score {
-    font-size: 1.3rem;
-  }
+  .team-logo { width: 28px; height: 28px; }
+  .game-title { font-size: var(--text-xl); }
+  .score { font-size: var(--text-xl); }
 }
 
 /* ---------------------------------------------------------------------------
@@ -871,25 +1158,36 @@ body {
    --------------------------------------------------------------------------- */
 
 /* Money, odds and scores are read in columns and update live. Without fixed-width
-   figures every digit change shifts the layout - "-110" and "+250" render at
-   different widths, and the stat dashboard jitters as balances tick over. */
+   figures every digit change shifts the layout — "-110" and "+250" render at
+   different widths, and the stat band jitters as balances tick over. */
 .stat-value,
 .bet-amount, .bet-amounts, .bet-odds,
 .score, .team-score, .live-score, .final-score-text, .final-score-inline,
 .user-amount, .user-stats,
 .amount, .odds, .total-badge, .odds-indicator,
-.rank-number, .balance {
+.rank-number, .balance, .figure,
+.quarter-score, .score-medium, .betting-value, .season-info {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
 
-/* Large bold text reads better slightly tightened */
-h1, h2, .page-title, .stat-value {
-  letter-spacing: -0.02em;
+/* Display type is set tight; the serif carries its own rhythm */
+h1, h2, .page-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 /* Only show focus rings for keyboard users, not on mouse click */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

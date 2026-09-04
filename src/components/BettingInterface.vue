@@ -1,140 +1,124 @@
 <template>
-  <div class="betting-interface" v-if="isAuthenticated && betting && gameScheduled">
-    <h4 class="betting-title">Place Your Bet</h4>
-    
-    <div class="bet-options">
-      <!-- Spread Betting -->
-      <div class="bet-type" v-if="betting.pointSpread">
-        <h5>Point Spread</h5>
-        <div class="bet-options-grid">
-          <button 
-            v-for="(option, index) in spreadOptions" 
-            :key="index"
-            @click="selectBet('spread', option)"
-            :class="{ 
-              'bet-option': true, 
-              'selected': selectedBet?.type === 'spread' && selectedBet?.selection === option.selection 
-            }"
-          >
-            <div class="bet-team">{{ option.team }}</div>
-            <div class="bet-line">{{ option.line }}</div>
-            <div class="bet-odds">{{ option.odds }}</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Moneyline Betting -->
-      <div class="bet-type" v-if="betting.moneyline">
-        <h5>Moneyline</h5>
-        <div class="bet-options-grid">
-          <button 
-            v-for="(option, index) in moneylineOptions" 
-            :key="index"
-            @click="selectBet('moneyline', option)"
-            :class="{ 
-              'bet-option': true, 
-              'selected': selectedBet?.type === 'moneyline' && selectedBet?.selection === option.selection 
-            }"
-          >
-            <div class="bet-team">{{ option.team }}</div>
-            <div class="bet-odds">{{ option.odds }}</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Total (Over/Under) Betting -->
-      <div class="bet-type" v-if="betting.total">
-        <h5>Total Points</h5>
-        <div class="bet-options-grid">
-          <button 
-            v-for="(option, index) in totalOptions" 
-            :key="index"
-            @click="selectBet('total', option)"
-            :class="{ 
-              'bet-option': true, 
-              'selected': selectedBet?.type === 'total' && selectedBet?.selection === option.selection 
-            }"
-          >
-            <div class="bet-team">{{ option.selection }}</div>
-            <div class="bet-line">{{ option.line }}</div>
-            <div class="bet-odds">{{ option.odds }}</div>
-          </button>
-        </div>
-      </div>
+  <div
+    class="betting-interface"
+    :class="[layout, { readonly: isReadonly }]"
+    v-if="isAuthenticated && betting && (gameScheduled || layout === 'board')"
+  >
+    <div class="bi-head" v-if="layout === 'card'">
+      <h4 class="bi-title">Place a bet</h4>
+      <span class="bi-note">Lines close at kickoff</span>
     </div>
 
-    <!-- Add the current pick to the parlay slip -->
-    <div class="parlay-add-row" v-if="selectedBet">
-      <button @click="addToParlay" class="add-parlay-btn" :class="{ 'in-slip': inSlip }">
-        <span class="add-parlay-icon">{{ inSlip ? '✓' : '+' }}</span>
-        {{ inSlip ? 'In your parlay slip' : 'Add to parlay' }}
-      </button>
-      <span v-if="parlayNote" class="parlay-note">{{ parlayNote }}</span>
-    </div>
-
-    <!-- Bet Amount Selection -->
-    <div class="bet-amount" v-if="selectedBet">
-      <h5>Bet Amount</h5>
-      <div class="amount-input-group">
-        <span class="currency-symbol">$</span>
-        <input 
-          v-model.number="betAmount" 
-          type="number" 
-          min="1" 
-          :max="userBalance"
-          step="1"
-          class="amount-input"
-          placeholder="Enter amount"
-        />
+    <!-- One grid, three markets. Rows are away-then-home so a column reads
+         straight down the way a printed sheet does; the three markets used to
+         be separate stacked sections with their own headings. -->
+    <div class="markets">
+      <div class="market-heads" v-if="layout === 'card'">
+        <span class="market-head">Point spread</span>
+        <span class="market-head">Moneyline</span>
+        <span class="market-head">Total points</span>
       </div>
-      
-      <!-- Quick amount buttons -->
-      <div class="quick-amounts">
-        <button 
-          v-for="amount in quickAmounts" 
-          :key="amount"
-          @click="betAmount = amount"
-          :disabled="amount > userBalance"
-          class="quick-amount-btn"
+
+      <div class="market-row" v-for="(row, rowIndex) in marketRows" :key="rowIndex">
+        <button
+          v-for="cell in row"
+          :key="cell.type"
+          class="odds-cell"
+          :class="{ selected: isCellSelected(cell) }"
+          :disabled="!cell.option || isReadonly"
+          @click="!isReadonly && cell.option && selectBet(cell.type, cell.option)"
         >
-          ${{ amount }}
+          <span class="odds-cell-main">
+            <span class="odds-cell-label">{{ cell.label }}</span>
+            <span class="odds-cell-line">{{ cellLine(cell) }}</span>
+          </span>
+          <span class="odds-cell-price">{{ cellPrice(cell) }}</span>
         </button>
       </div>
+    </div>
 
-      <!-- Bet Summary -->
-      <div class="bet-summary" v-if="betAmount > 0">
-        <div class="summary-row">
-          <span>Bet Amount:</span>
-          <span>${{ betAmount.toLocaleString() }}</span>
-        </div>
-        <div class="summary-row">
-          <span>Potential Win:</span>
-          <span class="potential-win">${{ potentialWin.toLocaleString() }}</span>
-        </div>
-        <div class="summary-row">
-          <span>Total Return:</span>
-          <span class="total-return">${{ (betAmount + potentialWin).toLocaleString() }}</span>
+    <!-- Stake and actions share a wrapper so the board can put them on one
+         line when there is room; the card layout keeps them stacked. -->
+    <div class="bi-footer" v-if="selectedBet && !isReadonly">
+      <div class="stake">
+      <div class="stake-field">
+        <span class="eyebrow">Wager</span>
+        <div class="amount-input-group">
+          <span class="currency-symbol">$</span>
+          <input
+            v-model.number="betAmount"
+            type="number"
+            min="1"
+            :max="userBalance"
+            step="1"
+            class="amount-input"
+            placeholder="0"
+          />
         </div>
       </div>
 
-      <!-- Place Bet Button -->
-      <button 
+      <div class="stake-field">
+        <span class="eyebrow">Quick</span>
+        <div class="quick-amounts">
+          <button
+            v-for="amount in quickAmounts"
+            :key="amount"
+            @click="betAmount = amount"
+            :disabled="amount > userBalance"
+            class="quick-amount-btn"
+            :class="{ active: betAmount === amount }"
+          >
+            ${{ amount }}
+          </button>
+        </div>
+      </div>
+
+      <div class="stake-summary" v-if="betAmount > 0">
+        <div class="summary-row">
+          <span>{{ selectionLabel }}</span>
+          <span class="figure">${{ betAmount.toLocaleString() }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Potential win</span>
+          <span class="figure potential-win">${{ potentialWin.toLocaleString() }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total return</span>
+          <span class="figure total-return">${{ (betAmount + potentialWin).toLocaleString() }}</span>
+        </div>
+        </div>
+      </div>
+
+      <div class="bi-actions">
+      <button @click="addToParlay" class="add-parlay-btn" :class="{ 'in-slip': inSlip }">
+        <span class="add-parlay-icon">
+          <svg v-if="inSlip" width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg v-else width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.5V11.5M2.5 7H11.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </span>
+        {{ inSlip ? 'In your parlay slip' : 'Add to parlay' }}
+      </button>
+
+      <button
         @click="placeBet"
         :disabled="!canPlaceBet || isPlacingBet"
         class="place-bet-btn"
       >
-        <span v-if="isPlacingBet">Placing Bet...</span>
-        <span v-else>Place Bet</span>
+        <span v-if="isPlacingBet">Placing bet…</span>
+        <span v-else-if="betAmount > 0">Place bet &mdash; ${{ betAmount.toLocaleString() }} to win ${{ potentialWin.toLocaleString() }}</span>
+        <span v-else>Place bet</span>
       </button>
+      </div>
     </div>
-    
+
+    <p v-if="parlayNote" class="parlay-note">{{ parlayNote }}</p>
+
     <!-- Messages displayed outside conditional block so they persist after form reset -->
     <div v-if="error" class="message-container error-message">
-      <span class="message-icon">⚠️</span>
+      <span class="message-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.75L14.75 13.5H1.25L8 1.75Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.25v3M8 11.4h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
       <span>{{ error }}</span>
     </div>
     <div v-if="success" class="message-container success-message">
-      <span class="message-icon">✓</span>
+      <span class="message-icon"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span>{{ success }}</span>
     </div>
   </div>
@@ -152,6 +136,11 @@ export default {
     game: {
       type: Object,
       required: true
+    },
+    layout: {
+      type: String,
+      default: 'card',
+      validator: (v) => ['card', 'board'].includes(v)
     },
     betting: {
       type: Object,
@@ -426,6 +415,65 @@ export default {
       }
     }
 
+    // The three option lists are ordered differently (spread by favourite,
+    // moneyline by home/away, total by over/under), so they cannot be zipped
+    // as-is. Re-key them onto away-then-home rows so each column lines up.
+    const marketRows = computed(() => {
+      const spreadFor = (team) => spreadOptions.value.find((o) => o.selection === team)
+      const moneylineFor = (team) => moneylineOptions.value.find((o) => o.selection === team)
+      const totalFor = (side) => totalOptions.value.find((o) => o.selection === side)
+
+      const row = (team, side) => ([
+        { type: 'spread', label: team, option: spreadFor(team) },
+        { type: 'moneyline', label: team, option: moneylineFor(team) },
+        { type: 'total', label: side, option: totalFor(side) }
+      ])
+
+      return [row(awayTeam.value, 'Over'), row(homeTeam.value, 'Under')]
+    })
+
+    // Lines are frozen once a game starts — placeBet() already refuses, this
+    // just stops the board offering a control that cannot be used.
+    const isReadonly = computed(() => !gameScheduled.value)
+
+    // "Bears -3.5 (-110)" rather than just "Bears -110"
+    const selectionLabel = computed(() => {
+      const bet = selectedBet.value
+      if (!bet) return ''
+      const odds = formatOdds(bet.odds)
+      const line = parseFloat(bet.line)
+      if (Number.isNaN(line)) return `${bet.selection} (${odds})`
+      if (bet.type === 'total') return `${bet.selection} ${Math.abs(line)} (${odds})`
+      return `${bet.selection} ${line > 0 ? '+' : ''}${line} (${odds})`
+    })
+
+    const isCellSelected = (cell) =>
+      !!cell.option &&
+      selectedBet.value?.type === cell.type &&
+      selectedBet.value?.selection === cell.option.selection
+
+    const cellLine = (cell) => {
+      if (!cell.option) return '—'
+      if (cell.type === 'moneyline') return formatOdds(cell.option.odds)
+      const line = parseFloat(cell.option.line)
+      if (Number.isNaN(line)) return cell.option.line ?? '—'
+      if (cell.type === 'total') return `${cell.option.selection === 'Over' ? 'o' : 'u'}${Math.abs(line)}`
+      return line > 0 ? `+${line}` : `${line}`
+    }
+
+    // Moneyline puts its price in the main slot, so it has nothing left here
+    const cellPrice = (cell) => {
+      if (!cell.option || cell.type === 'moneyline') return ''
+      return formatOdds(cell.option.odds)
+    }
+
+    const formatOdds = (odds) => {
+      if (odds === null || odds === undefined || odds === '') return ''
+      const n = parseFloat(odds)
+      if (Number.isNaN(n)) return String(odds)
+      return n > 0 ? `+${n}` : `${n}`
+    }
+
     const inSlip = computed(() => {
       const leg = currentLeg()
       return leg ? betSlip.hasLeg(leg) : false
@@ -445,6 +493,12 @@ export default {
     }
 
     return {
+      marketRows,
+      isReadonly,
+      selectionLabel,
+      isCellSelected,
+      cellLine,
+      cellPrice,
       selectedBet,
       betAmount,
       addToParlay,
@@ -471,284 +525,493 @@ export default {
 
 <style scoped>
 .betting-interface {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  margin-top: 1rem;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
 }
 
-.betting-title {
-  margin: 0 0 1.5rem 0;
-  color: var(--color-text);
-  font-size: var(--text-xl);
+.bi-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
+}
+
+.bi-title {
+  margin: 0;
+  font-size: var(--label-size);
   font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
 }
 
-
-.bet-type {
-  margin-bottom: 2rem;
+.bi-note {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
 }
 
-.bet-type h5 {
-  margin: 0 0 1rem 0;
-  color: #374151;
-  font-size: var(--text-base);
-  font-weight: 600;
+/* ── Odds grid ── */
+.markets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
 }
 
-.bet-options-grid {
+.market-heads,
+.market-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
 }
 
-.bet-option {
-  background: white;
-  border: 2px solid var(--color-border);
+.market-head {
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.odds-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  height: 46px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
+  text-align: left;
+  transition: border-color 0.14s ease, background 0.14s ease;
 }
 
-.bet-option:hover {
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+.odds-cell:hover:not(:disabled) {
+  border-color: var(--color-text-subtle);
+  background: var(--color-surface-muted);
 }
 
-.bet-option.selected {
+.odds-cell:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.odds-cell.selected {
   border-color: var(--color-primary);
   background: var(--color-primary-soft);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.bet-team {
+.odds-cell-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.odds-cell-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.odds-cell-line {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--color-text);
-  margin-bottom: 0.25rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.bet-line {
+.odds-cell-price {
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  margin-bottom: 0.25rem;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
 }
 
-.bet-odds {
-  font-weight: 700;
-  color: var(--color-success);
-  font-size: var(--text-lg);
+.odds-cell.selected .odds-cell-label,
+.odds-cell.selected .odds-cell-line,
+.odds-cell.selected .odds-cell-price {
+  color: var(--color-primary);
 }
 
-.bet-amount {
-  background: white;
+/* ── Stake ── */
+/* Card layout: a plain block, so .stake and .bi-actions stack exactly as before */
+.bi-footer {
+  display: block;
+}
+
+.stake {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-5);
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface-muted);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 1.5rem;
 }
 
-.bet-amount h5 {
-  margin: 0 0 1rem 0;
-  color: #374151;
-  font-size: var(--text-base);
-  font-weight: 600;
+.stake-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 0 0 auto;
 }
 
 .amount-input-group {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  gap: 2px;
+  width: 128px;
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.amount-input-group:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
 }
 
 .currency-symbol {
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: #374151;
-  margin-right: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  color: var(--color-text-subtle);
 }
 
 .amount-input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-lg);
-  font-weight: 600;
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
 }
 
-.amount-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.amount-input::-webkit-outer-spin-button,
+.amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .quick-amounts {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  gap: var(--space-1);
 }
 
 .quick-amount-btn {
-  padding: 0.5rem 1rem;
-  background: #f3f4f6;
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.3s ease;
+  font-variant-numeric: tabular-nums;
 }
 
 .quick-amount-btn:hover:not(:disabled) {
-  background: var(--color-border);
-  border-color: var(--color-text-subtle);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.quick-amount-btn.active {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-text-inverse);
 }
 
 .quick-amount-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
-.bet-summary {
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+.stake-summary {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--color-border-strong);
 }
 
 .summary-row {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
-.summary-row:last-child {
-  margin-bottom: 0;
+.summary-row .figure {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.summary-row .potential-win { color: var(--color-success); }
+
+.summary-row.total {
+  padding-top: var(--space-1);
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--color-border-strong);
+  color: var(--color-text);
   font-weight: 600;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--color-border);
 }
 
-.potential-win {
-  color: var(--color-success);
-  font-weight: 600;
-}
-
+.summary-row.total .figure,
 .total-return {
-  color: var(--color-primary);
-  font-weight: 700;
-}
-
-.place-bet-btn {
-  width: 100%;
-  padding: 1rem;
-  background: var(--color-success);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--text-lg);
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.place-bet-btn:hover:not(:disabled) {
-  background: #047857;
-}
-
-.place-bet-btn:disabled {
-  background: var(--color-text-subtle);
-  cursor: not-allowed;
-}
-
-.message-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md);
-  margin-top: 1rem;
-  font-weight: 500;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.error-message {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: var(--color-danger);
-}
-
-.success-message {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: var(--color-success);
-}
-
-.message-icon {
   font-size: var(--text-xl);
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
-@media (max-width: 768px) {
-  .bet-options-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-amounts {
-    justify-content: center;
-  }
-}
-
-.parlay-add-row {
+/* ── Actions ── */
+.bi-actions {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .add-parlay-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
+  gap: var(--space-2);
+  height: 44px;
+  padding: 0 var(--space-4);
   background: var(--color-surface);
-  border: 1px dashed var(--color-primary);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  color: var(--color-primary);
-  font-weight: 600;
-  font-size: var(--text-sm);
   font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.add-parlay-btn:hover { background: var(--color-surface-muted); }
+
+.add-parlay-btn.in-slip {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.add-parlay-icon { display: inline-flex; align-items: center; }
+
+.place-bet-btn {
+  flex: 1 1 0;
+  height: 44px;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-inverse);
   cursor: pointer;
 }
 
-.add-parlay-btn:hover { background: var(--color-primary-soft); }
-
-.add-parlay-btn.in-slip {
-  border-style: solid;
-  background: var(--color-primary-soft);
+.place-bet-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
 }
 
-.add-parlay-icon { font-weight: 700; }
+.place-bet-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .parlay-note {
+  margin: var(--space-2) 0 0;
   font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
+}
+
+/* ── Messages ── */
+.message-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+}
+
+.message-icon { display: inline-flex; align-items: center; }
+
+.error-message {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.success-message {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+/* ── Board layout ──
+   display:contents dissolves this wrapper so .markets, .stake and .bi-actions
+   become direct children of GameBoardRow's grid: the odds land in column 2
+   beside the matchup, and the stake bar spans the full width beneath. */
+.betting-interface.board {
+  display: contents;
+}
+
+.betting-interface.board .markets {
+  grid-column: 2;
+  gap: var(--space-1);
+  padding-top: 0;
+}
+
+.betting-interface.board .market-row {
+  gap: var(--space-2);
+}
+
+.betting-interface.board .odds-cell {
+  height: 38px;
+  padding: 0 var(--space-2);
+}
+
+.betting-interface.board .odds-cell-label {
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.betting-interface.board .odds-cell-line { font-size: var(--text-base); }
+.betting-interface.board .odds-cell-price { font-size: var(--text-xs); }
+
+.betting-interface.board .parlay-note,
+.betting-interface.board .message-container {
+  grid-column: 1 / -1;
+}
+
+/* ── Board footer: one line when it fits ──
+   The stake controls and the two buttons used to occupy two full-width rows
+   under a selected game, which is a lot of vertical space on a wide board.
+   Here the wrapper owns the panel and lays everything out in a single row;
+   flex-wrap drops the buttons to their own line only when they stop fitting. */
+.betting-interface.board .bi-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  margin-top: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* the panel moved to the wrapper, so the inner block is bare */
+.betting-interface.board .stake {
+  flex: 1 1 420px;
+  margin-top: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  gap: var(--space-4);
+}
+
+.betting-interface.board .bi-actions {
+  flex: 1 1 340px;
+  margin-top: 0;
+  gap: var(--space-2);
+}
+
+/* Let the label set the button's minimum. Squeezing it wraps "Place bet —
+   $100 to win $95" onto two lines inside the button; better to drop the whole
+   actions group to its own line, where there is room for it. */
+.betting-interface.board .place-bet-btn {
+  min-width: 190px;
+  white-space: nowrap;
+}
+
+.betting-interface.board .add-parlay-btn {
+  white-space: nowrap;
+}
+
+/* Keep the summary at a readable width. Without this it is the flex item that
+   gives, so "Total return" wraps onto two lines while the row insists on
+   staying single — better to let the buttons drop to their own line instead. */
+.betting-interface.board .stake-summary {
+  flex: 0 0 auto;
+  min-width: 224px;
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--color-border-strong);
+}
+
+.betting-interface.board .summary-row > span {
+  white-space: nowrap;
+}
+
+.betting-interface.board .stake-field {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1000px) {
+  .betting-interface.board .markets { grid-column: 1; }
+}
+
+/* a started game keeps its prices on the board, but inert */
+.betting-interface.readonly .odds-cell {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.betting-interface.readonly .odds-cell:hover {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+}
+
+@media (max-width: 720px) {
+  .market-heads { display: none; }
+
+  .market-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .odds-cell { padding: 0 var(--space-2); }
+
+  .stake {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .stake-summary {
+    padding-left: 0;
+    padding-top: var(--space-3);
+    border-left: none;
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .bi-actions { flex-direction: column; }
 }
 </style>

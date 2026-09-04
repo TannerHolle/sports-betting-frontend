@@ -25,7 +25,7 @@
         </div>
         <div class="ph-head-right">
           <span class="ph-amount">${{ parlay.amount.toLocaleString() }}</span>
-          <span class="ph-arrow">{{ isOpen(parlay._id) ? '▾' : '▸' }}</span>
+          <span class="ph-arrow" :class="{ open: isOpen(parlay._id) }"><svg class="icon-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </div>
       </button>
 
@@ -69,6 +69,7 @@
 </template>
 
 <script>
+import { formatLine } from '../utils/oddsMath.js'
 import { ref, computed, reactive } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
@@ -110,12 +111,6 @@ export default {
         ? `${leg.gameData.awayTeam} @ ${leg.gameData.homeTeam}`
         : leg.sport || '')
 
-    const displayLine = (leg) => {
-      if (!leg.line) return ''
-      if (leg.betType === 'total') return `${leg.selection === 'Over' ? 'o' : 'u'}${leg.line}`
-      const n = parseFloat(leg.line)
-      return Number.isNaN(n) ? leg.line : (n > 0 ? `+${n}` : `${n}`)
-    }
 
     // Mirrors the server rule: cancellable only while every game is unstarted
     const canCancel = (parlay) => {
@@ -142,8 +137,9 @@ export default {
     }
 
     return {
+      displayLine: formatLine,
       tab, isAuthenticated, parlays, activeParlays, settledParlays, visible,
-      isOpen, toggle, statusLabel, wonLegs, gameLabel, displayLine,
+      isOpen, toggle, statusLabel, wonLegs, gameLabel,
       canCancel, cancel, cancelling, errors
     }
   }
@@ -152,144 +148,219 @@ export default {
 
 <style scoped>
 .parlay-history {
-  /* Mirrors .bet-history so the two sections read as one family */
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .ph-header {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
 }
-.ph-header h3 { margin: 0; font-size: var(--text-2xl); font-weight: 700; color: var(--color-text); }
 
-.ph-tabs { display: flex; gap: 0.5rem; }
+.ph-header h3 {
+  margin: 0;
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
+}
 
-/* Same shape as .tab-btn in BetHistory */
-.ph-tab {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid var(--color-border);
-  background: white;
+.ph-tabs {
+  display: flex;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.ph-tab.active {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-}
-
-.ph-empty { color: var(--color-text-muted); padding: 1rem 0; }
-
-.ph-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  margin-bottom: 0.75rem;
   overflow: hidden;
 }
-.ph-card.won { border-left: 3px solid var(--color-success); }
-.ph-card.lost { border-left: 3px solid var(--color-danger); }
-.ph-card.push { border-left: 3px solid var(--color-warning); }
-.ph-card.pending { border-left: 3px solid var(--color-primary); }
+
+.ph-tab {
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface);
+  border: none;
+  border-left: 1px solid var(--color-border-strong);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ph-tab:first-child { border-left: none; }
+.ph-tab:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.ph-tab.active {
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+}
+
+.ph-empty,
+.ph-error {
+  padding: var(--space-5) 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.ph-error { color: var(--color-danger); }
+
+.ph-card {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--color-border);
+}
 
 .ph-card-head {
-  width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: none;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) 0;
+  background: transparent;
   border: none;
-  cursor: pointer;
   font-family: inherit;
+  cursor: pointer;
   text-align: left;
 }
-.ph-head-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ph-head-right { display: flex; align-items: center; gap: 10px; }
+
+.ph-head-left,
+.ph-head-right {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ph-legs {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.ph-odds,
+.ph-amount {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-odds { color: var(--color-success); }
+.ph-amount { color: var(--color-text-muted); }
 
 .ph-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
   font-size: var(--text-xs);
   font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
 }
-.ph-status.pending { background: var(--color-primary-soft); color: var(--color-primary); }
+
 .ph-status.won { background: var(--color-success-soft); color: var(--color-success); }
-.ph-status.lost { background: #fef2f2; color: var(--color-danger); }
-.ph-status.push { background: #fffbeb; color: #92400e; }
+.ph-status.lost { background: var(--color-danger-soft); color: var(--color-danger); }
+.ph-status.push { background: var(--color-warning-soft); color: var(--color-warning); }
 
-.ph-legs { font-weight: 600; color: var(--color-text); font-size: var(--text-sm); }
-.ph-odds { font-weight: 700; color: var(--color-primary); font-variant-numeric: tabular-nums; }
-.ph-amount { font-weight: 600; color: var(--color-text); font-variant-numeric: tabular-nums; }
-
-.ph-arrow { color: var(--color-text-subtle); }
+.ph-arrow { display: inline-flex; color: var(--color-text-subtle); }
+.ph-arrow .icon-chevron { transform: rotate(-90deg); transition: transform 0.16s ease; }
+.ph-arrow.open .icon-chevron { transform: rotate(0deg); }
 
 .ph-progress {
-  padding: 0 14px 12px;
-  font-size: var(--text-xs);
+  padding: 0 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
 }
+
 .ph-towin { color: var(--color-success); }
 
-.ph-legs-list { padding: 0 14px 14px; border-top: 1px solid var(--color-border); }
+.ph-legs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-3);
+}
 
-.ph-leg { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
-.ph-leg + .ph-leg { border-top: 1px dashed var(--color-border); }
+.ph-leg {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
 
-.ph-leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.ph-leg-dot.pending { background: var(--color-text-subtle); }
+.ph-leg-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+  flex: 0 0 auto;
+}
+
 .ph-leg-dot.won { background: var(--color-success); }
 .ph-leg-dot.lost { background: var(--color-danger); }
 .ph-leg-dot.push { background: var(--color-warning); }
 
-.ph-leg-body { flex: 1; min-width: 0; }
-.ph-leg-pick { font-size: var(--text-sm); font-weight: 600; color: var(--color-text); }
-.ph-leg-line { color: var(--color-text-muted); margin-left: 4px; font-variant-numeric: tabular-nums; }
-.ph-leg-odds { color: var(--color-primary); margin-left: 6px; font-variant-numeric: tabular-nums; }
+.ph-leg-body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ph-leg-pick {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.ph-leg-line,
+.ph-leg-odds {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .ph-leg-game {
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.ph-leg-status { font-size: var(--text-xs); font-weight: 600; }
-.ph-leg-status.won { color: var(--color-success); }
-.ph-leg-status.lost { color: var(--color-danger); }
-.ph-leg-status.push { color: #92400e; }
-.ph-leg-status.pending { color: var(--color-text-subtle); }
+
+.ph-leg-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  flex: 0 0 auto;
+}
 
 .ph-cancel {
-  margin-top: 12px;
-  padding: 8px 14px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-danger);
-  color: var(--color-danger);
+  align-self: flex-start;
+  margin-bottom: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: var(--text-xs);
   font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   cursor: pointer;
 }
-.ph-cancel:disabled { opacity: 0.6; cursor: not-allowed; }
-.ph-error { margin-top: 8px; font-size: var(--text-xs); color: var(--color-danger); }
 
-@media (max-width: 768px) {
-  .parlay-history { padding: 1rem; }
-  .ph-header { flex-direction: column; align-items: flex-start; }
-}
+.ph-cancel:hover { border-color: var(--color-danger); color: var(--color-danger); }
 </style>

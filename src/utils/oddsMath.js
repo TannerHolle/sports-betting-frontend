@@ -27,6 +27,24 @@ export const formatAmerican = (odds) => {
   return n > 0 ? `+${n}` : `${n}`
 }
 
+/**
+ * Display form of a bet's line: "-3.5", "+3.5", "o44.5", "u44.5".
+ *
+ * Was duplicated verbatim in BetSlip, ParlayCard, ParlayHistory and LiveBets.
+ * BetCard had its own copy that ran the line through Math.abs(), so a
+ * favourite's minus sign was dropped and "-3.5" and "+3.5" both displayed as
+ * "3.5" — that copy is gone.
+ *
+ * @param {{line?: string|number, betType?: string, selection?: string}} bet
+ * @returns {string} formatted line, or '' when there is none
+ */
+export const formatLine = (bet) => {
+  if (!bet || bet.line === null || bet.line === undefined || bet.line === '') return ''
+  if (bet.betType === 'total') return `${bet.selection === 'Over' ? 'o' : 'u'}${bet.line}`
+  const n = parseFloat(bet.line)
+  return Number.isNaN(n) ? String(bet.line) : (n > 0 ? `+${n}` : `${n}`)
+}
+
 // Pushed legs drop out of the price, matching how books settle them
 export const combineLegs = (legs = []) => {
   const priced = legs.filter(leg => leg && leg.status !== 'push')

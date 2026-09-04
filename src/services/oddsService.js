@@ -136,6 +136,107 @@ class OddsService {
     return Object.keys(betting).length > 0 ? betting : null
   }
 
+  // American prices come back as numbers from The Odds API and as strings from
+  // ESPN ("+102", "-122", "EVEN"). "OFF" means the book pulled the market -
+  // that has to read as "no price", not as a bet someone can take.
+  parseAmericanOdds(odds) {
+    if (odds === null || odds === undefined) return null
+    if (typeof odds === 'number') return Number.isFinite(odds) ? odds : null
+    const raw = String(odds).trim()
+    if (/^(even|ev)$/i.test(raw)) return 100
+    const n = parseInt(raw.replace(/[^0-9+-]/g, ''), 10)
+    return Number.isNaN(n) ? null : n
+  }
+
+  // ESPN writes totals as "o54.5"/"u54.5" and spreads as "+41.5"; The Odds API
+  // sends a bare number. Everything downstream - the odds cells, the bet
+  // payload, resolution - expects the number.
+  parseLine(line) {
+    if (line === null || line === undefined) return null
+    const n = parseFloat(String(line).replace(/^[ouOU]/, ''))
+    return Number.isFinite(n) ? n : null
+  }
+
+  // Convert ESPN's embedded book (competition.odds[0]) to the betting format.
+  // A market only survives if both sides are priced - half a market can't be
+  // shown as a bet, and ESPN routinely prices the spread while the moneyline
+  // on a 40-point favourite sits at "OFF".
+  convertEspnOddsToBettingFormat(espnOdds) {
+    if (!espnOdds) return null
+
+    const betting = {}
+
+    const spread = espnOdds.pointSpread
+    const homeSpread = {
+      line: this.parseLine(spread?.home?.close?.line),
+      odds: this.parseAmericanOdds(spread?.home?.close?.odds)
+    }
+    const awaySpread = {
+      line: this.parseLine(spread?.away?.close?.line),
+      odds: this.parseAmericanOdds(spread?.away?.close?.odds)
+    }
+    if (homeSpread.line !== null && homeSpread.odds !== null &&
+        awaySpread.line !== null && awaySpread.odds !== null) {
+      betting.pointSpread = {
+        home: { close: homeSpread },
+        away: { close: awaySpread }
+      }
+    }
+
+    const homeMoneyline = this.parseAmericanOdds(espnOdds.moneyline?.home?.close?.odds)
+    const awayMoneyline = this.parseAmericanOdds(espnOdds.moneyline?.away?.close?.odds)
+    if (homeMoneyline !== null && awayMoneyline !== null) {
+      betting.moneyline = {
+        home: { close: { odds: homeMoneyline } },
+        away: { close: { odds: awayMoneyline } }
+      }
+    }
+
+    const total = espnOdds.total
+    const over = {
+      line: this.parseLine(total?.over?.close?.line),
+      odds: this.parseAmericanOdds(total?.over?.close?.odds)
+    }
+    const under = {
+      line: this.parseLine(total?.under?.close?.line),
+      odds: this.parseAmericanOdds(total?.under?.close?.odds)
+    }
+    if (over.line !== null && over.odds !== null && under.line !== null && under.odds !== null) {
+      betting.total = { over: { close: over }, under: { close: under } }
+    }
+
+    return Object.keys(betting).length > 0 ? betting : null
+  }
+
+  // The single answer to "can this game be bet?", so the board's filter and the
+  // row it renders can't disagree - they used to, and a game ESPN priced but
+  // The Odds API didn't showed up on the board reading "No lines".
+  //
+  // The Odds API wins when it has the game (it's the feed the odds refresh is
+  // built around); ESPN's embedded book is the backup, which matters on the
+  // free key where small-conference games are missing.
+  resolveBetting(allOdds, sport, game) {
+    const competition = game?.competitions?.[0]
+    if (!competition) return null
+
+    const competitors = competition.competitors || []
+    const home = competitors.find(c => c.homeAway === 'home')?.team
+    const away = competitors.find(c => c.homeAway === 'away')?.team
+    if (!home || !away) return null
+
+    const gameOdds = this.findGameOdds(allOdds, sport, home, away, game.date)
+    if (gameOdds) {
+      const external = this.convertOddsToBettingFormat(
+        gameOdds,
+        home.shortDisplayName,
+        away.shortDisplayName
+      )
+      if (external) return external
+    }
+
+    return this.convertEspnOddsToBettingFormat(competition.odds?.[0])
+  }
+
   // Find odds for a specific game.
   //
   // ESPN and The Odds API name teams differently:

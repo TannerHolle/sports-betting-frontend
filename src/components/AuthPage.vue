@@ -470,7 +470,7 @@ export default {
 <style scoped>
 .auth-page {
   min-height: 100vh;
-  background: var(--gradient-brand);
+  background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -478,7 +478,7 @@ export default {
 }
 
 .auth-container {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   padding: 3rem;
@@ -513,7 +513,7 @@ export default {
 .auth-tabs {
   display: flex;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-surface-muted);
 }
 
 .tab-btn {
@@ -565,7 +565,7 @@ export default {
 }
 
 .strength-fill.weak {
-  background-color: #ef4444;
+  background-color: var(--color-danger-light);
 }
 
 .strength-fill.fair {
@@ -583,7 +583,7 @@ export default {
 }
 
 .strength-text.weak {
-  color: #ef4444;
+  color: var(--color-danger-light);
 }
 
 .strength-text.fair {
@@ -629,7 +629,7 @@ export default {
 }
 
 .requirement-text {
-  color: #374151;
+  color: var(--color-text-muted);
 }
 
 .requirement.met .requirement-text {
@@ -677,8 +677,8 @@ export default {
 }
 
 .password-toggle-btn:hover {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-muted);
 }
 
 .password-toggle-btn:focus {
@@ -690,7 +690,7 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-muted);
 }
 
 .form-input {
@@ -712,7 +712,7 @@ export default {
   width: 100%;
   padding: 0.875rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--text-lg);
@@ -722,7 +722,7 @@ export default {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--color-primary-dark);
 }
 
 .submit-btn:disabled {
@@ -740,9 +740,9 @@ export default {
 .success-message {
   text-align: center;
   padding: 2rem;
-  background: #f0fdf4;
+  background: var(--color-success-soft);
   border-radius: var(--radius-lg);
-  border: 2px solid #bbf7d0;
+  border: 2px solid var(--color-success-soft);
 }
 
 .success-message h4 {
@@ -758,7 +758,7 @@ export default {
 
 .success-btn {
   background: var(--color-success);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   padding: 0.75rem 2rem;
   border-radius: var(--radius-md);
@@ -768,7 +768,7 @@ export default {
 }
 
 .success-btn:hover {
-  background: #047857;
+  background: var(--color-success);
 }
 
 .remember-me-group {
@@ -780,7 +780,7 @@ export default {
   align-items: center;
   cursor: pointer;
   font-size: var(--text-base);
-  color: #374151;
+  color: var(--color-text-muted);
   user-select: none;
 }
 
@@ -793,7 +793,7 @@ export default {
 }
 
 .remember-me-label:hover {
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 @media (max-width: 768px) {

@@ -1,7 +1,7 @@
 <template>
   <div class="leaderboard" v-if="isAuthenticated">
     <div class="leaderboard-header">
-      <h3>🏆 {{ (selectedLeagueName || 'Worldwide') }} Leaderboard</h3>
+      <h3>{{ (selectedLeagueName || 'Worldwide') }} Leaderboard</h3>
       <p class="leaderboard-description">
         Top performers by total winnings
       </p>
@@ -49,7 +49,6 @@
       >
         <div class="rank">
           <span class="rank-number">{{ user.displayRank }}</span>
-          <span class="rank-medal" v-if="index < 3">{{ getMedal(index) }}</span>
         </div>
         
         <div class="user-info">
@@ -129,10 +128,6 @@ export default {
       return league ? league.name : null
     })
 
-    const getMedal = (index) => {
-      const medals = ['🥇', '🥈', '🥉']
-      return medals[index] || ''
-    }
 
     const fetchUserLeagues = async () => {
       if (props.userLeagues && props.userLeagues.length > 0) {
@@ -247,7 +242,6 @@ export default {
       currentUser,
       leaderboard,
       loading,
-      getMedal,
       selectedLeagueId,
       selectedLeagueName,
       onLeagueChange,
@@ -261,239 +255,172 @@ export default {
 
 <style scoped>
 .leaderboard {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .leaderboard-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
 }
 
 .leaderboard-header h3 {
-  margin: 0 0 0.5rem 0;
-  color: var(--color-text);
-  font-size: var(--text-2xl);
+  margin: 0;
+  font-size: var(--label-size);
   font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
 }
 
-.leaderboard-description {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-base);
-}
+.leaderboard-description { display: none; }
 
 .leaderboard-controls {
-  margin-top: 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
-.league-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
+.league-selector,
 .limit-selector {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-1);
 }
 
 .league-selector label,
 .limit-selector label {
-  font-size: var(--text-sm);
-  color: #374151;
-  font-weight: 500;
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
 }
 
 .league-dropdown,
 .limit-dropdown {
-  padding: 0.5rem 1rem;
+  height: 28px;
+  min-width: 0;
+  padding: 0 var(--space-1);
+  background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: white;
-  font-size: var(--text-sm);
-  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.league-dropdown {
-  min-width: 200px;
-}
-
-.limit-dropdown {
-  min-width: 80px;
-}
-
-.league-dropdown:hover,
-.limit-dropdown:hover {
-  border-color: var(--color-primary-light);
-}
-
-.league-dropdown:focus,
-.limit-dropdown:focus {
-  outline: none;
-  border-color: var(--color-primary-light);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .leaderboard-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .leaderboard-item {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  transition: all 0.3s ease;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.leaderboard-item:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.leaderboard-item.current-user {
-  background: linear-gradient(135deg, var(--color-primary-soft) 0%, #dbeafe 100%);
-  border-color: var(--color-primary-light);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+/* the viewer's own row, marked by tint rather than a border treatment */
+.leaderboard-item.current-user,
+.leaderboard-item.current {
+  background: var(--color-primary-soft);
+  box-shadow: -8px 0 0 var(--color-primary-soft), 8px 0 0 var(--color-primary-soft);
 }
 
 .rank {
+  flex: 0 0 22px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-right: 1rem;
-  min-width: 60px;
+  justify-content: flex-start;
 }
 
 .rank-number {
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  color: #374151;
-  width: 30px;
-  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+  font-variant-numeric: tabular-nums;
 }
 
-.rank-medal {
-  font-size: var(--text-xl);
-}
-
+.user,
 .user-info {
-  flex: 1;
-  margin-right: 1rem;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .username {
-  font-size: var(--text-lg);
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: 500;
   color: var(--color-text);
-  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.leaderboard-item.current-user .username,
+.leaderboard-item.current .username { font-weight: 700; }
 
 .user-stats {
   display: flex;
-  gap: 1rem;
   flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
 }
 
 .stat {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* the spans carry no separator of their own, so they read as one run-on string */
+.stat + .stat::before {
+  content: '·';
+  margin-right: var(--space-2);
+  color: var(--color-border-strong);
+}
+
+.user-amount,
+.amount,
+.net {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.amount.positive, .net.positive, .user-amount.positive { color: var(--color-success); }
+.amount.negative, .net.negative, .user-amount.negative { color: var(--color-danger); }
+
+.loading-state,
+.empty-state {
+  padding: var(--space-5) 0;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  background: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-}
-
-.user-amount {
-  text-align: right;
-}
-
-.amount {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  color: var(--color-success);
-}
-
-.amount.positive {
-  color: #27ae60;
-}
-
-.amount.negative {
-  color: #e74c3c;
-}
-
-.loading-state {
   text-align: center;
-  padding: 2rem;
-  color: var(--color-text-muted);
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
+  width: 14px;
+  height: 14px;
+  margin: 0 auto var(--space-2);
   border: 2px solid var(--color-border);
-  border-top: 2px solid var(--color-primary-light);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: var(--color-text-muted);
-}
-
-@media (max-width: 768px) {
-  .leaderboard {
-    padding: 1.5rem;
-  }
-  
-  .leaderboard-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-  
-  .rank {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-  }
-  
-  .user-info {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-  }
-  
-  .user-amount {
-    text-align: left;
-  }
-  
-  .user-stats {
-    gap: 0.5rem;
-  }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

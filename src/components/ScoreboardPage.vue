@@ -1,46 +1,65 @@
 <template>
   <div class="scoreboard-page">
-    <!-- League Tabs -->
-    <div class="league-tabs">
-      <div class="container">
-        <div class="tab-buttons">
-          <button 
-            v-for="sport in sports" 
-            :key="sport.id"
-            @click="setActiveLeague(sport.id)" 
-            :class="{ active: activeLeague === sport.id }"
-            class="tab-btn"
-          >
-            <span class="tab-icon">{{ sport.icon }}</span>
-            {{ sport.name }}
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="filters">
-      <div class="container">
-        <div class="filter-row">
-          <div class="filter-group">
-            <label class="filter-label">Filter by:</label>
-            <select v-model="selectedFilter" class="filter-select">
-              <option 
-                v-for="filter in currentSportFilters" 
-                :key="filter.value" 
-                :value="filter.value"
-              >
-                {{ filter.label }}
-              </option>
-            </select>
+    <!-- One control band. The league tabs and the filter row used to be two
+         separate full-width bands under the nav; together with the nav that put
+         188px of chrome above the first score. -->
+    <div class="board-bar">
+      <div class="container board-bar-row">
+        <div class="board-bar-left">
+          <div class="sport-switch">
+            <button
+              v-for="sport in sports"
+              :key="sport.id"
+              @click="setActiveLeague(sport.id)"
+              :class="{ active: activeLeague === sport.id }"
+              class="sport-chip"
+            >
+              {{ sport.name }}
+            </button>
           </div>
-          <div class="filter-group">
-            <label class="filter-label">Date:</label>
-            <input 
-              v-model="selectedDate" 
-              type="date" 
-              class="date-input"
+          <span class="board-tally" v-if="filteredGames.length">
+            <template v-if="liveCount">
+              <span class="tally-dot" aria-hidden="true"></span>
+              <span class="eyebrow tally-live">{{ liveCount }} live</span>
+              <span class="tally-sep" aria-hidden="true">&middot;</span>
+            </template>
+            <span class="eyebrow">{{ upcomingCount }} upcoming</span>
+          </span>
+        </div>
+
+        <div class="board-bar-right">
+          <label class="visually-hidden" for="sb-filter">Filter games</label>
+          <select id="sb-filter" v-model="selectedFilter" class="board-chip board-select">
+            <option
+              v-for="filter in currentSportFilters"
+              :key="filter.value"
+              :value="filter.value"
+            >
+              {{ filter.label }}
+            </option>
+          </select>
+
+          <!-- The native date input showed an empty mm/dd/yyyy while the board
+               was showing today. A stepper states the day and makes the common
+               move - one day either way - a single click. -->
+          <div class="date-stepper">
+            <button class="date-step" @click="stepDate(-1)" aria-label="Previous day">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7.5 2.5L4 6L7.5 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="date-value figure" @click="openDatePicker">
+              {{ dateLabel }}<span class="date-short" v-if="dateShort">{{ dateShort }}</span>
+            </button>
+            <input
+              ref="dateInput"
+              v-model="selectedDate"
+              type="date"
+              class="date-native"
+              tabindex="-1"
+              aria-hidden="true"
             />
+            <button class="date-step" @click="stepDate(1)" aria-label="Next day">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -49,7 +68,7 @@
     <main class="main">
       <div class="container">
         <div v-if="error" class="error-message">
-          <h3>⚠️ Error Loading Data</h3>
+          <h3>Could not load data</h3>
           <p>{{ error }}</p>
           <button @click="fetchData" class="retry-btn">Try Again</button>
         </div>
@@ -60,7 +79,12 @@
         </div>
 
         <div v-else-if="filteredGames.length === 0" class="no-games">
-          <div class="no-games-icon">{{ currentSport?.icon || '🏈' }}</div>
+          <div class="no-games-icon" aria-hidden="true">
+            <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+              <rect x="3.5" y="6.5" width="25" height="19" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M3.5 12.5h25M11 6.5v19M21 6.5v19" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </div>
           <h3>{{ emptyStateTitle }}</h3>
           <p>{{ emptyStateMessage }}</p>
         </div>
@@ -109,7 +133,6 @@ export default {
       {
         id: 'ncaa-football',
         name: 'NCAA Football',
-        icon: '🎓',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard',
         component: 'NCAAFootballCard',
         filters: [
@@ -126,7 +149,6 @@ export default {
       {
         id: 'nfl',
         name: 'NFL',
-        icon: '🏈',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',
         component: 'NFLGameCard',
         filters: [
@@ -146,7 +168,6 @@ export default {
       {
         id: 'ncaa-basketball',
         name: 'NCAA Basketball',
-        icon: '🏀',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard',
         component: 'CollegeBasketballCard',
         filters: [
@@ -162,7 +183,6 @@ export default {
       {
         id: 'nba',
         name: 'NBA',
-        icon: '🏀',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
         component: 'NBAGameCard',
         filters: [
@@ -299,6 +319,69 @@ export default {
     })
 
     // Format date for ESPN API (YYYYMMDD)
+    const dateInput = ref(null)
+
+    // selectedDate is '' for "whatever ESPN calls today", which is what the
+    // page loads with. The stepper needs a concrete day to move from.
+    const isoOf = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+
+    const activeDate = computed(() => {
+      if (!selectedDate.value) return new Date()
+      const [year, month, day] = selectedDate.value.split('-').map(Number)
+      return new Date(year, month - 1, day)
+    })
+
+    // Today, Yesterday and Tomorrow are the three the label can say better than
+    // a date can; everything else gets the weekday.
+    const dateLabel = computed(() => {
+      const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+      const days = Math.round((midnight(activeDate.value) - midnight(new Date())) / 86400000)
+      if (days === 0) return 'Today'
+      if (days === -1) return 'Yesterday'
+      if (days === 1) return 'Tomorrow'
+      return activeDate.value.toLocaleDateString('en-US', { weekday: 'short' })
+    })
+
+    const dateShort = computed(() =>
+      activeDate.value.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    )
+
+    const stepDate = (days) => {
+      const next = new Date(activeDate.value)
+      next.setDate(next.getDate() + days)
+      selectedDate.value = isoOf(next)
+    }
+
+    // The native picker is still the picker - it is just driven from the
+    // stepper's middle segment instead of being the control itself.
+    const openDatePicker = () => {
+      const el = dateInput.value
+      if (!el) return
+      if (typeof el.showPicker === 'function') {
+        try {
+          el.showPicker()
+          return
+        } catch {
+          // showPicker throws if the browser wants a closer user gesture
+        }
+      }
+      el.focus()
+      el.click()
+    }
+
+    const liveCount = computed(() =>
+      filteredGames.value.filter(g => g.competitions?.[0]?.status?.type?.state === 'in').length
+    )
+
+    const upcomingCount = computed(() =>
+      filteredGames.value.filter(g => g.competitions?.[0]?.status?.type?.state === 'pre').length
+    )
+
     const formatDateForAPI = (date) => {
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -600,13 +683,250 @@ export default {
       emptyStateTitle,
       emptyStateMessage,
       fetchData,
-      setActiveLeague
+      setActiveLeague,
+      dateInput,
+      dateLabel,
+      dateShort,
+      stepDate,
+      openDatePicker,
+      liveCount,
+      upcomingCount
     }
   }
 }
 </script>
 
 <style scoped>
+.board-bar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-strong);
+  /* Sits under the 66px nav so switching sport or day never needs a scroll
+     back to the top of a long slate. */
+  position: sticky;
+  top: 66px;
+  z-index: 90;
+}
+
+.board-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+.board-bar-left,
+.board-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.board-bar-right {
+  gap: var(--space-2);
+  flex: 0 0 auto;
+}
+
+/* Same switch as the betting board's league chips: hugs its buttons instead of
+   stretching four tabs across the container. */
+.sport-switch {
+  display: inline-flex;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+  flex: 0 0 auto;
+}
+
+.sport-chip {
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-left: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.sport-chip:first-child { border-left: none; }
+
+.sport-chip:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.sport-chip.active {
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+}
+
+.board-tally {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tally-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-danger);
+  flex: 0 0 auto;
+}
+
+.tally-live { color: var(--color-text-muted); }
+
+.tally-sep { color: var(--color-text-subtle); }
+
+.board-chip {
+  height: 32px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.board-select {
+  min-width: 0;
+  max-width: 200px;
+}
+
+.board-chip:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.date-stepper {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  height: 32px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.date-step,
+.date-value {
+  border: none;
+  background: var(--color-surface);
+  font-family: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.date-step {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+}
+
+.date-value {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border-left: 1px solid var(--color-border-strong);
+  border-right: 1px solid var(--color-border-strong);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.date-short { color: var(--color-text-subtle); }
+
+.date-step:hover,
+.date-value:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.date-step:focus-visible,
+.date-value:focus-visible {
+  outline: none;
+  box-shadow: inset var(--shadow-focus);
+}
+
+/* The real input still owns parsing and the calendar; it just isn't the
+   control any more. */
+.date-native {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .board-bar {
+    position: static;
+  }
+
+  .board-bar-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  /* Full-width switch on narrow screens, the way the Leagues tabs go.
+     flex:1 shares the leftover space but never shrinks a chip below its own
+     label, so "NCAA Basketball" keeps its width and the short ones give. */
+  .sport-switch {
+    display: flex;
+    width: 100%;
+  }
+
+  .sport-chip {
+    flex: 1;
+    padding: var(--space-2) var(--space-2);
+    text-align: center;
+  }
+
+  /* The tally goes first when the bar stacks: it cost a whole row, and the
+     slate underneath already shows what is live. */
+  .board-tally {
+    display: none;
+  }
+
+  /* Filter grows, date sits at the right edge - the two controls span the
+     width instead of huddling on one side. */
+  .board-bar-right {
+    justify-content: space-between;
+  }
+
+  .board-select {
+    max-width: none;
+    flex: 1;
+  }
+}
+
 </style>
 
 

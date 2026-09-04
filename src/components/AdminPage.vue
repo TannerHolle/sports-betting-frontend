@@ -48,14 +48,14 @@ export default {
 <style scoped>
 .admin-page {
   min-height: 100vh;
-  background: var(--gradient-brand);
+  background: var(--color-bg);
   padding: 2rem 0;
 }
 
 .page-header {
   text-align: center;
   margin-bottom: 3rem;
-  color: white;
+  color: var(--color-text-inverse);
   padding: 0 2rem;
 }
 

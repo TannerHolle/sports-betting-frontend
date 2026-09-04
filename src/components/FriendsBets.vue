@@ -582,7 +582,7 @@ export default {
 
 <style scoped>
 .friends-bets {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 2rem;
@@ -592,7 +592,7 @@ export default {
 .league-selector-section {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-surface-muted);
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -623,7 +623,7 @@ export default {
   display: block;
   font-size: var(--text-sm);
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-muted);
   margin-bottom: 0.5rem;
 }
 
@@ -634,7 +634,7 @@ export default {
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
-  background: white;
+  background: var(--color-surface);
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
@@ -649,7 +649,7 @@ export default {
   display: block;
   font-size: var(--text-sm);
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-muted);
   margin-bottom: 0.5rem;
 }
 
@@ -660,7 +660,7 @@ export default {
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
-  background: white;
+  background: var(--color-surface);
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
@@ -670,7 +670,7 @@ export default {
   display: block;
   font-size: var(--text-sm);
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-muted);
   margin-bottom: 0.5rem;
 }
 
@@ -681,7 +681,7 @@ export default {
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
-  background: white;
+  background: var(--color-surface);
   transition: border-color 0.2s ease;
 }
 
@@ -708,7 +708,7 @@ export default {
 }
 
 .league-selector:disabled {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   cursor: default;
   opacity: 0.6;
 }
@@ -758,7 +758,7 @@ export default {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
   background: var(--color-primary-light);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -804,7 +804,7 @@ export default {
 
 .bet-card.lost {
   border-left: 4px solid var(--color-danger);
-  background: #fef2f2;
+  background: var(--color-danger-soft);
 }
 
 .bet-card:hover {
@@ -840,8 +840,8 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-  color: white;
+  background: var(--color-primary-light);
+  color: var(--color-text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -885,18 +885,18 @@ export default {
 }
 
 .bet-status.pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
 }
 
 .bet-status.won {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--color-success-soft);
+  color: var(--color-success);
 }
 
 .bet-status.lost {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
 .bet-game h4 {
@@ -977,7 +977,7 @@ export default {
 /* Final Score Inline Styles */
 .final-score-inline {
   font-size: var(--text-xs);
-  color: #64748b;
+  color: var(--color-text-muted);
   font-weight: 400;
 }
 
@@ -986,13 +986,13 @@ export default {
 }
 
 .total-badge {
-  color: #475569;
+  color: var(--color-text-muted);
   font-weight: 500;
   margin-left: 0.25rem;
 }
 
 .spread-badge {
-  color: #475569;
+  color: var(--color-text-muted);
   font-weight: 500;
   margin-left: 0.25rem;
 }
@@ -1001,7 +1001,7 @@ export default {
 .live-game-data {
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: var(--color-warning-soft);
   border-radius: 0.5rem;
   border: 1px solid var(--color-warning);
 }
@@ -1014,15 +1014,15 @@ export default {
   margin-bottom: 0.5rem;
   font-size: var(--text-lg);
   font-weight: 700;
-  color: #92400e;
+  color: var(--color-warning);
 }
 
 .team-score {
-  color: #92400e;
+  color: var(--color-warning);
 }
 
 .score-separator {
-  color: #a16207;
+  color: var(--color-warning);
   font-weight: 500;
 }
 
@@ -1042,7 +1042,7 @@ export default {
 
 .game-time {
   font-size: var(--text-sm);
-  color: #92400e;
+  color: var(--color-warning);
   font-weight: 600;
 }
 
@@ -1137,7 +1137,7 @@ export default {
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
-  background: white;
+  background: var(--color-surface);
   cursor: pointer;
   transition: border-color 0.2s ease;
   min-width: 60px;
@@ -1159,10 +1159,10 @@ export default {
 .pagination-btn {
   padding: 0.75rem 1.5rem;
   border: 2px solid var(--color-border);
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 100px;

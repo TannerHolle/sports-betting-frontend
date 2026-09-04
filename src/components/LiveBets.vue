@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { formatLine } from '../utils/oddsMath.js'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import liveScoreService from '../services/liveScoreService.js'
@@ -140,12 +141,6 @@ export default {
       return s ? s.headline : 'Not started'
     }
 
-    const displayLine = (bet) => {
-      if (!bet.line) return ''
-      if (bet.betType === 'total') return `${bet.selection === 'Over' ? 'o' : 'u'}${bet.line}`
-      const n = parseFloat(bet.line)
-      return Number.isNaN(n) ? bet.line : (n > 0 ? `+${n}` : `${n}`)
-    }
 
     const refresh = async () => {
       if (!trackedGames.value.length) {
@@ -187,120 +182,211 @@ export default {
       document.removeEventListener('visibilitychange', onVisibility)
     })
 
-    return { isAuthenticated, liveWagers, loading, displayLine, legState, legStanding }
+    return { isAuthenticated, liveWagers, loading, displayLine: formatLine, legState, legStanding }
   }
 }
 </script>
 
 <style scoped>
 .live-bets {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .lb-header {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
 }
+
 .lb-header h3 {
-  margin: 0;
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  color: var(--color-text);
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
 }
 
 .lb-pulse {
-  width: 10px;
-  height: 10px;
+  display: block;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-soft);
   animation: lb-pulse 2s infinite;
 }
+
 @keyframes lb-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  50% { opacity: 0.45; }
 }
 
-.lb-count { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 600; }
-.lb-loading { color: var(--color-text-muted); font-size: var(--text-sm); }
-
-.lb-card {
-  border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-text-subtle);
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-}
-.lb-card.winning { border-left-color: var(--color-success); }
-.lb-card.losing { border-left-color: var(--color-danger); }
-.lb-card.tied { border-left-color: var(--color-warning); }
-
-.lb-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-.lb-pick { font-weight: 700; color: var(--color-text); font-size: var(--text-base); }
-.lb-line { color: var(--color-text-muted); margin-left: 4px; font-variant-numeric: tabular-nums; }
-.lb-odds { color: var(--color-success); margin-left: 6px; font-variant-numeric: tabular-nums; }
-
-.lb-standing {
-  font-weight: 700;
-  font-size: var(--text-sm);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.lb-standing.winning { color: var(--color-success); }
-.lb-standing.losing { color: var(--color-danger); }
-.lb-standing.tied { color: #92400e; }
-
-.lb-score {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin-bottom: 0.5rem;
-  font-variant-numeric: tabular-nums;
-}
-.lb-teams { font-weight: 600; color: var(--color-text); }
-.lb-clock { white-space: nowrap; }
-
-.lb-legs { margin: 0.5rem 0; }
-.lb-leg { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0; }
-.lb-leg + .lb-leg { border-top: 1px dashed var(--color-border); }
-.lb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--color-text-subtle); }
-.lb-dot.winning, .lb-dot.won { background: var(--color-success); }
-.lb-dot.losing, .lb-dot.lost { background: var(--color-danger); }
-.lb-dot.tied, .lb-dot.push { background: var(--color-warning); }
-.lb-leg-pick { flex: 1; font-size: var(--text-sm); font-weight: 600; color: var(--color-text); }
-.lb-leg-standing { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-muted); }
-.lb-leg-standing.winning { color: var(--color-success); }
-.lb-leg-standing.losing { color: var(--color-danger); }
-
-.lb-bottom {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+.lb-count,
+.lb-loading {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
-.lb-stake { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-@media (max-width: 768px) {
-  .live-bets { padding: 1rem; }
-  .lb-top, .lb-score, .lb-bottom { flex-direction: column; gap: 0.25rem; align-items: flex-start; }
+.lb-loading { padding: var(--space-4) 0; }
+
+/* Rows on hairlines rather than stacked cards — a live slate reads as a list */
+.lb-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lb-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.lb-pick {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  min-width: 0;
+}
+
+.lb-line,
+.lb-odds {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-line { font-size: var(--text-base); color: var(--color-text); }
+.lb-odds { font-size: var(--text-sm); color: var(--color-text-subtle); }
+
+.lb-standing {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+/* states come from utils/liveBetStatus.js: winning | losing | tied | live,
+   plus settled leg statuses won | lost | push */
+.lb-standing.winning,
+.lb-standing.won { background: var(--color-success-soft); color: var(--color-success); }
+
+.lb-standing.losing,
+.lb-standing.lost { background: var(--color-danger-soft); color: var(--color-danger); }
+
+.lb-standing.tied,
+.lb-standing.push { background: var(--color-warning-soft); color: var(--color-warning); }
+
+.lb-standing.live { background: var(--color-primary-soft); color: var(--color-primary); }
+
+.lb-score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.lb-teams {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-clock {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.lb-legs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-1);
+}
+
+.lb-leg {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.lb-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+  flex: 0 0 auto;
+}
+
+.lb-dot.winning, .lb-dot.won { background: var(--color-success); }
+.lb-dot.losing, .lb-dot.lost { background: var(--color-danger); }
+.lb-dot.tied, .lb-dot.push { background: var(--color-warning); }
+
+.lb-leg-pick {
+  flex: 1 1 0;
+  min-width: 0;
+  color: var(--color-text-muted);
+}
+
+.lb-leg-standing {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.lb-leg-standing.winning, .lb-leg-standing.won { color: var(--color-success); }
+.lb-leg-standing.losing, .lb-leg-standing.lost { color: var(--color-danger); }
+.lb-leg-standing.tied, .lb-leg-standing.push { color: var(--color-warning); }
+
+.lb-bottom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.lb-detail { color: var(--color-text-muted); }
+
+.lb-stake {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .lb-top,
+  .lb-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
 }
 </style>
