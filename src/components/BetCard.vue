@@ -399,8 +399,10 @@ export default {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-xl);
-  font-weight: 400;
-  line-height: 1.2;
+  font-weight: var(--display-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--display-tracking);
+  line-height: 1.1;
   color: var(--color-text);
 }
 

@@ -380,9 +380,10 @@ export default {
 
 .brand-text {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: var(--display-weight);
+  text-transform: uppercase;
   color: var(--color-text);
-  letter-spacing: -0.005em;
+  letter-spacing: var(--display-tracking);
 }
 
 .nav-links {
@@ -407,9 +408,11 @@ export default {
   border: none;
   border-bottom: 2px solid transparent;
   background: transparent;
-  font-family: inherit;
-  font-size: var(--text-base);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: color 0.14s ease, border-color 0.14s ease;

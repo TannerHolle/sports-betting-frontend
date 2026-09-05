@@ -618,7 +618,7 @@ export default {
   border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
   font-size: var(--text-sm);
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--font-mono);
   color: var(--color-text);
   overflow-x: auto;
   word-break: break-all;
@@ -654,7 +654,7 @@ export default {
   border-radius: var(--radius-sm);
   padding: 0.25rem 0.5rem;
   font-size: 0.7rem;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--font-mono);
   color: var(--color-text-muted);
   overflow-x: auto;
 }
@@ -703,7 +703,7 @@ export default {
   border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
   font-size: var(--text-sm);
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--font-mono);
   color: var(--color-text);
   overflow-x: auto;
   min-width: 0;

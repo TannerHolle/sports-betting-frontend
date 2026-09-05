@@ -781,7 +781,7 @@ export default {
   bottom: 0;
   right: 0;
   z-index: 1000;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Toggle Button */

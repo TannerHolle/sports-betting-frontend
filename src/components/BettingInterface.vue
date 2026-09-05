@@ -107,6 +107,16 @@
         <span v-else-if="betAmount > 0">Place bet &mdash; ${{ betAmount.toLocaleString() }} to win ${{ potentialWin.toLocaleString() }}</span>
         <span v-else>Place bet</span>
       </button>
+
+      <button
+        @click="clearSelection"
+        class="cancel-bet-btn"
+        type="button"
+        title="Cancel this bet (Esc)"
+        aria-label="Cancel this bet"
+      >
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
       </div>
     </div>
 
@@ -125,7 +135,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import { useBetSlip } from '../stores/betSlipStore.js'
 import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
@@ -326,7 +336,24 @@ export default {
              gameScheduled.value
     })
 
+    const clearSelection = () => {
+      selectedBet.value = null
+      // Drop the stake too. Re-opening the tray with a stale $500 still in the
+      // box is how you place a bet you didn't mean to.
+      betAmount.value = 0
+      error.value = ''
+    }
+
+    // Clicking the line you already picked puts the tray away — it is the only
+    // way to close it, so the odds cell has to be a toggle rather than a set.
     const selectBet = (type, option) => {
+      if (
+        selectedBet.value?.type === type &&
+        selectedBet.value?.selection === option.selection
+      ) {
+        clearSelection()
+        return
+      }
       selectedBet.value = {
         type,
         selection: option.selection,
@@ -337,6 +364,13 @@ export default {
       error.value = ''
       success.value = ''
     }
+
+    // Esc closes it as well, matching every other dismissable surface here.
+    const onKeydown = (e) => {
+      if (e.key === 'Escape' && selectedBet.value) clearSelection()
+    }
+    onMounted(() => window.addEventListener('keydown', onKeydown))
+    onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
     const placeBet = async () => {
       if (!canPlaceBet.value || isPlacingBet.value || !gameScheduled.value) return
@@ -497,6 +531,7 @@ export default {
       isReadonly,
       selectionLabel,
       isCellSelected,
+      clearSelection,
       cellLine,
       cellPrice,
       selectedBet,
@@ -819,6 +854,28 @@ export default {
 }
 
 .add-parlay-icon { display: inline-flex; align-items: center; }
+
+/* Square, so it reads as a dismiss rather than a third choice competing with
+   "Add to parlay" and "Place bet". */
+.cancel-bet-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.cancel-bet-btn:hover {
+  background: var(--color-surface-muted);
+  border-color: var(--color-text-subtle);
+  color: var(--color-text);
+}
 
 .place-bet-btn {
   flex: 1 1 0;

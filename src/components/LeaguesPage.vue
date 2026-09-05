@@ -85,8 +85,10 @@ export default {
 .page-description {
   margin: 0;
   font-family: var(--font-display);
-  font-style: italic;
-  font-size: var(--text-xl);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--text-lg);
   color: var(--color-text-muted);
 }
 

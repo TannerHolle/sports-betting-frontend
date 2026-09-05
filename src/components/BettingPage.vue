@@ -47,16 +47,14 @@
           <span class="eyebrow">Win potential</span>
           <span class="ledger-value figure positive">${{ winPotential.toLocaleString() }}</span>
         </div>
-        <div class="ledger-cell" v-if="userStats.todaysProfitLoss !== 0">
-          <span class="eyebrow">Today P/L</span>
-          <span class="ledger-value figure" :class="{ positive: userStats.todaysProfitLoss > 0, negative: userStats.todaysProfitLoss < 0 }">{{ userStats.todaysProfitLoss >= 0 ? '+' : '' }}${{ userStats.todaysProfitLoss.toLocaleString() }}</span>
-        </div>
       </section>
 
       <div class="dash">
         <main class="dash-main">
 
           <LiveBets />
+
+          <TodayResults />
 
           <section class="board">
             <div class="section-head">
@@ -143,6 +141,7 @@ import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
 import ParlayHistory from './ParlayHistory.vue'
 import LiveBets from './LiveBets.vue'
+import TodayResults from './TodayResults.vue'
 import GameBoardRow from './GameBoardRow.vue'
 import Leaderboard from './Leaderboard.vue'
 
@@ -150,6 +149,7 @@ export default {
   name: 'BettingPage',
   components: {
     LiveBets,
+    TodayResults,
     GameBoardRow,
     ParlayHistory,
     BetHistory,
@@ -639,8 +639,10 @@ export default {
 .page-description {
   margin: 0;
   font-family: var(--font-display);
-  font-style: italic;
-  font-size: var(--text-xl);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--text-lg);
   color: var(--color-text-muted);
 }
 
@@ -697,11 +699,16 @@ export default {
   border-left: 1px solid var(--color-border-strong);
 }
 
+/* The headline number takes the display face rather than the mono the rest of
+   the band uses — at 3rem+ the mono comma opens a gap you can park a car in,
+   and this is the one figure that reads as a headline, not a column. It keeps
+   tabular figures from .figure so it still doesn't jitter as the balance moves. */
 .ledger-primary-value {
-  font-size: clamp(1.75rem, 3.4vw, var(--text-display));
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.9vw, var(--text-display));
+  font-weight: var(--display-weight);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   color: var(--color-text);
 }
 
@@ -851,11 +858,15 @@ export default {
 @media (max-width: 1180px) {
   .dash {
     flex-direction: column;
+    /* Column flow turns the cross axis horizontal, so the flex-start above
+       would size both children to their content and leave the board floating
+       in a dead right-hand gutter. Once the rail is underneath rather than
+       beside it, the board gets the whole width. */
+    align-items: stretch;
   }
 
   .dash-rail {
     flex: 1 1 auto;
-    width: 100%;
     position: static;
   }
 }

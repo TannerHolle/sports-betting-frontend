@@ -1,10 +1,11 @@
 /* ---------------------------------------------------------------------------
-   Design tokens — "Press Box"
+   Design tokens — "Broadcast"
    Single source of truth for color, space, radius, shadow and type.
 
-   Ground is warm paper, not a blue gradient; structure is carried by hairline
-   rules rather than drop shadows. Headlines are a serif, every number is
-   monospaced so odds and balances stop shifting as they tick over.
+   Ground is cold graphite, not warm paper; structure is carried by hairline
+   rules rather than drop shadows. Headlines are condensed uppercase — the
+   lower-third of a broadcast graphic — and every number is monospaced so odds
+   and balances stop shifting as they tick over.
 
    Token NAMES are stable — components referencing --color-primary and friends
    keep working; only the values moved.
@@ -13,48 +14,56 @@
   color-scheme: light;
 
   /* ── Ground and ink ── */
-  --color-bg: #faf9f6;
-  --color-surface: #fffefd;
-  --color-surface-muted: #f4f2ee;
-  --color-surface-sunk: #f4f2ee;
-  --color-border: #e2dfda;
-  --color-border-strong: #d0cbc5;
-  --color-text: #231d18;
-  --color-text-muted: #726a64;
-  --color-text-subtle: #918b84;
-  --color-text-inverse: #faf9f6;
+  --color-bg: #eef0f3;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e6e9ee;
+  --color-surface-sunk: #e6e9ee;
+  --color-border: #d6dae1;
+  --color-border-strong: #b9bfc9;
+  --color-text: #0d1117;
+  --color-text-muted: #5b636e;
+  --color-text-subtle: #838b95;
+  --color-text-inverse: #ffffff;
 
-  /* ── Brand: one blue, deep enough to read as ink ── */
-  --color-primary: #1a609e;
-  --color-primary-light: #2b76b8;
-  --color-primary-dark: #144a79;
-  --color-primary-soft: rgba(26, 99, 158, 0.07);
+  /* ── Brand: one steel blue, saturated enough to cut against graphite ── */
+  --color-primary: #0f5fc4;
+  --color-primary-light: #2a7bdf;
+  --color-primary-dark: #0a4795;
+  --color-primary-soft: rgba(15, 95, 196, 0.08);
   /* Kept for components still referencing it — now a flat ground, not a gradient */
   --gradient-brand: var(--color-bg);
 
   /* ── Status: same lightness and chroma, hue apart ── */
-  --color-success: #00713e;
-  --color-success-light: #0d8a51;
-  --color-success-soft: #e6f4ea;
-  --color-danger: #963d3a;
-  --color-danger-light: #b04b47;
-  --color-danger-soft: #feebe9;
-  --color-warning: #845100;
-  --color-warning-soft: #fbf1de;
+  --color-success: #00803f;
+  --color-success-light: #069c51;
+  --color-success-soft: #dcf1e4;
+  --color-danger: #c2281f;
+  --color-danger-light: #d94236;
+  --color-danger-soft: #fce4e1;
+  --color-warning: #8a5200;
+  --color-warning-soft: #fbeed6;
 
-  /* ── Type ── */
-  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* ── Type ──
+     Display is condensed and set uppercase — it buys ~25% more characters per
+     line than the sans, so display sizes run larger than they read. The three
+     faces are one family (Barlow) so weights and metrics stay consistent. */
+  --font-display: 'Barlow Condensed', 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --font-sans: 'Barlow', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
 
   --text-xs: 0.6875rem;
   --text-sm: 0.8125rem;
   --text-base: 0.875rem;
   --text-lg: 1rem;
-  --text-xl: 1.125rem;
-  --text-2xl: 1.375rem;
-  --text-3xl: 1.75rem;
-  --text-display: 2.75rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-display: 3.25rem;
+
+  /* Every headline set in --font-display shares these — condensed uppercase
+     needs a touch of positive tracking to stop the counters closing up. */
+  --display-weight: 700;
+  --display-tracking: 0.015em;
 
   /* Uppercase micro-labels — the section heads and stat captions */
   --label-size: 0.6875rem;
@@ -78,48 +87,48 @@
   --radius-pill: 999px;
 
   /* ── Elevation: reserved for things that genuinely float ── */
-  --shadow-sm: 0 1px 2px rgba(35, 29, 24, 0.05);
-  --shadow-md: 0 1px 2px rgba(35, 29, 24, 0.05), 0 4px 12px rgba(35, 29, 24, 0.07);
-  --shadow-lg: 0 1px 2px rgba(35, 29, 24, 0.05), 0 14px 34px rgba(35, 29, 24, 0.11);
-  --shadow-focus: 0 0 0 3px rgba(26, 96, 158, 0.18);
+  --shadow-sm: 0 1px 2px rgba(13, 17, 23, 0.06);
+  --shadow-md: 0 1px 2px rgba(13, 17, 23, 0.06), 0 4px 12px rgba(13, 17, 23, 0.09);
+  --shadow-lg: 0 1px 2px rgba(13, 17, 23, 0.06), 0 14px 34px rgba(13, 17, 23, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(15, 95, 196, 0.22);
 }
 
 /* ── Dark ─────────────────────────────────────────────────────────────────
-   Same structure, warm-dark ground. Accents lift; ink and paper swap roles. */
+   Same structure, near-black ground. Accents lift; ink and paper swap roles. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
-    --color-bg: #15120f;
-    --color-surface: #211e1a;
-    --color-surface-muted: #1c1916;
-    --color-surface-sunk: #1c1916;
-    --color-border: #302c28;
-    --color-border-strong: #3d3934;
-    --color-text: #efece8;
-    --color-text-muted: #a29e98;
-    --color-text-subtle: #78746e;
-    --color-text-inverse: #15120f;
+    --color-bg: #0a0c0f;
+    --color-surface: #14181d;
+    --color-surface-muted: #1b2027;
+    --color-surface-sunk: #1b2027;
+    --color-border: #262c34;
+    --color-border-strong: #38404a;
+    --color-text: #f0f3f6;
+    --color-text-muted: #9aa3ae;
+    --color-text-subtle: #6e7783;
+    --color-text-inverse: #0a0c0f;
 
-    --color-primary: #67aaed;
-    --color-primary-light: #8cc0f2;
-    --color-primary-dark: #4a8fd4;
-    --color-primary-soft: rgba(103, 170, 237, 0.16);
+    --color-primary: #4c9bff;
+    --color-primary-light: #7ab6ff;
+    --color-primary-dark: #2f7fe0;
+    --color-primary-soft: rgba(76, 155, 255, 0.16);
     --gradient-brand: var(--color-bg);
 
-    --color-success: #60bb83;
-    --color-success-light: #7fcc9c;
-    --color-success-soft: #173221;
-    --color-danger: #e6857e;
-    --color-danger-light: #f0a09a;
-    --color-danger-soft: #3f2220;
-    --color-warning: #d09945;
-    --color-warning-soft: #3a2d16;
+    --color-success: #35c26f;
+    --color-success-light: #5fd48c;
+    --color-success-soft: #0d2a1a;
+    --color-danger: #f26257;
+    --color-danger-light: #f8867c;
+    --color-danger-soft: #331512;
+    --color-warning: #e0a13c;
+    --color-warning-soft: #33260f;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.5);
-    --shadow-focus: 0 0 0 3px rgba(103, 170, 237, 0.3);
+    --shadow-focus: 0 0 0 3px rgba(76, 155, 255, 0.32);
   }
 }
 
@@ -127,36 +136,36 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --color-bg: #15120f;
-  --color-surface: #211e1a;
-  --color-surface-muted: #1c1916;
-  --color-surface-sunk: #1c1916;
-  --color-border: #302c28;
-  --color-border-strong: #3d3934;
-  --color-text: #efece8;
-  --color-text-muted: #a29e98;
-  --color-text-subtle: #78746e;
-  --color-text-inverse: #15120f;
+  --color-bg: #0a0c0f;
+  --color-surface: #14181d;
+  --color-surface-muted: #1b2027;
+  --color-surface-sunk: #1b2027;
+  --color-border: #262c34;
+  --color-border-strong: #38404a;
+  --color-text: #f0f3f6;
+  --color-text-muted: #9aa3ae;
+  --color-text-subtle: #6e7783;
+  --color-text-inverse: #0a0c0f;
 
-  --color-primary: #67aaed;
-  --color-primary-light: #8cc0f2;
-  --color-primary-dark: #4a8fd4;
-  --color-primary-soft: rgba(103, 170, 237, 0.16);
+  --color-primary: #4c9bff;
+  --color-primary-light: #7ab6ff;
+  --color-primary-dark: #2f7fe0;
+  --color-primary-soft: rgba(76, 155, 255, 0.16);
   --gradient-brand: var(--color-bg);
 
-  --color-success: #60bb83;
-  --color-success-light: #7fcc9c;
-  --color-success-soft: #173221;
-  --color-danger: #e6857e;
-  --color-danger-light: #f0a09a;
-  --color-danger-soft: #3f2220;
-  --color-warning: #d09945;
-  --color-warning-soft: #3a2d16;
+  --color-success: #35c26f;
+  --color-success-light: #5fd48c;
+  --color-success-soft: #0d2a1a;
+  --color-danger: #f26257;
+  --color-danger-light: #f8867c;
+  --color-danger-soft: #331512;
+  --color-warning: #e0a13c;
+  --color-warning-soft: #33260f;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.5);
-  --shadow-focus: 0 0 0 3px rgba(103, 170, 237, 0.3);
+  --shadow-focus: 0 0 0 3px rgba(76, 155, 255, 0.32);
 }
 
 /* ---------------------------------------------------------------------------
@@ -406,12 +415,13 @@ img {
 .title {
   font-family: var(--font-display);
   font-size: var(--text-3xl);
-  font-weight: 400;
+  font-weight: var(--display-weight);
+  text-transform: uppercase;
   color: var(--color-text);
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  letter-spacing: -0.005em;
+  letter-spacing: var(--display-tracking);
 }
 
 .title-icon {
@@ -517,9 +527,11 @@ img {
   border: none;
   border-bottom: 2px solid transparent;
   padding: var(--space-4) var(--space-6);
-  font-family: inherit;
-  font-size: var(--text-base);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: color 0.14s ease, border-color 0.14s ease;
@@ -653,7 +665,9 @@ img {
 .no-games h3 {
   margin-bottom: var(--space-3);
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: var(--display-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--display-tracking);
   color: var(--color-text);
   font-size: var(--text-2xl);
 }
@@ -750,11 +764,12 @@ img {
 .game-title {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
-  font-weight: 400;
+  font-weight: var(--display-weight);
+  text-transform: uppercase;
   color: var(--color-text);
-  line-height: 1.15;
+  line-height: 1.1;
   margin-bottom: var(--space-1);
-  letter-spacing: -0.005em;
+  letter-spacing: var(--display-tracking);
 }
 
 .game-meta {
@@ -940,7 +955,9 @@ img {
 .last-play {
   font-family: var(--font-display);
   font-size: var(--text-lg);
-  font-style: italic;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   color: var(--color-text-muted);
 }
 
@@ -1171,11 +1188,15 @@ img {
   font-feature-settings: 'tnum' 1;
 }
 
-/* Display type is set tight; the serif carries its own rhythm */
+/* Headlines are the condensed face, always uppercase — one rule so a new h1
+   inherits the voice without opting in. Line-height comes down to match: caps
+   have no descenders, so the serif's leading leaves a gap. */
 h1, h2, .page-title {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: var(--display-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--display-tracking);
+  line-height: 1.05;
 }
 
 /* Only show focus rings for keyboard users, not on mouse click */

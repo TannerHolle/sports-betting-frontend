@@ -752,7 +752,7 @@ export default {
   height: calc(100vh - 80px);
   max-height: calc(100vh - 80px);
   background: var(--color-surface);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   position: relative;
   overflow: hidden;
 }
