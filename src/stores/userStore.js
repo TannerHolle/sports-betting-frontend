@@ -43,20 +43,26 @@ const initializeSession = async () => {
 // Default starting balance
 const STARTING_BALANCE = 1000
 
+// Adopt a user payload as the current session. Shared so a write that already
+// returns the updated user persists it exactly as a fresh read would.
+const adoptUser = (data, useLocalStorage = false) => {
+  currentUser.value = data
+  isAuthenticated.value = true
+  // Persist latest user state - use same storage type as before
+  if (useLocalStorage || localStorage.getItem('currentUser')) {
+    localStorage.setItem('currentUser', JSON.stringify(data))
+  } else {
+    sessionStorage.setItem('currentUser', JSON.stringify(data))
+  }
+  return data
+}
+
 // Load user from backend API
 const loadUserFromAPI = async (username, useLocalStorage = false) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/user/${username}`)
     if (response.data) {
-      currentUser.value = response.data
-      isAuthenticated.value = true
-      // Persist latest user state - use same storage type as before
-      if (useLocalStorage || localStorage.getItem('currentUser')) {
-        localStorage.setItem('currentUser', JSON.stringify(response.data))
-      } else {
-        sessionStorage.setItem('currentUser', JSON.stringify(response.data))
-      }
-      return response.data
+      return adoptUser(response.data, useLocalStorage)
     }
   } catch (error) {
     if (error.response?.status === 404) {
@@ -173,8 +179,10 @@ const placeBet = async (betData) => {
     const response = await axios.post(`${API_BASE_URL}/user/${currentUser.value.username}/bet`, betData)
     
     if (response.data.success) {
-      // Re-fetch full user to ensure bets/history are up to date
-      await loadUserFromAPI(currentUser.value.username)
+      // The route returns the updated user already populated, so the slip and
+      // the balance move on this response rather than a second round trip.
+      if (response.data.user) adoptUser(response.data.user)
+      else await loadUserFromAPI(currentUser.value.username)
       return { success: true, bet: response.data.bet }
     } else {
       return { success: false, error: response.data.error || 'Failed to place bet' }
@@ -233,6 +241,28 @@ const cancelBet = async (betId) => {
       return { success: false, error: error.response.data.error }
     }
     return { success: false, error: 'Failed to cancel bet' }
+  }
+}
+
+// Cancel a parlay. Mirrors cancelBet so a caller holding either kind of wager
+// has one shape to code against.
+const cancelParlay = async (parlayId) => {
+  if (!currentUser.value) return { success: false, error: 'User not authenticated' }
+
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/user/${currentUser.value.username}/parlay/${parlayId}`)
+
+    if (response.data.success !== false) {
+      await loadUserFromAPI(currentUser.value.username)
+      return { success: true }
+    }
+    return { success: false, error: response.data.error || 'Failed to cancel parlay' }
+  } catch (error) {
+    console.error('Error cancelling parlay:', error)
+    if (error.response?.data?.error) {
+      return { success: false, error: error.response.data.error }
+    }
+    return { success: false, error: 'Failed to cancel parlay' }
   }
 }
 
@@ -338,6 +368,7 @@ export const useUserStore = () => {
     placeBet,
     resolveBet,
     cancelBet,
+    cancelParlay,
     loadUserFromAPI,
     initializeStore
   }

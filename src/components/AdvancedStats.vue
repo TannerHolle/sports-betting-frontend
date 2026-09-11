@@ -1,136 +1,168 @@
 <template>
   <div class="advanced-stats">
     <div v-if="stats && stats.availableSports && stats.availableSports.length > 0" class="stats-content">
-      <!-- Win Percentage by Bet Type -->
+      <!-- Bottom line. Win rate alone was the old headline, which is the
+           wrong number to lead with: at -110 a 50% record loses money. -->
       <div class="stats-section">
         <div class="section-header">
-          <h4>Win Percentage by Bet Type</h4>
-          <!-- Sport Filter inside the section -->
+          <h4>Bottom line</h4>
           <div class="section-filter" v-if="stats.availableSports && stats.availableSports.length > 0">
-            <label for="sport-select">Filter by Sport:</label>
+            <label for="sport-select">Sport</label>
             <select id="sport-select" v-model="selectedSport" @change="onSportChange" class="sport-select">
-              <option value="all">All Sports</option>
+              <option value="all">All sports</option>
               <option v-for="sport in stats.availableSports" :key="sport" :value="sport">
                 {{ formatSportName(sport) }}
               </option>
             </select>
           </div>
         </div>
-        <div class="stats-grid">
-          <div 
-            v-for="(stat, betType) in currentWinPercentageByType" 
-            :key="betType"
-            class="stat-card"
-          >
-            <div class="stat-header">
-              <span class="bet-type-label">{{ formatBetType(betType) }}</span>
-            </div>
-            <div class="stat-value" :class="{ 
-              'positive': parseFloat(stat.winRate) > 50, 
-              'negative': parseFloat(stat.winRate) < 50 
-            }">
-              {{ stat.winRate }}%
-            </div>
-            <div class="stat-details">
-              <div class="stat-detail">
-                <span class="label">Won:</span>
-                <span class="value positive">{{ stat.won }}</span>
-              </div>
-              <div class="stat-detail">
-                <span class="label">Lost:</span>
-                <span class="value negative">{{ stat.lost }}</span>
-              </div>
-              <div v-if="stat.push > 0" class="stat-detail">
-                <span class="label">Push:</span>
-                <span class="value">{{ stat.push }}</span>
-              </div>
-              <div class="stat-detail">
-                <span class="label">Total:</span>
-                <span class="value">{{ stat.total }}</span>
-              </div>
-            </div>
+
+        <div class="ledger-strip">
+          <div class="ls-cell ls-lead">
+            <span class="ls-key">Net</span>
+            <span class="ls-val figure" :class="signClass(overall.profit)">{{ money(overall.profit) }}</span>
+          </div>
+          <div class="ls-cell">
+            <span class="ls-key">Return</span>
+            <span class="ls-val figure" :class="signClass(overall.roi)">{{ pct(overall.roi, true) }}</span>
+          </div>
+          <div class="ls-cell">
+            <span class="ls-key">Wagered</span>
+            <span class="ls-val figure">${{ Math.round(overall.wagered).toLocaleString() }}</span>
+          </div>
+          <div class="ls-cell">
+            <span class="ls-key">Settled</span>
+            <span class="ls-val figure">{{ overall.settled }}</span>
+          </div>
+          <div class="ls-cell">
+            <span class="ls-key">Win rate</span>
+            <span class="ls-val figure">{{ pct(overall.winRate) }}</span>
+          </div>
+          <div class="ls-cell">
+            <span class="ls-key">Needed</span>
+            <span class="ls-val figure">{{ pct(overall.breakEven) }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Team Statistics -->
-      <div class="stats-section" v-if="stats.teamStats && Object.keys(stats.teamStats).length > 0">
-        <h4>Team Statistics</h4>
-        <div class="fun-stats-grid">
-          <div class="fun-stat-card" v-if="stats.mostBetTeam">
-            <div class="fun-stat-label">Most Bet On</div>
-            <div class="fun-stat-value">{{ stats.mostBetTeam.name }}</div>
-            <div class="fun-stat-detail">{{ stats.mostBetTeam.count }} bets</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.mostProfitableTeam">
-            <div class="fun-stat-label">Most Profitable</div>
-            <div class="fun-stat-value positive">{{ stats.mostProfitableTeam.name }}</div>
-            <div class="fun-stat-detail">+${{ stats.mostProfitableTeam.profit.toLocaleString() }}</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.mostWinsTeam">
-            <div class="fun-stat-label">Most Wins</div>
-            <div class="fun-stat-value positive">{{ stats.mostWinsTeam.name }}</div>
-            <div class="fun-stat-detail">{{ stats.mostWinsTeam.wins }} wins</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.mostLossesTeam">
-            <div class="fun-stat-label">Most Losses</div>
-            <div class="fun-stat-value negative">{{ stats.mostLossesTeam.name }}</div>
-            <div class="fun-stat-detail">{{ stats.mostLossesTeam.losses }} losses</div>
-          </div>
+      <div class="stats-section">
+        <h4>By market</h4>
+        <p class="section-note">Win rate only means something next to the rate the price demanded. <strong>Edge</strong> is the gap between them.</p>
+        <div class="table-scroll">
+          <table class="stat-table">
+            <thead>
+              <tr>
+                <th class="t-left">Market</th>
+                <th>Record</th>
+                <th>Win rate</th>
+                <th>Needed</th>
+                <th>Edge</th>
+                <th>Net</th>
+                <th>Return</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in byMarket" :key="row.key">
+                <td class="t-left t-name">{{ row.label }}</td>
+                <td class="figure">{{ row.won }}-{{ row.lost }}<span v-if="row.push">-{{ row.push }}</span></td>
+                <td class="figure">{{ pct(row.winRate) }}</td>
+                <td class="figure t-muted">{{ pct(row.breakEven) }}</td>
+                <td class="figure" :class="signClass(row.edge)">{{ pct(row.edge, true) }}</td>
+                <td class="figure" :class="signClass(row.profit)">{{ money(row.profit) }}</td>
+                <td class="figure" :class="signClass(row.roi)">{{ pct(row.roi, true) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Betting Patterns -->
-      <div class="stats-section" v-if="stats.bettingPatterns">
-        <h4>Betting Patterns</h4>
-        <div class="fun-stats-grid">
-          <div class="fun-stat-card" v-if="stats.bettingPatterns.favoriteSport">
-            <div class="fun-stat-label">Favorite Sport</div>
-            <div class="fun-stat-value">{{ formatSportName(stats.bettingPatterns.favoriteSport.name) }}</div>
-            <div class="fun-stat-detail">{{ stats.bettingPatterns.favoriteSport.count }} bets</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.bettingPatterns.mostProfitableSport">
-            <div class="fun-stat-label">Most Profitable Sport</div>
-            <div class="fun-stat-value positive">{{ formatSportName(stats.bettingPatterns.mostProfitableSport.name) }}</div>
-            <div class="fun-stat-detail">+${{ stats.bettingPatterns.mostProfitableSport.profit.toLocaleString() }}</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.bettingPatterns.favoriteBetType">
-            <div class="fun-stat-label">Favorite Bet Type</div>
-            <div class="fun-stat-value">{{ formatBetType(stats.bettingPatterns.favoriteBetType.name) }}</div>
-            <div class="fun-stat-detail">{{ stats.bettingPatterns.favoriteBetType.count }} bets</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.bettingPatterns.overUnderPercent">
-            <div class="fun-stat-label">Over/Under Preference</div>
-            <div class="fun-stat-value">{{ stats.bettingPatterns.overUnderPercent.over }}%</div>
-            <div class="fun-stat-detail">{{ stats.bettingPatterns.overUnderPercent.overCount }} Over / {{ stats.bettingPatterns.overUnderPercent.underCount }} Under</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.bettingPatterns.spreadPreference">
-            <div class="fun-stat-label">Spread Preference</div>
-            <div class="fun-stat-value">{{ stats.bettingPatterns.spreadPreference.favorite }}%</div>
-            <div class="fun-stat-detail">{{ stats.bettingPatterns.spreadPreference.favoriteCount }} Favorite / {{ stats.bettingPatterns.spreadPreference.underdogCount }} Underdog</div>
-          </div>
+      <div class="stats-section" v-if="bySport.length > 1">
+        <h4>By sport</h4>
+        <div class="table-scroll">
+          <table class="stat-table">
+            <thead>
+              <tr>
+                <th class="t-left">Sport</th>
+                <th>Record</th>
+                <th>Win rate</th>
+                <th>Needed</th>
+                <th>Edge</th>
+                <th>Net</th>
+                <th>Return</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in bySport" :key="row.key">
+                <td class="t-left t-name">{{ row.label }}</td>
+                <td class="figure">{{ row.won }}-{{ row.lost }}<span v-if="row.push">-{{ row.push }}</span></td>
+                <td class="figure">{{ pct(row.winRate) }}</td>
+                <td class="figure t-muted">{{ pct(row.breakEven) }}</td>
+                <td class="figure" :class="signClass(row.edge)">{{ pct(row.edge, true) }}</td>
+                <td class="figure" :class="signClass(row.profit)">{{ money(row.profit) }}</td>
+                <td class="figure" :class="signClass(row.roi)">{{ pct(row.roi, true) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Record Bets -->
-      <div class="stats-section" v-if="stats.recordBets">
-        <h4>Record Bets</h4>
-        <div class="fun-stats-grid">
-          <div class="fun-stat-card" v-if="stats.recordBets.largestBet">
-            <div class="fun-stat-label">Largest Bet</div>
-            <div class="fun-stat-value">${{ stats.recordBets.largestBet.amount.toLocaleString() }}</div>
-            <div class="fun-stat-detail">{{ stats.recordBets.largestBet.team || 'N/A' }}</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.recordBets.biggestWin">
-            <div class="fun-stat-label">Biggest Win</div>
-            <div class="fun-stat-value positive">+${{ stats.recordBets.biggestWin.profit.toLocaleString() }}</div>
-            <div class="fun-stat-detail">{{ stats.recordBets.biggestWin.team || 'N/A' }}</div>
-          </div>
-          <div class="fun-stat-card" v-if="stats.recordBets.biggestLoss">
-            <div class="fun-stat-label">Biggest Loss</div>
-            <div class="fun-stat-value negative">-${{ Math.abs(stats.recordBets.biggestLoss.profit).toLocaleString() }}</div>
-            <div class="fun-stat-detail">{{ stats.recordBets.biggestLoss.team || 'N/A' }}</div>
-          </div>
+      <div class="stats-section" v-if="bySide.length">
+        <h4>Which side you take</h4>
+        <p class="section-note">Knowing you lean one way is only half of it — this is whether leaning that way pays.</p>
+        <div class="table-scroll">
+          <table class="stat-table">
+            <thead>
+              <tr>
+                <th class="t-left">Side</th>
+                <th>Record</th>
+                <th>Win rate</th>
+                <th>Needed</th>
+                <th>Edge</th>
+                <th>Net</th>
+                <th>Return</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in bySide" :key="row.key">
+                <td class="t-left t-name">{{ row.label }}</td>
+                <td class="figure">{{ row.won }}-{{ row.lost }}<span v-if="row.push">-{{ row.push }}</span></td>
+                <td class="figure">{{ pct(row.winRate) }}</td>
+                <td class="figure t-muted">{{ pct(row.breakEven) }}</td>
+                <td class="figure" :class="signClass(row.edge)">{{ pct(row.edge, true) }}</td>
+                <td class="figure" :class="signClass(row.profit)">{{ money(row.profit) }}</td>
+                <td class="figure" :class="signClass(row.roi)">{{ pct(row.roi, true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="stats-section" v-if="teamRows.length">
+        <h4>Teams that paid, and didn&apos;t</h4>
+        <p class="section-note">Best and worst by net, over at least {{ MIN_TEAM_BETS }} settled bets.</p>
+        <div class="table-scroll">
+          <table class="stat-table">
+            <thead>
+              <tr>
+                <th class="t-left">Team</th>
+                <th>Record</th>
+                <th>Win rate</th>
+                <th>Wagered</th>
+                <th>Net</th>
+                <th>Return</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in teamRows" :key="row.key">
+                <td class="t-left t-name">{{ row.label }}</td>
+                <td class="figure">{{ row.won }}-{{ row.lost }}<span v-if="row.push">-{{ row.push }}</span></td>
+                <td class="figure">{{ pct(row.winRate) }}</td>
+                <td class="figure t-muted">${{ Math.round(row.wagered).toLocaleString() }}</td>
+                <td class="figure" :class="signClass(row.profit)">{{ money(row.profit) }}</td>
+                <td class="figure" :class="signClass(row.roi)">{{ pct(row.roi, true) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -144,6 +176,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
+import { isSettled, summarize, summarizeBy, edgeOf } from '../utils/betAnalytics.js'
 
 export default {
   name: 'AdvancedStats',
@@ -428,25 +461,6 @@ export default {
         notCovered: notCoveredBets.length
       } : null
 
-      // Find record bets
-      const largestBet = allBets.length > 0
-        ? allBets.reduce((max, bet) => (bet.amount || 0) > (max.amount || 0) ? bet : max)
-        : null
-
-      const biggestWin = completedBets.filter(b => b.status === 'won').length > 0
-        ? completedBets.filter(b => b.status === 'won').reduce((max, bet) => {
-            // potentialWin is already the profit amount (winnings on top of bet amount)
-            const profit = bet.potentialWin || 0
-            const maxProfit = max.potentialWin || 0
-            return profit > maxProfit ? bet : max
-          })
-        : null
-
-      const biggestLoss = completedBets.filter(b => b.status === 'lost').length > 0
-        ? completedBets.filter(b => b.status === 'lost').reduce((max, bet) => 
-            (bet.amount || 0) > (max.amount || 0) ? bet : max)
-        : null
-
       return {
         winPercentageByType,
         winPercentageByTypeBySport,
@@ -466,20 +480,6 @@ export default {
           overUnderPercent,
           spreadPreference,
           spreadCoverPercent
-        },
-        recordBets: {
-          largestBet: largestBet ? {
-            amount: largestBet.amount,
-            team: largestBet.selection || 'N/A'
-          } : null,
-          biggestWin: biggestWin ? {
-            profit: biggestWin.potentialWin || 0,
-            team: biggestWin.selection || 'N/A'
-          } : null,
-          biggestLoss: biggestLoss ? {
-            profit: -(biggestLoss.amount || 0),
-            team: biggestLoss.selection || 'N/A'
-          } : null
         }
       }
     })
@@ -503,6 +503,92 @@ export default {
       return names[sport] || sport
     }
 
+    // Money-aware view of the same bets - see utils/betAnalytics.js
+    const settledBets = computed(() =>
+      (userStore.currentUser.value?.bets || []).filter(isSettled))
+
+    const filteredBets = computed(() => selectedSport.value === 'all'
+      ? settledBets.value
+      : settledBets.value.filter(b => b.sport === selectedSport.value))
+
+    const overall = computed(() => summarize(filteredBets.value))
+
+    const MARKET_ORDER = ['spread', 'moneyline', 'total']
+    const byMarket = computed(() => {
+      const grouped = summarizeBy(filteredBets.value, b => b.betType)
+      return MARKET_ORDER
+        .filter(key => grouped.has(key))
+        .map(key => {
+          const summary = grouped.get(key)
+          return { key, label: formatBetType(key), ...summary, edge: edgeOf(summary) }
+        })
+    })
+
+    const bySport = computed(() => {
+      const grouped = summarizeBy(filteredBets.value, b => b.sport)
+      return [...grouped.entries()]
+        .map(([key, summary]) => ({ key, label: formatSportName(key), ...summary, edge: edgeOf(summary) }))
+        .sort((a, b) => b.profit - a.profit)
+    })
+
+    // You bet favourites four times out of five - this is how that actually
+    // goes, which the raw split never said.
+    const sideOf = (bet) => {
+      if (bet.betType === 'spread') {
+        const n = parseFloat(bet.line)
+        if (Number.isNaN(n)) return null
+        return n < 0 ? 'Favorites' : 'Underdogs'
+      }
+      if (bet.betType === 'total') {
+        if (bet.selection === 'Over') return 'Overs'
+        if (bet.selection === 'Under') return 'Unders'
+      }
+      return null
+    }
+
+    const SIDE_ORDER = ['Favorites', 'Underdogs', 'Overs', 'Unders']
+    const bySide = computed(() => {
+      const grouped = summarizeBy(filteredBets.value, sideOf)
+      return SIDE_ORDER
+        .filter(key => grouped.has(key))
+        .map(key => {
+          const summary = grouped.get(key)
+          return { key, label: key, ...summary, edge: edgeOf(summary) }
+        })
+    })
+
+    // Teams, by money rather than by count. "Most bet on" and "most losses"
+    // were both BYU and neither said whether that cost anything.
+    const MIN_TEAM_BETS = 3
+    const teamRows = computed(() => {
+      const grouped = summarizeBy(
+        filteredBets.value.filter(b => b.betType !== 'total'),
+        b => b.selection
+      )
+      const rows = [...grouped.entries()]
+        .filter(([, summary]) => summary.settled >= MIN_TEAM_BETS)
+        .map(([name, summary]) => ({ key: name, label: name, ...summary, edge: edgeOf(summary) }))
+        .sort((a, b) => b.profit - a.profit)
+      if (rows.length <= 6) return rows
+      return [...rows.slice(0, 3), ...rows.slice(-3)]
+    })
+
+    const pct = (v, signed = false) => {
+      if (v === null || v === undefined || Number.isNaN(v)) return '—'
+      const n = v * 100
+      return (signed && n > 0 ? '+' : '') + n.toFixed(1) + '%'
+    }
+
+    const money = (v) => {
+      if (v === null || v === undefined || Number.isNaN(v)) return '—'
+      const n = Math.round(v)
+      return (n < 0 ? '-$' : '+$') + Math.abs(n).toLocaleString()
+    }
+
+    const signClass = (v) =>
+      v === null || v === undefined || Number.isNaN(v) || v === 0
+        ? '' : (v > 0 ? 'positive' : 'negative')
+
     const currentWinPercentageByType = computed(() => {
       if (!stats.value?.winPercentageByTypeBySport) return stats.value?.winPercentageByType || {}
       const sportKey = selectedSport.value === 'all' ? 'all' : selectedSport.value
@@ -517,6 +603,15 @@ export default {
       stats,
       selectedSport,
       currentWinPercentageByType,
+      overall,
+      byMarket,
+      bySport,
+      bySide,
+      teamRows,
+      MIN_TEAM_BETS,
+      pct,
+      money,
+      signClass,
       formatBetType,
       formatSportName,
       onSportChange
@@ -541,44 +636,9 @@ export default {
   margin: 0;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--color-border);
-  border-top: 4px solid var(--color-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem auto;
-}
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-.error-message {
-  text-align: center;
-  padding: 2rem;
-  background: var(--color-danger-soft);
-  border: 1px solid var(--color-danger-soft);
-  border-radius: var(--radius-md);
-  color: var(--color-danger);
-}
-
-.retry-btn {
-  margin-top: 1rem;
-  padding: 0.5rem 1.5rem;
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.retry-btn:hover {
-  background: var(--color-primary-dark);
 }
 
 .stats-content {
@@ -643,249 +703,10 @@ export default {
   gap: 0.75rem;
 }
 
-.section-description {
-  margin: 0 0 1.5rem 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-}
-
-.subsection-description {
-  margin: 0 0 1rem 0;
-  color: var(--color-text-subtle);
-  font-size: 0.8125rem;
-  font-style: italic;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.stat-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.stat-header {
-  margin-bottom: 1rem;
-}
-
-.bet-type-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-value {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  margin-bottom: 1rem;
-  color: var(--color-text);
-}
-
-.stat-value.positive {
-  color: var(--color-success);
-}
-
-.stat-value.negative {
-  color: var(--color-danger);
-}
-
-.stat-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: var(--text-sm);
-}
-
-.stat-detail {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.stat-detail .label {
-  color: var(--color-text-muted);
-}
-
-.stat-detail .value {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.stat-detail .value.positive {
-  color: var(--color-success);
-}
-
-.stat-detail .value.negative {
-  color: var(--color-danger);
-}
-
-.outcomes-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-top: 1.5rem;
-}
-
-.outcome-section {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
-
-.outcome-section h5 {
-  margin: 0 0 1rem 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-lg);
-  font-weight: 600;
-}
-
-.outcome-section h5.centered-header {
-  text-align: center;
-}
-
-.outcome-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.outcome-card {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  text-align: center;
-  transition: transform 0.2s ease;
-}
-
-.outcome-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.outcome-card.over {
-  border-color: var(--color-success);
-  background: var(--color-success-soft);
-}
-
-.outcome-card.under {
-  border-color: var(--color-danger);
-  background: var(--color-danger-soft);
-}
-
-.outcome-card.covered {
-  border-color: var(--color-success);
-  background: var(--color-success-soft);
-}
-
-.outcome-card.covered-low {
-  border-color: var(--color-warning);
-  background: var(--color-warning-soft);
-}
-
-.outcome-card.covered-zero {
-  border-color: var(--color-border);
-  background: var(--color-surface-muted);
-}
-
-.outcome-card.push {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-}
-
-.outcome-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
-}
-
-.outcome-percentage {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  color: var(--color-text);
-  margin-bottom: 0.5rem;
-}
-
-.outcome-card.over .outcome-percentage {
-  color: var(--color-success);
-}
-
-.outcome-card.under .outcome-percentage {
-  color: var(--color-danger);
-}
-
-.outcome-card.covered .outcome-percentage {
-  color: var(--color-success);
-}
-
-.outcome-card.covered-low .outcome-percentage {
-  color: var(--color-warning);
-}
-
-.outcome-card.covered-zero .outcome-percentage {
-  color: var(--color-text-muted);
-}
-
-.outcome-count {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.no-data {
-  text-align: center;
-  padding: 2rem;
-  color: var(--color-text-muted);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.total-games {
-  text-align: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 600;
-}
-
 .fun-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-}
-
-.fun-stat-card {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.fun-stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary-light);
 }
 
 .fun-stat-label {
@@ -920,15 +741,8 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
 
   .fun-stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .outcome-stats {
     grid-template-columns: 1fr;
   }
 
@@ -949,4 +763,201 @@ export default {
     flex: 1;
   }
 }
+
+/* ── Flat treatment, matching the ledger band and board rows ──
+   The panel nested white rounded cards inside grey rounded boxes, a different
+   language from every other surface on this page, and spent a lot of height
+   saying little. */
+
+.stats-section {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: var(--space-6);
+}
+
+.stats-section h4 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* One rule-divided strip, same shape as the page's ledger band */
+.ledger-strip {
+  display: flex;
+  flex-wrap: wrap;
+  border-top: 1.5px solid var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ls-cell {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-left: 1px solid var(--color-border);
+}
+
+.ls-cell:first-child { padding-left: 0; border-left: none; }
+
+.ls-key {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+.ls-val {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.ls-lead .ls-val { font-size: var(--text-2xl); }
+.ls-val.positive { color: var(--color-success); }
+.ls-val.negative { color: var(--color-danger); }
+
+/* Markets read as a table because they are one - three rows of the same
+   columns, which floating cards could not line up */
+
+/* Records and patterns: hairline cells rather than boxes in boxes */
+.fun-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
+  /* container caps top and left, each cell caps its own right and bottom, so
+     the block closes on all four sides however many cells wrap */
+  border-top: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+}
+
+.fun-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: none;
+  border-radius: 0;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  transition: background 0.15s ease;
+}
+
+.fun-stat-card:hover {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  transform: none;
+  box-shadow: none;
+}
+
+.fun-stat-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.fun-stat-value {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.fun-stat-value.positive { color: var(--color-success); }
+.fun-stat-value.negative { color: var(--color-danger); }
+
+.fun-stat-detail {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.sport-select {
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.section-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+@media (max-width: 720px) {
+  .ls-cell { flex: 1 1 40%; }
+}
+
+.section-note {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.section-note strong { color: var(--color-text); font-weight: 600; }
+
+.table-scroll { overflow-x: auto; }
+
+.stat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-table th {
+  padding: 0 var(--space-3) var(--space-2);
+  border-bottom: 1.5px solid var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.stat-table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-base);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.stat-table tbody tr:hover { background: var(--color-surface-muted); }
+
+.stat-table .t-left { text-align: left; padding-left: 0; }
+.stat-table .t-name { font-weight: 600; color: var(--color-text); }
+.stat-table .t-muted { color: var(--color-text-muted); }
+.stat-table td.positive { color: var(--color-success); font-weight: 600; }
+.stat-table td.negative { color: var(--color-danger); font-weight: 600; }
 </style>

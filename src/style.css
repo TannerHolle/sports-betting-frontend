@@ -237,6 +237,39 @@ img {
   color: var(--color-text-muted);
 }
 
+/* A section-head that collapses its section. `font: inherit` rather than
+   font-family alone: a button otherwise keeps the UA's 13.33px and
+   line-height:normal, which makes the rule sit a few pixels off from a
+   neighbouring panel's plain-div head. */
+.section-head.is-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1.5px solid var(--color-text);
+  border-radius: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* takes the slack so the chevron lands hard right, and the count sits beside
+   the title the way it does on the other panel heads */
+.section-head.is-toggle .section-meta { flex: 1 1 auto; }
+
+.section-chevron {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-bottom: 2px;
+  border-right: 1.5px solid var(--color-text-muted);
+  border-bottom: 1.5px solid var(--color-text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.section-chevron.open { transform: rotate(45deg); }
+.section-head.is-toggle:hover .section-chevron { border-color: var(--color-text); }
+
 /* Micro-label above a figure */
 .eyebrow {
   font-size: var(--label-size);

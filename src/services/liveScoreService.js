@@ -2,8 +2,14 @@ import axios from 'axios'
 
 class LiveScoreService {
   constructor() {
-    this.cache = new Map()
-    this.cacheTimeout = 30000 // 30 seconds
+    // One entry per sport, not per game. The old per-game cache couldn't help
+    // the callers that hurt: getLiveScores fans out over N games at once, so
+    // all N missed together and each fell through to its own full scoreboard
+    // fetch. Worse, a game outside ESPN's current window never got cached at
+    // all, so it re-fetched the whole scoreboard on every poll, forever.
+    this.sportCache = new Map() // sport -> { games: Map, timestamp }
+    this.inFlight = new Map()   // sport -> Promise, so parallel callers share one request
+    this.cacheTimeout = 10000   // 10s - live scores don't move faster than this
   }
 
   // Format date for ESPN API (YYYYMMDD)
@@ -63,27 +69,43 @@ class LiveScoreService {
     }
   }
 
-  // Fetch a sport's whole scoreboard once and cache every game in it.
-  // getLiveScore used to fetch the full scoreboard per game, so five bets on
-  // one slate meant five identical requests.
+  // A sport's whole scoreboard, keyed by game id.
+  //
+  // Every live-score path in the app funnels through here, so this is the one
+  // place worth deduping: a fresh-enough copy is reused, and callers that
+  // arrive while a request is already open share it instead of opening their
+  // own. One sport costs one request per cacheTimeout no matter how many games
+  // or components ask for it.
   async getScoresForSport(sport) {
-    try {
-      const response = await axios.get(this.scoreboardUrl(sport))
-      const games = response.data.events || []
-      const now = Date.now()
-      const byId = new Map()
+    const key = (sport || 'nba').toLowerCase()
 
-      for (const game of games) {
-        const parsed = this.parseGame(game)
-        if (!parsed) continue
-        byId.set(parsed.gameId, parsed)
-        this.cache.set(parsed.gameId, { data: parsed, timestamp: now })
-      }
-      return byId
-    } catch (error) {
-      console.error(`Error fetching ${sport} scoreboard:`, error)
-      return new Map()
-    }
+    const cached = this.sportCache.get(key)
+    if (cached && Date.now() - cached.timestamp < this.cacheTimeout) return cached.games
+
+    const pending = this.inFlight.get(key)
+    if (pending) return pending
+
+    const request = axios.get(this.scoreboardUrl(key))
+      .then(response => {
+        const byId = new Map()
+        for (const game of response.data.events || []) {
+          const parsed = this.parseGame(game)
+          if (parsed) byId.set(parsed.gameId, parsed)
+        }
+        this.sportCache.set(key, { games: byId, timestamp: Date.now() })
+        return byId
+      })
+      .catch(error => {
+        console.error(`Error fetching ${sport} scoreboard:`, error)
+        // A stale slate beats no slate - scores only ever move forward
+        return cached?.games || new Map()
+      })
+      .finally(() => {
+        this.inFlight.delete(key)
+      })
+
+    this.inFlight.set(key, request)
+    return request
   }
 
   // Live data for a set of games, grouped so each sport costs one request
@@ -108,14 +130,11 @@ class LiveScoreService {
 
   // Live score for one game. Shares the undated URL and the parsing with the
   // batched path above, so both agree on which games exist and what they say.
+  // A game that isn't on the board costs nothing extra - the lookup misses the
+  // sport's cached slate rather than triggering a fetch of its own.
   async getLiveScore(gameId, sport = 'nba') {
-    const id = String(gameId)
-    const cached = this.cache.get(id)
-    if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-      return cached.data
-    }
     const scores = await this.getScoresForSport(sport)
-    return scores.get(id) || null
+    return scores.get(String(gameId)) || null
   }
 
   // Format game status
@@ -172,24 +191,23 @@ class LiveScoreService {
     }
   }
 
-  // Get live scores for multiple games
+  // Get live scores for multiple games. One request for the sport, then N
+  // lookups against it - this used to be N parallel getLiveScore calls, which
+  // all missed the cache at once and became N full scoreboard fetches.
   async getLiveScores(gameIds, sport = 'nba') {
-    const promises = gameIds.map(gameId => this.getLiveScore(gameId, sport))
-    const results = await Promise.all(promises)
-    
+    const scores = await this.getScoresForSport(sport)
+
     const liveScores = new Map()
-    results.forEach((data, index) => {
-      if (data) {
-        liveScores.set(gameIds[index], data)
-      }
-    })
-    
+    for (const gameId of gameIds) {
+      const found = scores.get(String(gameId))
+      if (found) liveScores.set(gameId, found)
+    }
     return liveScores
   }
 
   // Clear cache
   clearCache() {
-    this.cache.clear()
+    this.sportCache.clear()
   }
 }
 

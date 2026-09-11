@@ -792,9 +792,13 @@ export default {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--color-text);
+  /* Routed through local vars so the dark override below only has to restate
+     the two colors, and can't lose a specificity race with :hover. */
+  --fab-bg: var(--color-text);
+  --fab-bg-hover: var(--color-text);
+  background: var(--fab-bg);
   color: var(--color-text-inverse);
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -805,7 +809,7 @@ export default {
 }
 
 .chat-toggle-button:hover {
-  background: var(--color-text);
+  background: var(--fab-bg-hover);
   transform: scale(1.05);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
@@ -818,6 +822,26 @@ export default {
   width: 24px;
   height: 24px;
   display: block;
+}
+
+/* The bubble is ink on paper. In dark, --color-text is near-white, which turned
+   it into a white disc with a white icon on it — so it stays dark in both
+   themes, and takes a hairline instead of the shadow, which does nothing on a
+   near-black ground. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .chat-toggle-button {
+    --fab-bg: var(--color-surface-muted);
+    --fab-bg-hover: var(--color-border-strong);
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+  }
+}
+
+:root[data-theme='dark'] .chat-toggle-button {
+  --fab-bg: var(--color-surface-muted);
+  --fab-bg-hover: var(--color-border-strong);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
 }
 
 /* Chat Widget */

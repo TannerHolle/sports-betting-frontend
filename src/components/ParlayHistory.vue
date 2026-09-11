@@ -1,22 +1,11 @@
 <template>
-  <div class="parlay-history" v-if="isAuthenticated && parlays.length">
+  <div class="parlay-history" v-if="isAuthenticated && settledParlays.length">
     <div class="ph-header">
-      <h3>Your Parlays</h3>
-      <div class="ph-tabs">
-        <button @click="tab = 'active'" :class="{ active: tab === 'active' }" class="ph-tab">
-          Active ({{ activeParlays.length }})
-        </button>
-        <button @click="tab = 'settled'" :class="{ active: tab === 'settled' }" class="ph-tab">
-          Settled ({{ settledParlays.length }})
-        </button>
-      </div>
+      <h3>Settled parlays</h3>
+      <span class="ph-count">{{ settledParlays.length }}</span>
     </div>
 
-    <div v-if="!visible.length" class="ph-empty">
-      No {{ tab }} parlays.
-    </div>
-
-    <div v-for="parlay in visible" :key="parlay._id" class="ph-card" :class="parlay.status">
+    <div v-for="parlay in settledParlays" :key="parlay._id" class="ph-card" :class="parlay.status">
       <button class="ph-card-head" @click="toggle(parlay._id)">
         <div class="ph-head-left">
           <span class="ph-status" :class="parlay.status">{{ statusLabel(parlay.status) }}</span>
@@ -29,11 +18,7 @@
         </div>
       </button>
 
-      <div class="ph-progress" v-if="parlay.status === 'pending'">
-        {{ wonLegs(parlay) }} of {{ parlay.legs.length }} legs hit
-        <span class="ph-towin">· to win ${{ parlay.potentialWin.toLocaleString() }}</span>
-      </div>
-      <div class="ph-progress" v-else-if="parlay.status === 'won'">
+      <div class="ph-progress" v-if="parlay.status === 'won'">
         Won ${{ parlay.potentialWin.toLocaleString() }}
       </div>
       <div class="ph-progress" v-else-if="parlay.status === 'push'">
@@ -54,15 +39,6 @@
           <span class="ph-leg-status" :class="leg.status">{{ statusLabel(leg.status) }}</span>
         </div>
 
-        <button
-          v-if="parlay.status === 'pending' && canCancel(parlay)"
-          @click="cancel(parlay)"
-          :disabled="cancelling === parlay._id"
-          class="ph-cancel"
-        >
-          {{ cancelling === parlay._id ? 'Cancelling…' : 'Cancel parlay' }}
-        </button>
-        <p v-if="errors[parlay._id]" class="ph-error">{{ errors[parlay._id] }}</p>
       </div>
     </div>
   </div>
@@ -70,19 +46,22 @@
 
 <script>
 import { formatLine } from '../utils/oddsMath.js'
-import { ref, computed, reactive } from 'vue'
-import axios from 'axios'
+import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
-import { API_BASE_URL } from '../config/api.js'
 
+/**
+ * Parlays that have finished, in the rail.
+ *
+ * Open parlays used to have their own tab here, with their own cancel button -
+ * a third place showing the same wagers as the open-bets panel and the bet
+ * history's active tab. They all live in OpenBets now, so this is purely the
+ * record of what already happened.
+ */
 export default {
   name: 'ParlayHistory',
   setup() {
     const userStore = useUserStore()
-    const tab = ref('active')
     const open = ref(new Set())
-    const cancelling = ref(null)
-    const errors = reactive({})
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -91,9 +70,7 @@ export default {
     const byNewest = (list) => [...list].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     )
-    const activeParlays = computed(() => byNewest(parlays.value.filter(p => p.status === 'pending')))
     const settledParlays = computed(() => byNewest(parlays.value.filter(p => p.status !== 'pending')))
-    const visible = computed(() => (tab.value === 'active' ? activeParlays.value : settledParlays.value))
 
     const isOpen = (id) => open.value.has(id)
     const toggle = (id) => {
@@ -103,7 +80,6 @@ export default {
     }
 
     const statusLabel = (s) => ({ pending: 'Open', won: 'Won', lost: 'Lost', push: 'Push' }[s] || s)
-    const wonLegs = (p) => p.legs.filter(l => l.status === 'won').length
 
     const gameLabel = (leg) =>
       leg.gameData?.gameName ||
@@ -111,36 +87,10 @@ export default {
         ? `${leg.gameData.awayTeam} @ ${leg.gameData.homeTeam}`
         : leg.sport || '')
 
-
-    // Mirrors the server rule: cancellable only while every game is unstarted
-    const canCancel = (parlay) => {
-      const now = Date.now()
-      return parlay.legs.every(leg => {
-        const t = leg.gameData?.gameStartTime
-        if (!t) return true
-        const d = new Date(t).getTime()
-        return Number.isNaN(d) || d > now
-      })
-    }
-
-    const cancel = async (parlay) => {
-      cancelling.value = parlay._id
-      errors[parlay._id] = ''
-      try {
-        await axios.delete(`${API_BASE_URL}/user/${currentUser.value.username}/parlay/${parlay._id}`)
-        await userStore.loadUserFromAPI(currentUser.value.username)
-      } catch (error) {
-        errors[parlay._id] = error.response?.data?.error || 'Failed to cancel parlay'
-      } finally {
-        cancelling.value = null
-      }
-    }
-
     return {
       displayLine: formatLine,
-      tab, isAuthenticated, parlays, activeParlays, settledParlays, visible,
-      isOpen, toggle, statusLabel, wonLegs, gameLabel,
-      canCancel, cancel, cancelling, errors
+      isAuthenticated, settledParlays,
+      isOpen, toggle, statusLabel, gameLabel
     }
   }
 }
@@ -161,6 +111,13 @@ export default {
   border-bottom: 1.5px solid var(--color-text);
 }
 
+.ph-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .ph-header h3 {
   margin: 0;
   font-size: var(--label-size);
@@ -169,44 +126,6 @@ export default {
   text-transform: uppercase;
   color: var(--color-text);
 }
-
-.ph-tabs {
-  display: flex;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.ph-tab {
-  padding: var(--space-1) var(--space-2);
-  background: var(--color-surface);
-  border: none;
-  border-left: 1px solid var(--color-border-strong);
-  font-family: inherit;
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.ph-tab:first-child { border-left: none; }
-.ph-tab:hover { background: var(--color-surface-muted); color: var(--color-text); }
-
-.ph-tab.active {
-  background: var(--color-text);
-  color: var(--color-text-inverse);
-  font-weight: 600;
-}
-
-.ph-empty,
-.ph-error {
-  padding: var(--space-5) 0;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.ph-error { color: var(--color-danger); }
 
 .ph-card {
   display: flex;
@@ -282,8 +201,6 @@ export default {
   font-variant-numeric: tabular-nums;
 }
 
-.ph-towin { color: var(--color-success); }
-
 .ph-legs-list {
   display: flex;
   flex-direction: column;
@@ -349,18 +266,4 @@ export default {
   flex: 0 0 auto;
 }
 
-.ph-cancel {
-  align-self: flex-start;
-  margin-bottom: var(--space-3);
-  padding: var(--space-1) var(--space-2);
-  background: transparent;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  font-family: inherit;
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.ph-cancel:hover { border-color: var(--color-danger); color: var(--color-danger); }
 </style>

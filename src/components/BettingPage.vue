@@ -52,18 +52,25 @@
       <div class="dash">
         <main class="dash-main">
 
-          <LiveBets />
+          <OpenBets />
 
           <TodayResults />
 
           <section class="board">
-            <div class="section-head">
+            <button
+              type="button"
+              class="section-head is-toggle"
+              :aria-expanded="String(!boardCollapsed)"
+              @click="toggleBoard"
+            >
               <h2>{{ showingDate === 'tomorrow' ? "Tomorrow's board" : "Today's board" }}</h2>
               <span class="section-meta" v-if="gamesWithBetting.length">
                 {{ gamesWithBetting.length }} game{{ gamesWithBetting.length === 1 ? '' : 's' }} with lines
               </span>
-            </div>
+              <span class="section-chevron" :class="{ open: !boardCollapsed }" aria-hidden="true"></span>
+            </button>
 
+            <template v-if="!boardCollapsed">
             <div class="board-controls">
               <div class="board-controls-left">
                 <div class="league-switch" v-if="availableSports.length">
@@ -118,6 +125,7 @@
                 :sport="activeLeague"
               />
             </div>
+            </template>
           </section>
 
           <BetHistory />
@@ -136,19 +144,31 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
+import { useCollapsible } from '../composables/useCollapsible.js'
 import { API_BASE_URL } from '../config/api.js'
 import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
 import ParlayHistory from './ParlayHistory.vue'
-import LiveBets from './LiveBets.vue'
+import OpenBets from './OpenBets.vue'
 import TodayResults from './TodayResults.vue'
 import GameBoardRow from './GameBoardRow.vue'
 import Leaderboard from './Leaderboard.vue'
 
+// The board lists scheduled games at prices the server refreshes daily, and a
+// game that kicks off is removed by the local clock rather than by a fetch.
+// One request per tick, so this can stay as brisk as it ever was.
+const BOARD_REFRESH_MS = 30000
+// The other leagues, only to keep the chip row honest. One request each, and
+// only for the date already on screen.
+const BOARD_SWEEP_MS = 120000
+// Drives the "has this game started" filter, so it wants to be finer than the
+// fetch cadence. Costs nothing - it's a clock read.
+const CLOCK_TICK_MS = 15000
+
 export default {
   name: 'BettingPage',
   components: {
-    LiveBets,
+    OpenBets,
     TodayResults,
     GameBoardRow,
     ParlayHistory,
@@ -157,17 +177,25 @@ export default {
   },
   setup() {
     const userStore = useUserStore()
+    const { collapsed: boardCollapsed, toggle: toggleBoard } = useCollapsible('boardCollapsed')
     const games = ref([])
     const loading = ref(false)
     const switchingSports = ref(false)
     const error = ref(null)
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
     const refreshInterval = ref(null)
-    const allSportsRefreshInterval = ref(null)
+    const sweepInterval = ref(null)
     const userLeaguesForLeaderboard = ref([])
     const gamesBySport = ref({}) // Store games for each sport
     const showingDate = ref('today') // Track if showing 'today' or 'tomorrow'
     const allOdds = ref({}) // Cache all odds data
+    // Ticks locally so a game that has kicked off drops off the board on its
+    // own. Freshness here is a clock problem, not a network problem - the old
+    // 30s poll existed mostly to notice this.
+    const now = ref(Date.now())
+    const clockInterval = ref(null)
+    const lastSeenDay = ref(new Date().toDateString())
+    const lastFullPass = ref(Date.now())
 
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
@@ -288,6 +316,10 @@ export default {
         const status = competition?.status
         const isScheduled = status?.type?.state === 'pre'
         if (!isScheduled) return false
+        // ESPN can lag flipping pre -> in. Trust the kickoff time too, so we
+        // never offer a price on a game that has already started.
+        const kickoff = Date.parse(game.date || competition?.date || '')
+        if (!Number.isNaN(kickoff) && kickoff <= now.value) return false
         return gameHasOdds(game, activeLeague.value)
       })
 
@@ -314,9 +346,33 @@ export default {
         const response = await axios.get(apiUrl)
         return response.data.events || []
       } catch (err) {
+        // null means "we don't know", not "there are no games". A background
+        // poll that hits a blip must not blank a board that's already on screen.
         console.error(`Error fetching games for ${sportId} on ${formattedDate}:`, err)
-        return []
+        return null
       }
+    }
+
+    // One sport's slate for one date. ok:false is a failed request, which
+    // every caller treats as "keep whatever we already had".
+    const loadSlate = async (date, sport) => {
+      const events = await fetchGamesForDate(date, sport.id)
+      if (!events) return { sportId: sport.id, ok: false, hasGames: false, games: [] }
+
+      const withOdds = events.filter(game => {
+        const status = game.competitions?.[0]?.status
+        if (status?.type?.state !== 'pre') return false
+        return gameHasOdds(game, sport.id)
+      })
+      return { sportId: sport.id, ok: true, hasGames: withOdds.length > 0, games: events }
+    }
+
+    // Fold a round of results into gamesBySport, leaving failed sports alone
+    // so their league chip doesn't blink out and reflow the controls row.
+    const mergeSlates = (results) => {
+      results.forEach(result => {
+        if (result.ok) gamesBySport.value[result.sportId] = result.games
+      })
     }
 
     // Fetch all odds data
@@ -335,6 +391,7 @@ export default {
         loading.value = true
       }
       error.value = null
+      lastFullPass.value = Date.now()
       
       try {
         // First, ensure we have odds data (refresh it to get latest)
@@ -346,24 +403,12 @@ export default {
         tomorrow.setDate(tomorrow.getDate() + 1)
         
         // Check all sports for today's games first
-        const todayCheckPromises = sports.value.map(async (sport) => {
-          try {
-            let todayGames = await fetchGamesForDate(today, sport.id)
-            let todayGamesWithOdds = todayGames.filter(game => {
-              const competition = game.competitions?.[0]
-              const status = competition?.status
-              const isScheduled = status?.type?.state === 'pre'
-              if (!isScheduled) return false
-              return gameHasOdds(game, sport.id)
-            })
-            return { sportId: sport.id, hasGames: todayGamesWithOdds.length > 0, games: todayGames }
-          } catch (err) {
-            console.error(`Error fetching today's data for ${sport.name}:`, err)
-            return { sportId: sport.id, hasGames: false, games: [] }
-          }
-        })
+        const todayResults = await Promise.all(sports.value.map(sport => loadSlate(today, sport)))
         
-        const todayResults = await Promise.all(todayCheckPromises)
+        // If nothing came back at all, this poll learned nothing. Bail rather
+        // than read the silence as "no games today" and swing the whole board
+        // over to tomorrow's slate.
+        if (!todayResults.some(result => result.ok)) return
         
         // Check if ANY sport has games today
         const hasAnyGamesToday = todayResults.some(result => result.hasGames)
@@ -372,40 +417,19 @@ export default {
           // At least one sport has games today - use today's games
           showingDate.value = 'today'
           const activeSportResult = todayResults.find(r => r.sportId === sportId)
-          games.value = activeSportResult ? activeSportResult.games : []
+          if (activeSportResult?.ok) games.value = activeSportResult.games
           // Update gamesBySport for all sports
-          todayResults.forEach(result => {
-            gamesBySport.value[result.sportId] = result.games
-          })
+          mergeSlates(todayResults)
         } else {
           // No sports have games today - check tomorrow for all sports
           console.log('No games with odds today across all sports, checking tomorrow')
           showingDate.value = 'tomorrow'
           
-          const tomorrowCheckPromises = sports.value.map(async (sport) => {
-            try {
-              const tomorrowGames = await fetchGamesForDate(tomorrow, sport.id)
-              const tomorrowGamesWithOdds = tomorrowGames.filter(game => {
-                const competition = game.competitions?.[0]
-                const status = competition?.status
-                const isScheduled = status?.type?.state === 'pre'
-                if (!isScheduled) return false
-                return gameHasOdds(game, sport.id)
-              })
-              return { sportId: sport.id, games: tomorrowGames }
-            } catch (err) {
-              console.error(`Error fetching tomorrow's data for ${sport.name}:`, err)
-              return { sportId: sport.id, games: [] }
-            }
-          })
-          
-          const tomorrowResults = await Promise.all(tomorrowCheckPromises)
+          const tomorrowResults = await Promise.all(sports.value.map(sport => loadSlate(tomorrow, sport)))
           const activeSportResult = tomorrowResults.find(r => r.sportId === sportId)
-          games.value = activeSportResult ? activeSportResult.games : []
+          if (activeSportResult?.ok) games.value = activeSportResult.games
           // Update gamesBySport for all sports
-          tomorrowResults.forEach(result => {
-            gamesBySport.value[result.sportId] = result.games
-          })
+          mergeSlates(tomorrowResults)
         }
         
       } catch (err) {
@@ -415,73 +439,6 @@ export default {
         if (showLoading) {
           loading.value = false
         }
-      }
-    }
-
-    // Check all sports to see which have games available (today or tomorrow)
-    // Only checks tomorrow if NO sports have games today
-    const checkAllSports = async () => {
-      // Ensure we have odds data
-      if (Object.keys(allOdds.value).length === 0) {
-        await fetchAllOdds()
-      }
-      
-      const today = new Date()
-      const tomorrow = new Date(today)
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      
-      // First, check all sports for today's games
-      const todayCheckPromises = sports.value.map(async (sport) => {
-        try {
-          let todayGames = await fetchGamesForDate(today, sport.id)
-          let todayGamesWithOdds = todayGames.filter(game => {
-            const competition = game.competitions?.[0]
-            const status = competition?.status
-            const isScheduled = status?.type?.state === 'pre'
-            if (!isScheduled) return false
-            return gameHasOdds(game, sport.id)
-          })
-          return { sportId: sport.id, hasGames: todayGamesWithOdds.length > 0, games: todayGames }
-        } catch (err) {
-          console.error(`Error fetching today's data for ${sport.name}:`, err)
-          return { sportId: sport.id, hasGames: false, games: [] }
-        }
-      })
-      
-      const todayResults = await Promise.all(todayCheckPromises)
-      
-      // Check if ANY sport has games today
-      const hasAnyGamesToday = todayResults.some(result => result.hasGames)
-      
-      if (hasAnyGamesToday) {
-        // At least one sport has games today - store today's games for all sports
-        todayResults.forEach(result => {
-          gamesBySport.value[result.sportId] = result.games
-        })
-      } else {
-        // No sports have games today - check tomorrow for all sports
-        console.log('No games with odds today across all sports, checking tomorrow')
-        const tomorrowCheckPromises = sports.value.map(async (sport) => {
-          try {
-            const tomorrowGames = await fetchGamesForDate(tomorrow, sport.id)
-            const tomorrowGamesWithOdds = tomorrowGames.filter(game => {
-              const competition = game.competitions?.[0]
-              const status = competition?.status
-              const isScheduled = status?.type?.state === 'pre'
-              if (!isScheduled) return false
-              return gameHasOdds(game, sport.id)
-            })
-            return { sportId: sport.id, games: tomorrowGames }
-          } catch (err) {
-            console.error(`Error fetching tomorrow's data for ${sport.name}:`, err)
-            return { sportId: sport.id, games: [] }
-          }
-        })
-        
-        const tomorrowResults = await Promise.all(tomorrowCheckPromises)
-        tomorrowResults.forEach(result => {
-          gamesBySport.value[result.sportId] = result.games
-        })
       }
     }
 
@@ -508,16 +465,55 @@ export default {
       }
     }
 
-    // Start periodic refresh for live games
+    // The date whose slate is on screen
+    const boardDateValue = () => {
+      const date = new Date()
+      if (showingDate.value === 'tomorrow') date.setDate(date.getDate() + 1)
+      return date
+    }
+
+    // Refresh just the league on screen - one request.
+    //
+    // fetchData checks all four leagues across two dates to work out which has
+    // a slate. That answer only changes when the calendar date rolls or the
+    // current card runs out, both of which we detect without asking anyone.
+    const refreshActiveLeague = async () => {
+      const sport = currentSport.value
+      if (!sport) return
+
+      // Cheap: oddsService serves this from its own cache and shares any
+      // request already open, so polling costs at most one round trip per its
+      // 5-minute TTL.
+      await fetchAllOdds()
+
+      const slate = await loadSlate(boardDateValue(), sport)
+      if (slate.ok) {
+        games.value = slate.games
+        gamesBySport.value[sport.id] = slate.games
+      }
+    }
+
+    // The other leagues, for the date already on screen. This is only here to
+    // keep the league chips honest, so it skips the active league (just
+    // refreshed) and skips the date we already know is empty.
+    const sweepOtherLeagues = async () => {
+      const others = sports.value.filter(sport => sport.id !== activeLeague.value)
+      if (!others.length) return
+      const date = boardDateValue()
+      mergeSlates(await Promise.all(others.map(sport => loadSlate(date, sport))))
+    }
+
+    // No initial fetch here - both callers (mount and setActiveLeague) have
+    // just awaited fetchData themselves, and firing a second one meant every
+    // page load pulled all four scoreboards twice.
     const startLiveRefresh = () => {
-      // Initial fetch with loading
-      fetchData(true)
-      
-      // Set up interval to refresh every 30 seconds (without loading indicator)
-      // This also refreshes odds data to catch new games
       refreshInterval.value = setInterval(() => {
-        fetchData(false)
-      }, 30000)
+        refreshActiveLeague()
+      }, BOARD_REFRESH_MS)
+
+      sweepInterval.value = setInterval(() => {
+        sweepOtherLeagues()
+      }, BOARD_SWEEP_MS)
     }
 
     // Stop live refresh
@@ -526,23 +522,9 @@ export default {
         clearInterval(refreshInterval.value)
         refreshInterval.value = null
       }
-    }
-
-    // Start periodic refresh for all sports (to update available sports list)
-    const startAllSportsRefresh = () => {
-      // Check all sports every 5 minutes to update availability
-      // Also refresh odds data periodically
-      allSportsRefreshInterval.value = setInterval(async () => {
-        await fetchAllOdds()
-        await checkAllSports()
-      }, 300000) // 5 minutes
-    }
-
-    // Stop all sports refresh
-    const stopAllSportsRefresh = () => {
-      if (allSportsRefreshInterval.value) {
-        clearInterval(allSportsRefreshInterval.value)
-        allSportsRefreshInterval.value = null
+      if (sweepInterval.value) {
+        clearInterval(sweepInterval.value)
+        sweepInterval.value = null
       }
     }
 
@@ -562,24 +544,50 @@ export default {
       await fetchUserLeagues()
       // Fetch odds data first
       await fetchAllOdds()
-      // Check all sports first to see which have games available
-      await checkAllSports()
+      // One pass fills every sport's slate and the active league's board.
+      // checkAllSports used to run first and pull the exact same scoreboards
+      // that fetchData pulls a moment later, which doubled time-to-content.
+      await fetchData(true)
       
-      // If current active league doesn't have games, switch to first available
+      // If current active league doesn't have games, switch to first available.
+      // fetchData already has every sport's slate, so this costs no request.
       if (availableSports.value.length > 0) {
         const hasActiveLeagueGames = availableSports.value.some(sport => sport.id === activeLeague.value)
         if (!hasActiveLeagueGames) {
           activeLeague.value = availableSports.value[0].id
+          games.value = gamesBySport.value[activeLeague.value] || []
         }
       }
       
       startLiveRefresh()
-      startAllSportsRefresh()
+
+      // The local clock, not the network, is what tells us the today/tomorrow
+      // choice has gone stale: either the calendar date rolled, or the card on
+      // screen has emptied out because every game kicked off. Only then is the
+      // full cross-league pass worth re-running.
+      clockInterval.value = setInterval(() => {
+        now.value = Date.now()
+
+        const today = new Date().toDateString()
+        const rolled = today !== lastSeenDay.value
+        const cardExhausted = showingDate.value === 'today' && gamesWithBetting.value.length === 0
+
+        // An exhausted card doesn't always resolve on the next pass - the
+        // active league can be empty while another still has games, which
+        // leaves showingDate on 'today' and this condition true. Without a
+        // floor that would re-run the full pass every tick.
+        const settled = Date.now() - lastFullPass.value < BOARD_SWEEP_MS
+
+        if (rolled || (cardExhausted && !settled)) {
+          lastSeenDay.value = today
+          fetchData(false)
+        }
+      }, CLOCK_TICK_MS)
     })
 
     onUnmounted(() => {
       stopLiveRefresh()
-      stopAllSportsRefresh()
+      if (clockInterval.value) clearInterval(clockInterval.value)
     })
 
     return {
@@ -592,6 +600,8 @@ export default {
       availableSports,
       currentSport,
       gamesWithBetting,
+      boardCollapsed,
+      toggleBoard,
       userBalance,
       userStats,
       outstandingBetAmount,
@@ -687,7 +697,6 @@ export default {
   /* 260px is the width it wants, not a floor. A fixed basis here was what
      pushed the band past the page and turned it into a sideways scroll. */
   flex: 0 1 260px;
-  padding-left: 0;
 }
 
 .ledger-cell {

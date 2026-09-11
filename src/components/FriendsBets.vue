@@ -128,6 +128,8 @@ import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import liveScoreService from '../services/liveScoreService.js'
+import { nextPollDelay } from '../utils/pollCadence.js'
+import { getSportFromBet } from '../utils/betSport.js'
 import BetCard from './BetCard.vue'
 import ParlayCard from './ParlayCard.vue'
 
@@ -429,44 +431,24 @@ export default {
 
 
     // Get sport from bet data
-    const getSportFromBet = (bet) => {
-      if (bet.sport) {
-        return bet.sport
-      }
-      
-      const homeTeam = bet.gameData?.homeTeam?.toLowerCase() || ''
-      const awayTeam = bet.gameData?.awayTeam?.toLowerCase() || ''
-      
-      const nflTeams = ['commanders', 'chiefs', 'cowboys', 'giants', 'eagles', 'washington', 'kansas city', 'dallas', 'new york', 'philadelphia', 'patriots', 'bills', 'dolphins', 'jets', 'ravens', 'bengals', 'browns', 'steelers', 'texans', 'colts', 'jaguars', 'titans', 'broncos', 'raiders', 'chargers', 'cardinals', 'rams', '49ers', 'seahawks', 'packers', 'bears', 'lions', 'vikings', 'falcons', 'panthers', 'saints', 'buccaneers']
-      if (nflTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
-        return 'nfl'
-      }
-      
-      const nbaTeams = ['lakers', 'kings', 'clippers', 'trail blazers', 'cavaliers', 'pistons', '76ers', 'magic', 'bulls', 'hawks', 'timberwolves', 'nuggets', 'warriors', 'celtics', 'heat', 'knicks', 'nets', 'raptors', 'bucks', 'pacers', 'hornets', 'wizards', 'thunder', 'mavericks', 'rockets', 'grizzlies', 'pelicans', 'spurs', 'suns', 'jazz', 'blazers']
-      if (nbaTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
-        return 'nba'
-      }
-      
-      const ncaaBasketballTeams = ['duke', 'kentucky', 'north carolina', 'kansas', 'villanova', 'gonzaga', 'michigan state', 'michigan', 'ohio state', 'indiana', 'purdue', 'wisconsin', 'maryland', 'illinois', 'iowa', 'minnesota', 'nebraska', 'northwestern', 'rutgers', 'penn state']
-      if (ncaaBasketballTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
-        return 'ncaa-basketball'
-      }
-      
-      const ncaaFootballTeams = ['alabama', 'auburn', 'georgia', 'florida', 'tennessee', 'lsu', 'texas a&m', 'ole miss', 'mississippi state', 'arkansas', 'missouri', 'kentucky', 'vanderbilt', 'south carolina', 'ohio state', 'michigan', 'penn state', 'michigan state', 'wisconsin', 'iowa']
-      if (ncaaFootballTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
-        return 'ncaa-football'
-      }
-      
-      return 'nba'
-    }
 
-    // Fetch live scores for all bets
+    // Only open wagers can change - settled results already come from the API
+    const liveCandidates = computed(() =>
+      friendsBets.value.filter(({ bet }) => bet.status === 'pending'))
+
+    const trackedGames = computed(() => liveCandidates.value.map(({ bet }) => ({
+      gameId: bet.gameId,
+      sport: getSportFromBet(bet),
+      gameStartTime: bet.gameData?.gameStartTime || null
+    })))
+
+    // Fetch live scores for open wagers
     const fetchLiveScores = async () => {
-      if (!friendsBets.value.length) return
+      if (!liveCandidates.value.length) return
 
       try {
         const betsBySport = {}
-        friendsBets.value.forEach(({ bet }) => {
+        liveCandidates.value.forEach(({ bet }) => {
           const sport = getSportFromBet(bet)
           if (!betsBySport[sport]) {
             betsBySport[sport] = []
@@ -495,16 +477,26 @@ export default {
       }
     }
 
-    // Start periodic refresh for live scores
-    const startLiveScoreRefresh = () => {
-      fetchLiveScores()
-      refreshInterval.value = setInterval(fetchLiveScores, 10000)
+    // Cadence follows what's in play rather than a fixed 10s - see pollCadence
+    const scheduleLiveScoreRefresh = () => {
+      stopLiveScoreRefresh()
+      const delay = nextPollDelay(trackedGames.value, liveScores.value)
+      if (delay === null) return
+      refreshInterval.value = setTimeout(async () => {
+        await fetchLiveScores()
+        scheduleLiveScoreRefresh()
+      }, delay)
+    }
+
+    const startLiveScoreRefresh = async () => {
+      await fetchLiveScores()
+      scheduleLiveScoreRefresh()
     }
 
     // Stop live score refresh
     const stopLiveScoreRefresh = () => {
       if (refreshInterval.value) {
-        clearInterval(refreshInterval.value)
+        clearTimeout(refreshInterval.value)
         refreshInterval.value = null
       }
     }

@@ -42,7 +42,9 @@ watch(theme, (mode) => {
   }
 })
 
-const LABELS = { system: 'System', light: 'Light', dark: 'Dark' }
+// 'Auto' reads better in the menu than 'System'; the mode key stays `system`
+// so themes already in localStorage keep working.
+const LABELS = { system: 'Auto', light: 'Light', dark: 'Dark' }
 
 export function useTheme() {
   const themeLabel = computed(() => LABELS[theme.value])

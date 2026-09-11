@@ -57,8 +57,16 @@
 
         <!-- User Info -->
         <div v-else class="user-section">
-          <div class="user-menu-container" @click.stop="toggleUserMenu">
-            <div class="user-info">
+          <div class="user-menu-container">
+            <div
+              class="user-info"
+              @click.stop="toggleUserMenu"
+              role="button"
+              tabindex="0"
+              :aria-expanded="isUserMenuOpen"
+              @keydown.enter.prevent="toggleUserMenu"
+              @keydown.space.prevent="toggleUserMenu"
+            >
               <div class="user-avatar">
                 <span class="avatar-text">{{ currentUser.username.charAt(0).toUpperCase() }}</span>
               </div>
@@ -71,10 +79,23 @@
               </svg>
             </div>
             <div v-if="isUserMenuOpen" class="user-dropdown">
-              <button @click="cycleTheme" class="dropdown-item theme-item">
-                <svg class="theme-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="3.25" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M8 1.25v1.5M8 13.25v1.5M14.75 8h-1.5M2.75 8h-1.5M12.77 3.23l-1.06 1.06M4.29 11.71l-1.06 1.06M12.77 12.77l-1.06-1.06M4.29 4.29L3.23 3.23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- .stop so cycling through the three modes doesn't shut the
+                   menu on the first click -->
+              <button
+                @click.stop="cycleTheme"
+                class="dropdown-item theme-item"
+                :aria-label="`Appearance: ${themeLabel}. Click to change.`"
+              >
+                <svg class="theme-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <template v-if="theme === 'light'">
+                    <circle cx="8" cy="8" r="3.25" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 1.25v1.5M8 13.25v1.5M14.75 8h-1.5M2.75 8h-1.5M12.77 3.23l-1.06 1.06M4.29 11.71l-1.06 1.06M12.77 12.77l-1.06-1.06M4.29 4.29L3.23 3.23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </template>
+                  <path v-else-if="theme === 'dark'" d="M13.4 9.7A5.8 5.8 0 0 1 6.3 2.6 5.75 5.75 0 1 0 13.4 9.7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <template v-else>
+                    <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 2.5a5.5 5.5 0 0 1 0 11Z" fill="currentColor"/>
+                  </template>
                 </svg>
                 <span>Appearance</span>
                 <span class="theme-value">{{ themeLabel }}</span>
@@ -232,7 +253,7 @@ export default {
   emits: ['change-page'],
   setup(props, { emit }) {
     const userStore = useUserStore()
-    const { themeLabel, cycleTheme } = useTheme()
+    const { theme, themeLabel, cycleTheme } = useTheme()
     const isMobileMenuOpen = ref(false)
     const isUserMenuOpen = ref(false)
     const isSuggestionsModalOpen = ref(false)
@@ -321,6 +342,7 @@ export default {
     })
 
     return {
+      theme,
       themeLabel,
       cycleTheme,
       isAuthenticated,
@@ -566,7 +588,7 @@ export default {
   border-radius: var(--radius-md);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid var(--color-border);
-  min-width: 160px;
+  min-width: 200px;
   padding: 0.25rem 0;
   z-index: 1000;
   animation: slideDown 0.2s ease;
@@ -586,6 +608,7 @@ export default {
 .dropdown-item {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.625rem 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -634,9 +657,30 @@ export default {
 
 .theme-value {
   margin-left: auto;
+  padding: 2px 6px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--color-text-subtle);
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.theme-item .theme-icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.theme-item:hover .theme-value {
+  border-color: var(--color-text-subtle);
+  color: var(--color-text);
+}
+
+.theme-item:hover .theme-icon {
+  color: var(--color-text);
 }
 
 .theme-btn-mobile {
@@ -654,7 +698,6 @@ export default {
 .logout-item {
   color: var(--color-danger);
   font-weight: 600;
-  gap: 0.5rem;
 }
 
 .logout-item:hover {
@@ -669,7 +712,6 @@ export default {
 .suggestions-item {
   color: var(--color-primary);
   font-weight: 600;
-  gap: 0.5rem;
 }
 
 .suggestions-item:hover {

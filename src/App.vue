@@ -41,6 +41,7 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useUserStore } from './stores/userStore.js'
+import { useWagerSync } from './composables/useWagerSync.js'
 import { FEATURES } from './config/features.js'
 import Navigation from './components/Navigation.vue'
 import ScoreboardPage from './components/ScoreboardPage.vue'
@@ -69,6 +70,10 @@ export default {
     const userStore = useUserStore()
     // Initialize user session on app start
     userStore.initializeStore()
+
+    // Keeps balances and bet statuses in step with the server's resolver, on
+    // every page - without it a bet stays "pending" on screen until a reload
+    useWagerSync()
     
     // Check for invite code in URL - if present and user not authenticated, go to auth page
     const urlParams = new URLSearchParams(window.location.search)

@@ -30,7 +30,7 @@ export const formatAmerican = (odds) => {
 /**
  * Display form of a bet's line: "-3.5", "+3.5", "o44.5", "u44.5".
  *
- * Was duplicated verbatim in BetSlip, ParlayCard, ParlayHistory and LiveBets.
+ * Was duplicated verbatim in BetSlip, ParlayCard, ParlayHistory and OpenBets.
  * BetCard had its own copy that ran the line through Math.abs(), so a
  * favourite's minus sign was dropped and "-3.5" and "+3.5" both displayed as
  * "3.5" — that copy is gone.
